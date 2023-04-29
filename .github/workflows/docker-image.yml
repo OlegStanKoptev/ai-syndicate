@@ -1,0 +1,23 @@
+name: Deployment
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Remove containers
+      run: docker compose rm -f
+    
+    - name: Build and run the Docker image
+      run: docker compose up -d --build

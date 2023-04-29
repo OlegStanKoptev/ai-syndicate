@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    restart: always
+    depends_on:
+      - server
+      - client
+    ports:
+      - "8085:80"
+
+  server:
+    build:
+      dockerfile: Dockerfile
+      context: ./server
+    restart: always
+
+  client:
+    build:
+      dockerfile: Dockerfile
+      context: ./client
+    restart: always
