@@ -78,6 +78,10 @@ export default function Private() {
           data.user && data.user.role === "admin"
             ? [
                 {
+                  path: "startups",
+                  name: "Startups",
+                },
+                {
                   path: "users",
                   name: "Users",
                 },

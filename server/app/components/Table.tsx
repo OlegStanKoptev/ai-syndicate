@@ -98,7 +98,7 @@ export default function Table<
             <tr
               key={row.id}
               onClick={onRowClick ? () => onRowClick({ row }) : undefined}
-              className="flex cursor-pointer hover:bg-blue-100"
+              className="flex hover:bg-blue-100"
             >
               {columns.map(({ id, cell, width = defaultColumnWidth }) => {
                 return (

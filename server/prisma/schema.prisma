@@ -18,12 +18,14 @@ enum UserRole {
 }
 
 model User {
-  id              String   @id @default(cuid())
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  role            UserRole
-  balance         Int?
-  email           String   @unique
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role    UserRole
+  balance Int?
+
+  email           String  @unique
   passwordHash    String
   fullName        String
   avatarImageFile String?
@@ -36,4 +38,28 @@ model User {
   actualAddress   String?
   website         String?
   phone           String?
+
+  startupsCreated Startup[]
+}
+
+enum StartupStatus {
+  verification
+}
+
+model Startup {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status      StartupStatus
+  startuperId String
+
+  name              String
+  description       String
+  logoFile          String?
+  specificationFile String
+  businessPlanFile  String?
+  presentationFile  String?
+
+  startuper User @relation(fields: [startuperId], references: [id])
 }

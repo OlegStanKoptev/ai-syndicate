@@ -1,4 +1,4 @@
-import type { UserRole } from "@prisma/client";
+import type { StartupStatus, UserRole } from "@prisma/client";
 import { useSearchParams, useTransition } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { FieldValues, Path, UseFormSetFocus } from "react-hook-form";
@@ -9,6 +9,13 @@ import invariant from "tiny-invariant";
 
 export const orderByValues = ["desc", "asc"] as const;
 export type OrderBy = (typeof orderByValues)[number];
+
+export const startupStatuses: readonly [StartupStatus, ...StartupStatus[]] = [
+  "verification",
+];
+export const startupStatusNames: { [K in StartupStatus]: string } = {
+  verification: "Verification",
+};
 
 export const userRoles: readonly [UserRole, ...UserRole[]] = [
   "admin",
@@ -175,10 +182,12 @@ export function prepareTable<T extends string, U extends T>({
   return { columns, sortKeys, prepareColumn };
 }
 
-export type User = { id: string; email: string; fullName: string } & (
-  | { role: "admin" }
-  | { role: "user"; balance: number }
-);
+export type User = {
+  id: string;
+  email: string;
+  fullName: string;
+  avatarImageFile: string | null;
+} & ({ role: "admin" } | { role: "user"; balance: number });
 
 export function parseUser(user: DbUser): User {
   switch (user.role) {
@@ -188,6 +197,7 @@ export function parseUser(user: DbUser): User {
         role: "admin",
         email: user.email,
         fullName: user.fullName,
+        avatarImageFile: user.avatarImageFile,
       };
     case "user":
       invariant(typeof user.balance === "number");
@@ -196,6 +206,7 @@ export function parseUser(user: DbUser): User {
         role: "user",
         email: user.email,
         fullName: user.fullName,
+        avatarImageFile: user.avatarImageFile,
         balance: user.balance,
       };
     default:
