@@ -6,6 +6,7 @@ import {
   validateRegistryParams,
 } from "~/utils.server";
 import type { TableColumn } from "~/components";
+import { LinkButton } from "~/components";
 import {
   ExpectedError,
   Pagination,
@@ -24,8 +25,8 @@ import type { OrderBy } from "~/utils";
 import type { User } from "@prisma/client";
 
 const { columns, sortKeys, prepareColumn } = prepareTable({
-  columns: ["id", "fullName", "email", "role", "phone", "shortOrgName"],
-  sortKeys: ["fullName", "email", "role", "phone", "shortOrgName"],
+  columns: ["id", "fullName", "email", "role", "shortOrgName"],
+  sortKeys: ["fullName", "email", "role", "shortOrgName"],
 });
 
 type SortableColumnKey = (typeof sortKeys)[number];
@@ -109,7 +110,6 @@ export default function UsersIndex() {
     },
     { ...prepareColumn("fullName"), header: "Full name" },
     { ...prepareColumn("email"), header: "Email", width: 225 },
-    { ...prepareColumn("phone"), header: "Phone" },
     { ...prepareColumn("shortOrgName"), header: "Short org name" },
   ];
   return (
@@ -121,6 +121,9 @@ export default function UsersIndex() {
             ({data.from}-{data.to} out of {data.totalUsers})
           </span>
         </h1>
+        <LinkButton to="new-expert" size="sm">
+          Create expert
+        </LinkButton>
       </div>
       <div className="flex">
         <Table

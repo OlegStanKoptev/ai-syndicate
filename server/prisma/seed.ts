@@ -29,6 +29,14 @@ async function seed() {
       balance: 0,
     },
   });
+  await db.user.create({
+    data: {
+      role: "expert",
+      email: "expert@expert.com",
+      passwordHash: await bcrypt.hash("expert", 10),
+      fullName: "Expert Expertov",
+    },
+  });
 
   await db.startup.create({
     data: {

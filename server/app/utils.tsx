@@ -186,8 +186,11 @@ export type User = {
   id: string;
   email: string;
   fullName: string;
-  avatarImageFile: string | null;
-} & ({ role: "admin" } | { role: "user"; balance: number });
+} & (
+  | { role: "admin" }
+  | { role: "user"; balance: number; avatarImageFile: string | null }
+  | { role: "expert" }
+);
 
 export function parseUser(user: DbUser): User {
   switch (user.role) {
@@ -197,7 +200,6 @@ export function parseUser(user: DbUser): User {
         role: "admin",
         email: user.email,
         fullName: user.fullName,
-        avatarImageFile: user.avatarImageFile,
       };
     case "user":
       invariant(typeof user.balance === "number");
@@ -208,6 +210,13 @@ export function parseUser(user: DbUser): User {
         fullName: user.fullName,
         avatarImageFile: user.avatarImageFile,
         balance: user.balance,
+      };
+    case "expert":
+      return {
+        id: user.id,
+        role: "expert",
+        email: user.email,
+        fullName: user.fullName,
       };
     default:
       invariant(false, `Wrong user role: ${user.role}`);

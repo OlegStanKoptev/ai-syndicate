@@ -57,19 +57,20 @@ export default function UserIndex() {
         <div>
           <CardField name="Full name">{data.user.fullName}</CardField>
           <CardField name="Email">{data.user.email}</CardField>
-          <CardField name="Phone">{data.user.phone}</CardField>
-          <CardField name="Avatar image file">
-            {data.user.avatarImageFile ? (
-              <a
-                href={`/files/${data.user.avatarImageFile}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-400"
-              >
-                {data.user.avatarImageFile}
-              </a>
-            ) : null}
-          </CardField>
+          {(data.user.role === "user" || data.user.role === "developer") && (
+            <CardField name="Avatar image file">
+              {data.user.avatarImageFile ? (
+                <a
+                  href={`/files/${data.user.avatarImageFile}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-400"
+                >
+                  {data.user.avatarImageFile}
+                </a>
+              ) : null}
+            </CardField>
+          )}
           <CardField name="Role">{userRoleNames[data.user.role]}</CardField>
           {data.user.role === "developer" && (
             <>

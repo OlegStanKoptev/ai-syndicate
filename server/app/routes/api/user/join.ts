@@ -9,7 +9,6 @@ const requestBodySchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(32),
   fullName: z.string().min(1),
-  phone: z.string().optional().nullable(),
   avatarImageFile: z.string().optional().nullable(),
 });
 
@@ -43,7 +42,6 @@ export const action: ActionFunction = async ({ request }) => {
         email: validatedData.email,
         passwordHash: await bycript.hash(validatedData.password, 10),
         fullName: validatedData.fullName,
-        phone: validatedData.phone,
         avatarImageFile: validatedData.avatarImageFile,
         balance: 0,
       },

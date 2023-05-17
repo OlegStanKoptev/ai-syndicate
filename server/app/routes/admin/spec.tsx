@@ -56,6 +56,10 @@ export default function Spec() {
             body: { email: "investor@investor.com", password: "investor" },
           },
           {
+            name: "As expert",
+            body: { email: "expert@expert.com", password: "expert" },
+          },
+          {
             name: "As admin",
             body: { email: "admin@admin.com", password: "admin" },
           },
@@ -82,7 +86,6 @@ export default function Spec() {
               email: "user1337@user1337.com",
               password: "user1337",
               fullName: "User 1337",
-              phone: null,
               avatarImageFile: null,
             },
           },
