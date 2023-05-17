@@ -3,7 +3,6 @@ import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
 import bycript from "bcryptjs";
-import type { User } from "~/utils";
 import { parseUser } from "~/utils";
 
 const requestBodySchema = z.object({
@@ -14,7 +13,7 @@ const requestBodySchema = z.object({
   avatarImageFile: z.string().optional().nullable(),
 });
 
-type ActionData = User;
+type ActionData = { id: string };
 
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.json();
@@ -50,5 +49,5 @@ export const action: ActionFunction = async ({ request }) => {
       },
     })
   );
-  return json<ActionData>(user);
+  return json<ActionData>({ id: user.id });
 };

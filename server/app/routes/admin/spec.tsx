@@ -1,12 +1,31 @@
-import type { ActionFunction, MetaFunction } from "@remix-run/node";
-import { Link, useFetcher } from "@remix-run/react";
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { InputWrapper } from "~/components";
-import { useHydrated } from "~/utils";
+import { db } from "~/db.server";
+import { deserialize, serialize, startupStatuses, useHydrated } from "~/utils";
 
 export const action: ActionFunction = async () => {
   return null;
+};
+
+type LoaderData = {
+  exampleStartupId: string;
+  exampleStartuperId: string;
+};
+
+export const loader: LoaderFunction = async () => {
+  const startup = await db.startup.findFirst();
+  const startuper = await db.user.findFirst({ where: { role: "user" } });
+  return serialize<LoaderData>({
+    exampleStartupId: startup ? startup.id : "",
+    exampleStartuperId: startuper ? startuper.id : "",
+  });
 };
 
 export const handle = {
@@ -20,6 +39,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Spec() {
+  const data = deserialize<LoaderData>(useLoaderData());
   return (
     <main className="m-5">
       <h1 className="mt-14 font-bold text-lg">User</h1>
@@ -78,6 +98,51 @@ export default function Spec() {
             body: { amount: 50 },
           },
         ]}
+      />
+      <h1 className="mt-14 font-bold text-lg">Startup</h1>
+      <Endpoint
+        method="get"
+        route="/api/startup/{startupId}"
+        examples={[
+          { name: "Example", path: { startupId: data.exampleStartupId } },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/new"
+        examples={[
+          {
+            name: "Example",
+            body: {
+              name: "Startup with AI",
+              description: "Please invest",
+              logoFile: null,
+              specificationFile: "tz4.pdf",
+              businessPlanFile: null,
+              presentationFile: null,
+            },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="get"
+        route="/api/startup/search"
+        examples={[
+          { name: "All" },
+          { name: "With pagination", search: { page: 1, size: 10 } },
+          {
+            name: "With filters",
+            comment: `Statuses: ${startupStatuses}`,
+            search: { status: "verification" },
+          },
+          {
+            name: "For startupers",
+            search: { startuperId: data.exampleStartuperId },
+          },
+        ]}
+        className="mt-4"
       />
       <h1 className="mt-14 font-bold text-lg">Files</h1>
       <Endpoint

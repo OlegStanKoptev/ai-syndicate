@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { FieldValues, Path, UseFormSetFocus } from "react-hook-form";
 import { useSpinDelay } from "~/components";
 import superjson from "superjson";
-import type { User as DbUser } from "@prisma/client";
+import type { User as DbUser, Startup as DbStartup } from "@prisma/client";
 import invariant from "tiny-invariant";
 
 export const orderByValues = ["desc", "asc"] as const;
@@ -210,6 +210,40 @@ export function parseUser(user: DbUser): User {
         balance: user.balance,
       };
     default:
-      invariant(false, `wrong user role: ${user.role}`);
+      invariant(false, `Wrong user role: ${user.role}`);
+  }
+}
+
+export type Startup = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  startuperId: string;
+  name: string;
+  description: string;
+  logoFile: string | null;
+  specificationFile: string;
+  businessPlanFile: string | null;
+  presentationFile: string | null;
+} & { status: "verification" };
+
+export function parseStartup(startup: DbStartup): Startup {
+  switch (startup.status) {
+    case "verification":
+      return {
+        id: startup.id,
+        status: "verification",
+        createdAt: startup.createdAt,
+        updatedAt: startup.updatedAt,
+        startuperId: startup.startuperId,
+        name: startup.name,
+        description: startup.description,
+        logoFile: startup.logoFile,
+        specificationFile: startup.specificationFile,
+        businessPlanFile: startup.businessPlanFile,
+        presentationFile: startup.presentationFile,
+      };
+    default:
+      invariant(false, `Wrong startup status: ${startup.status}`);
   }
 }
