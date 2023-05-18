@@ -83,7 +83,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       status: 400,
     });
   }
-  const startups = await db.startup.findMany({
+  const startups: any = await db.startup.findMany({
     where,
     orderBy: (() => {
       if (!sortKey) {

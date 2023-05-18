@@ -21,6 +21,7 @@ export const startupStatusNames: { [K in StartupStatus]: string } = {
   financing: "Financing",
   financing_failed: "Financing failed",
   financing_succeded: "Financing succeded",
+  developerApplication: "Developer application",
 };
 
 export const userRoles: readonly [UserRole, ...UserRole[]] = [
