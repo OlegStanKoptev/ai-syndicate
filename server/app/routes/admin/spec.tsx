@@ -167,6 +167,20 @@ export default function Spec() {
         ]}
         className="mt-4"
       />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/financing_succeded/confirm"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+            body: {
+              developerApplicationDeadline: new Date(2023, 6, 7),
+            },
+          },
+        ]}
+        className="mt-4"
+      />
       <h1 className="mt-14 font-bold text-lg">Files</h1>
       <Endpoint
         method="post"

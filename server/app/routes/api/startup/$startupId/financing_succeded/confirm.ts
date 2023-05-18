@@ -6,7 +6,7 @@ import { requireCurrentApiUser } from "~/utils.server";
 import invariant from "tiny-invariant";
 
 const requestBodySchema = z.object({
-  financingDeadline: z.preprocess(
+  developerApplicationDeadline: z.preprocess(
     (val) => (typeof val == "string" ? new Date(val) : undefined),
     z.date()
   ),
@@ -22,11 +22,11 @@ export const action: ActionFunction = async ({ request, params }) => {
       { status: 404 }
     );
   }
-  if (startupData.status !== "verification_succeded") {
+  if (startupData.status !== "financing_succeded") {
     return json(
       {
         message:
-          "You can only do this for startups that are in 'verification_succeded' status",
+          "You can only do this for startups that are in 'financing_succeded' status",
       },
       { status: 409 }
     );
@@ -47,8 +47,8 @@ export const action: ActionFunction = async ({ request, params }) => {
   await db.startup.update({
     where: { id: startupId },
     data: {
-      status: "financing",
-      financingDeadline: validatedData.financingDeadline,
+      status: "developerApplication",
+      developerApplicationDeadline: validatedData.developerApplicationDeadline,
     },
   });
   return new Response();

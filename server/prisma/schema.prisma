@@ -51,6 +51,7 @@ enum StartupStatus {
   financing
   financing_failed
   financing_succeded
+  developerApplication
 }
 
 model Startup {
@@ -68,7 +69,8 @@ model Startup {
   businessPlanFile  String?
   presentationFile  String?
 
-  financingDeadline DateTime?
+  financingDeadline            DateTime?
+  developerApplicationDeadline DateTime?
 
   startuper       User             @relation(fields: [startuperId], references: [id])
   investments     Investment[]

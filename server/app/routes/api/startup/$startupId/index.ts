@@ -47,7 +47,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           startup.status === "verification_succeded" ||
           startup.status === "financing" ||
           startup.status === "financing_failed" ||
-          startup.status === "financing_succeded"
+          startup.status === "financing_succeded" ||
+          startup.status === "developerApplication"
         )
       ) {
         return null;
@@ -100,7 +101,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           startup.status === "verification_succeded" ||
           startup.status === "financing" ||
           startup.status === "financing_failed" ||
-          startup.status === "financing_succeded"
+          startup.status === "financing_succeded" ||
+          startup.status === "developerApplication"
         )
       ) {
         return null;
@@ -112,7 +114,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         !(
           startup.status === "financing" ||
           startup.status === "financing_failed" ||
-          startup.status === "financing_succeded"
+          startup.status === "financing_succeded" ||
+          startup.status === "developerApplication"
         )
       ) {
         return null;
@@ -144,7 +147,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       return {};
     })(),
     financing_succeded: await (async () => {
-      if (!(startup.status === "financing_succeded")) {
+      if (
+        !(
+          startup.status === "financing_succeded" ||
+          startup.status === "developerApplication"
+        )
+      ) {
+        return null;
+      }
+      return {};
+    })(),
+    developerApplication: await (async () => {
+      if (!(startup.status === "developerApplication")) {
         return null;
       }
       return {};

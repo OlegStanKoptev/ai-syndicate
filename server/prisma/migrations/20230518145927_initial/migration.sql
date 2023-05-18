@@ -2,7 +2,7 @@
 CREATE TYPE "UserRole" AS ENUM ('user', 'expert', 'admin', 'developer');
 
 -- CreateEnum
-CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded');
+CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded', 'developerApplication');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -43,6 +43,7 @@ CREATE TABLE "Startup" (
     "businessPlanFile" TEXT,
     "presentationFile" TEXT,
     "financingDeadline" TIMESTAMP(3),
+    "developerApplicationDeadline" TIMESTAMP(3),
 
     CONSTRAINT "Startup_pkey" PRIMARY KEY ("id")
 );
