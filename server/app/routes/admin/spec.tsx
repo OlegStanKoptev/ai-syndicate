@@ -1,38 +1,12 @@
-import type {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import type { ActionFunction, MetaFunction } from "@remix-run/node";
+import { Link, useFetcher } from "@remix-run/react";
 import { useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { InputWrapper } from "~/components";
-import { db } from "~/db.server";
-import { deserialize, serialize, startupStatuses, useHydrated } from "~/utils";
+import { startupStatuses, useHydrated } from "~/utils";
 
 export const action: ActionFunction = async () => {
   return null;
-};
-
-type LoaderData = {
-  exampleStartupId: string;
-  exampleStartuperId: string;
-  exampleVerificationStartupId: string;
-};
-
-export const loader: LoaderFunction = async () => {
-  const startup = await db.startup.findFirst();
-  const startuper = await db.user.findFirst({ where: { role: "user" } });
-  const startupVerification = await db.startup.findFirst({
-    where: { status: "verification" },
-  });
-  return serialize<LoaderData>({
-    exampleStartupId: startup ? startup.id : "",
-    exampleStartuperId: startuper ? startuper.id : "",
-    exampleVerificationStartupId: startupVerification
-      ? startupVerification.id
-      : "",
-  });
 };
 
 export const handle = {
@@ -46,7 +20,6 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Spec() {
-  const data = deserialize<LoaderData>(useLoaderData());
   return (
     <main className="m-5">
       <h1 className="mt-14 font-bold text-lg">User</h1>
@@ -113,9 +86,7 @@ export default function Spec() {
       <Endpoint
         method="get"
         route="/api/startup/{startupId}"
-        examples={[
-          { name: "Example", path: { startupId: data.exampleStartupId } },
-        ]}
+        examples={[{ name: "Example", path: { startupId: "" } }]}
         className="mt-4"
       />
       <Endpoint
@@ -131,6 +102,7 @@ export default function Spec() {
               specificationFile: "tz4.pdf",
               businessPlanFile: null,
               presentationFile: null,
+              targetFinancing: 300,
             },
           },
         ]}
@@ -149,7 +121,7 @@ export default function Spec() {
           },
           {
             name: "For startupers",
-            search: { startuperId: data.exampleStartuperId },
+            search: { startuperId: "" },
           },
         ]}
         className="mt-4"
@@ -160,12 +132,12 @@ export default function Spec() {
         examples={[
           {
             name: "Yea",
-            path: { startupId: data.exampleVerificationStartupId },
+            path: { startupId: "" },
             body: { yea: true },
           },
           {
             name: "Nay",
-            path: { startupId: data.exampleVerificationStartupId },
+            path: { startupId: "" },
             body: { yea: false, nayReason: "Bad idea" },
           },
         ]}
@@ -179,8 +151,21 @@ export default function Spec() {
             name: "Example",
             path: { startupId: "" },
             body: {
-              targetFinancing: 100,
               financingDeadline: new Date(2023, 6, 1),
+            },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/financing/invest"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+            body: {
+              amount: 0,
             },
           },
         ]}

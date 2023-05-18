@@ -1,14 +1,7 @@
-import type { Startup, User, VoteNewStartup } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import { db } from "~/db.server";
-
-type LoaderData = Startup & {
-  newStartupVotes: (VoteNewStartup & {
-    expert: User;
-  })[];
-};
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { startupId } = params;
@@ -20,9 +13,6 @@ export const loader: LoaderFunction = async ({ params }) => {
       { status: 404 }
     );
   }
-  const newStartupVotes = await db.voteNewStartup.findMany({
-    where: { startupId },
-    include: { expert: true },
-  });
-  return json<LoaderData>({ ...startup, newStartupVotes });
+
+  return json(startup);
 };

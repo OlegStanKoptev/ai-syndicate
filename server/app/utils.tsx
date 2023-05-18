@@ -19,6 +19,8 @@ export const startupStatusNames: { [K in StartupStatus]: string } = {
   verification_failed: "Verification failed",
   verification_succeded: "Verification succeded",
   financing: "Financing",
+  financing_failed: "Financing failed",
+  financing_succeded: "Financing succeded",
 };
 
 export const userRoles: readonly [UserRole, ...UserRole[]] = [

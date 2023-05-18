@@ -41,6 +41,7 @@ model User {
 
   startupsCreated Startup[]
   votesNewStartup VoteNewStartup[]
+  investments     Investment[]
 }
 
 enum StartupStatus {
@@ -48,6 +49,8 @@ enum StartupStatus {
   verification_failed
   verification_succeded
   financing
+  financing_failed
+  financing_succeded
 }
 
 model Startup {
@@ -57,7 +60,7 @@ model Startup {
 
   status            StartupStatus
   startuperId       String
-  targetFinancing   Int?
+  targetFinancing   Int
   financingDeadline DateTime?
 
   name              String
@@ -67,7 +70,8 @@ model Startup {
   businessPlanFile  String?
   presentationFile  String?
 
-  startuper User @relation(fields: [startuperId], references: [id])
+  startuper   User         @relation(fields: [startuperId], references: [id])
+  investments Investment[]
 }
 
 model VoteNewStartup {
@@ -83,4 +87,16 @@ model VoteNewStartup {
   expert User @relation(fields: [expertId], references: [id])
 
   @@unique([startupId, expertId])
+}
+
+model Investment {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  amount     Int
+  investorId String
+  startupId  String
+
+  investor User    @relation(fields: [investorId], references: [id])
+  startup  Startup @relation(fields: [startupId], references: [id])
 }

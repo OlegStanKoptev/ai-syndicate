@@ -225,3 +225,11 @@ export function validateRegistryParams<T extends string>(
     }) ?? "desc";
   return { page, size, sortKey, orderBy };
 }
+
+export async function getStartupTotalFinancing(id: string) {
+  const investmentAggregation = await db.investment.aggregate({
+    where: { startupId: id },
+    _sum: { amount: true },
+  });
+  return investmentAggregation._sum.amount ?? 0;
+}

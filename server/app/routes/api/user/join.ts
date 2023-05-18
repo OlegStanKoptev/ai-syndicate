@@ -11,8 +11,6 @@ const requestBodySchema = z.object({
   avatarImageFile: z.string().optional().nullable(),
 });
 
-type ActionData = { id: string };
-
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.json();
   const dataValidationResult = requestBodySchema.safeParse(data);
@@ -44,5 +42,5 @@ export const action: ActionFunction = async ({ request }) => {
       balance: 0,
     },
   });
-  return json<ActionData>({ id: user.id });
+  return json({ id: user.id });
 };

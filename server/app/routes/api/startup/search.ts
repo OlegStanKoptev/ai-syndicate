@@ -4,21 +4,6 @@ import { z } from "zod";
 import { db } from "~/db.server";
 import { startupStatuses } from "~/utils";
 
-type LoaderData = {
-  size: number;
-  page: number;
-  total: number;
-  totalPages: number;
-  from: number;
-  to: number;
-  data: {
-    id: string;
-    name: string;
-    description: string;
-    logoFile: string | null;
-  }[];
-};
-
 const searchSchema = z.object({
   page: z.preprocess(
     (val) => (val ? Number(val) : undefined),
@@ -65,7 +50,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     take: size,
     select: { id: true, name: true, description: true, logoFile: true },
   });
-  return json<LoaderData>({
+  return json({
     size,
     page,
     total,

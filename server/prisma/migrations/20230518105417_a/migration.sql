@@ -2,7 +2,7 @@
 CREATE TYPE "UserRole" AS ENUM ('user', 'expert', 'admin', 'developer');
 
 -- CreateEnum
-CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing');
+CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -35,7 +35,7 @@ CREATE TABLE "Startup" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "status" "StartupStatus" NOT NULL,
     "startuperId" TEXT NOT NULL,
-    "targetFinancing" INTEGER,
+    "targetFinancing" INTEGER NOT NULL,
     "financingDeadline" TIMESTAMP(3),
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -60,6 +60,18 @@ CREATE TABLE "VoteNewStartup" (
     CONSTRAINT "VoteNewStartup_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Investment" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "investorId" TEXT NOT NULL,
+    "startupId" TEXT NOT NULL,
+
+    CONSTRAINT "Investment_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -71,3 +83,9 @@ ALTER TABLE "Startup" ADD CONSTRAINT "Startup_startuperId_fkey" FOREIGN KEY ("st
 
 -- AddForeignKey
 ALTER TABLE "VoteNewStartup" ADD CONSTRAINT "VoteNewStartup_expertId_fkey" FOREIGN KEY ("expertId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Investment" ADD CONSTRAINT "Investment_investorId_fkey" FOREIGN KEY ("investorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Investment" ADD CONSTRAINT "Investment_startupId_fkey" FOREIGN KEY ("startupId") REFERENCES "Startup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

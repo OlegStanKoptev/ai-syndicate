@@ -11,9 +11,8 @@ const requestBodySchema = z.object({
   specificationFile: z.string().min(1),
   businessPlanFile: z.string().optional().nullable(),
   presentationFile: z.string().optional().nullable(),
+  targetFinancing: z.number().int().positive(),
 });
-
-type ActionData = { id: string };
 
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.json();
@@ -42,7 +41,8 @@ export const action: ActionFunction = async ({ request }) => {
       specificationFile: validatedData.specificationFile,
       businessPlanFile: validatedData.businessPlanFile,
       presentationFile: validatedData.presentationFile,
+      targetFinancing: validatedData.targetFinancing,
     },
   });
-  return json<ActionData>({ id: startup.id });
+  return json({ id: startup.id });
 };

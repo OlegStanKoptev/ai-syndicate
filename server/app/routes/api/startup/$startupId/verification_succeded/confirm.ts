@@ -6,15 +6,8 @@ import { requireCurrentUserForApi } from "~/utils.server";
 import invariant from "tiny-invariant";
 
 const requestBodySchema = z.object({
-  targetFinancing: z.preprocess(
-    (val) => (val ? Number(val) : undefined),
-    z.number().int().positive()
-  ),
   financingDeadline: z.preprocess(
-    (val) =>
-      (typeof val == "string" && val) || val instanceof Date
-        ? new Date(val)
-        : undefined,
+    (val) => (typeof val == "string" ? new Date(val) : undefined),
     z.date()
   ),
   nayReason: z.string().optional().nullable(),
@@ -57,7 +50,6 @@ export const action: ActionFunction = async ({ request, params }) => {
     data: {
       status: "financing",
       financingDeadline: validatedData.financingDeadline,
-      targetFinancing: validatedData.targetFinancing,
     },
   });
   return new Response();

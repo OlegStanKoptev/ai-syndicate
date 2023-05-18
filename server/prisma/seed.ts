@@ -11,7 +11,7 @@ async function seed() {
       fullName: "Admin Adminov",
     },
   });
-  const startuper = await db.user.create({
+  await db.user.create({
     data: {
       role: "user",
       email: "startuper@startuper.com",
@@ -26,7 +26,7 @@ async function seed() {
       email: "investor@investor.com",
       passwordHash: await bcrypt.hash("investor", 10),
       fullName: "Investor Investorov",
-      balance: 0,
+      balance: 1000,
     },
   });
   await db.user.create({
@@ -35,16 +35,6 @@ async function seed() {
       email: "expert@expert.com",
       passwordHash: await bcrypt.hash("expert", 10),
       fullName: "Expert Expertov",
-    },
-  });
-
-  await db.startup.create({
-    data: {
-      status: "verification",
-      startuperId: startuper.id,
-      name: "Startup 1",
-      description: "This is startup 1",
-      specificationFile: "tz1.pdf",
     },
   });
 }

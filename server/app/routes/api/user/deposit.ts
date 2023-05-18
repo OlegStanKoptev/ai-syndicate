@@ -6,13 +6,8 @@ import { requireCurrentUserForApi } from "~/utils.server";
 import invariant from "tiny-invariant";
 
 const requestBodySchema = z.object({
-  amount: z.preprocess(
-    (val) => (val ? Number(val) : undefined),
-    z.number().int().positive()
-  ),
+  amount: z.number().int().positive(),
 });
-
-type ActionData = { balance: number };
 
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.json();
@@ -32,10 +27,10 @@ export const action: ActionFunction = async ({ request }) => {
     );
   }
   invariant(typeof user.balance === "number");
-  const updatedInvestor = await db.user.update({
+  const investor = await db.user.update({
     where: { id: user.id },
     data: { balance: user.balance + validatedData.amount },
   });
-  invariant(typeof updatedInvestor.balance === "number");
-  return json<ActionData>({ balance: updatedInvestor.balance });
+  invariant(typeof investor.balance === "number");
+  return json({ balance: investor.balance });
 };

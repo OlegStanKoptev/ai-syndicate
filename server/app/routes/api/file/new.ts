@@ -7,10 +7,6 @@ import {
   unstable_parseMultipartFormData,
 } from "@remix-run/node";
 
-type ActionData = {
-  file: string;
-};
-
 export const action: ActionFunction = async ({ request }) => {
   const uploadHandler = unstable_composeUploadHandlers(
     unstable_createFileUploadHandler({
@@ -32,5 +28,5 @@ export const action: ActionFunction = async ({ request }) => {
   if (!file.name) {
     return json({ message: "File is required" }, { status: 400 });
   }
-  return json<ActionData>({ file: file.name });
+  return json({ file: file.name });
 };
