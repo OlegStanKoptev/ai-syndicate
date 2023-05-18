@@ -27,7 +27,7 @@ model User {
 
   email           String  @unique
   passwordHash    String
-  fullName        String
+  fullName        String?
   avatarImageFile String?
   orgName         String?
   shortOrgName    String?
@@ -61,8 +61,6 @@ model Startup {
   status            StartupStatus
   startuperId       String
   targetFinancing   Int
-  financingDeadline DateTime?
-
   name              String
   description       String
   logoFile          String?
@@ -70,8 +68,11 @@ model Startup {
   businessPlanFile  String?
   presentationFile  String?
 
-  startuper   User         @relation(fields: [startuperId], references: [id])
-  investments Investment[]
+  financingDeadline DateTime?
+
+  startuper       User             @relation(fields: [startuperId], references: [id])
+  investments     Investment[]
+  votesNewStartup VoteNewStartup[]
 }
 
 model VoteNewStartup {
@@ -84,7 +85,8 @@ model VoteNewStartup {
   yea       Boolean
   nayReason String?
 
-  expert User @relation(fields: [expertId], references: [id])
+  startup Startup @relation(fields: [startupId], references: [id])
+  expert  User    @relation(fields: [expertId], references: [id])
 
   @@unique([startupId, expertId])
 }

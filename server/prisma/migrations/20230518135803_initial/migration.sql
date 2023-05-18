@@ -13,7 +13,7 @@ CREATE TABLE "User" (
     "balance" INTEGER,
     "email" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
-    "fullName" TEXT NOT NULL,
+    "fullName" TEXT,
     "avatarImageFile" TEXT,
     "orgName" TEXT,
     "shortOrgName" TEXT,
@@ -36,13 +36,13 @@ CREATE TABLE "Startup" (
     "status" "StartupStatus" NOT NULL,
     "startuperId" TEXT NOT NULL,
     "targetFinancing" INTEGER NOT NULL,
-    "financingDeadline" TIMESTAMP(3),
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "logoFile" TEXT,
     "specificationFile" TEXT NOT NULL,
     "businessPlanFile" TEXT,
     "presentationFile" TEXT,
+    "financingDeadline" TIMESTAMP(3),
 
     CONSTRAINT "Startup_pkey" PRIMARY KEY ("id")
 );
@@ -80,6 +80,9 @@ CREATE UNIQUE INDEX "VoteNewStartup_startupId_expertId_key" ON "VoteNewStartup"(
 
 -- AddForeignKey
 ALTER TABLE "Startup" ADD CONSTRAINT "Startup_startuperId_fkey" FOREIGN KEY ("startuperId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "VoteNewStartup" ADD CONSTRAINT "VoteNewStartup_startupId_fkey" FOREIGN KEY ("startupId") REFERENCES "Startup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "VoteNewStartup" ADD CONSTRAINT "VoteNewStartup_expertId_fkey" FOREIGN KEY ("expertId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -225,3 +225,17 @@ export async function getStartupTotalFinancing(id: string) {
   });
   return investmentAggregation._sum.amount ?? 0;
 }
+
+export async function getNewStartupYeasTotal(id: string) {
+  const yeasTotal = await db.voteNewStartup.count({
+    where: { startupId: id, yea: true },
+  });
+  return yeasTotal;
+}
+
+export async function getNewStartupNaysTotal(id: string) {
+  const naysTotal = await db.voteNewStartup.count({
+    where: { startupId: id, yea: false },
+  });
+  return naysTotal;
+}

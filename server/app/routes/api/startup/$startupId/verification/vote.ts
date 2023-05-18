@@ -2,7 +2,11 @@ import { json } from "@remix-run/node";
 import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
-import { requireCurrentApiUser } from "~/utils.server";
+import {
+  getNewStartupNaysTotal,
+  getNewStartupYeasTotal,
+  requireCurrentApiUser,
+} from "~/utils.server";
 import invariant from "tiny-invariant";
 import {
   startupVerificationNayThreshold,
@@ -73,13 +77,8 @@ export const action: ActionFunction = async ({ request, params }) => {
       },
     });
   }
-  const yeasTotal = await db.voteNewStartup.count({
-    where: { startupId, yea: true },
-  });
-  console.log(yeasTotal, startupVerificationYeaThreshold);
-  const naysTotal = await db.voteNewStartup.count({
-    where: { startupId, yea: false },
-  });
+  const yeasTotal = await getNewStartupYeasTotal(startupId);
+  const naysTotal = await getNewStartupNaysTotal(startupId);
   if (yeasTotal >= startupVerificationYeaThreshold) {
     await db.startup.update({
       where: { id: startupId },
