@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import type { FieldValues, Path, UseFormSetFocus } from "react-hook-form";
 import { useSpinDelay } from "~/components";
 import superjson from "superjson";
-import type { User as DbUser, Startup as DbStartup } from "@prisma/client";
-import invariant from "tiny-invariant";
+
+export const startupVerificationYeaThreshold = 1; // 7
+export const startupVerificationNayThreshold = 1; // 3
 
 export const orderByValues = ["desc", "asc"] as const;
 export type OrderBy = (typeof orderByValues)[number];
@@ -15,6 +16,9 @@ export const startupStatuses: readonly [StartupStatus, ...StartupStatus[]] = [
 ];
 export const startupStatusNames: { [K in StartupStatus]: string } = {
   verification: "Verification",
+  verification_failed: "Verification failed",
+  verification_succeded: "Verification succeded",
+  financing: "Financing",
 };
 
 export const userRoles: readonly [UserRole, ...UserRole[]] = [
@@ -180,79 +184,4 @@ export function prepareTable<T extends string, U extends T>({
     return { id, sortable: (sortKeys as T[]).includes(id) };
   };
   return { columns, sortKeys, prepareColumn };
-}
-
-export type User = {
-  id: string;
-  email: string;
-  fullName: string;
-} & (
-  | { role: "admin" }
-  | { role: "user"; balance: number; avatarImageFile: string | null }
-  | { role: "expert" }
-);
-
-export function parseUser(user: DbUser): User {
-  switch (user.role) {
-    case "admin":
-      return {
-        id: user.id,
-        role: "admin",
-        email: user.email,
-        fullName: user.fullName,
-      };
-    case "user":
-      invariant(typeof user.balance === "number");
-      return {
-        id: user.id,
-        role: "user",
-        email: user.email,
-        fullName: user.fullName,
-        avatarImageFile: user.avatarImageFile,
-        balance: user.balance,
-      };
-    case "expert":
-      return {
-        id: user.id,
-        role: "expert",
-        email: user.email,
-        fullName: user.fullName,
-      };
-    default:
-      invariant(false, `Wrong user role: ${user.role}`);
-  }
-}
-
-export type Startup = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  startuperId: string;
-  name: string;
-  description: string;
-  logoFile: string | null;
-  specificationFile: string;
-  businessPlanFile: string | null;
-  presentationFile: string | null;
-} & { status: "verification" };
-
-export function parseStartup(startup: DbStartup): Startup {
-  switch (startup.status) {
-    case "verification":
-      return {
-        id: startup.id,
-        status: "verification",
-        createdAt: startup.createdAt,
-        updatedAt: startup.updatedAt,
-        startuperId: startup.startuperId,
-        name: startup.name,
-        description: startup.description,
-        logoFile: startup.logoFile,
-        specificationFile: startup.specificationFile,
-        businessPlanFile: startup.businessPlanFile,
-        presentationFile: startup.presentationFile,
-      };
-    default:
-      invariant(false, `Wrong startup status: ${startup.status}`);
-  }
 }

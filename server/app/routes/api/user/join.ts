@@ -3,7 +3,6 @@ import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
 import bycript from "bcryptjs";
-import { parseUser } from "~/utils";
 
 const requestBodySchema = z.object({
   email: z.string().email(),
@@ -35,17 +34,15 @@ export const action: ActionFunction = async ({ request }) => {
       { status: 401 }
     );
   }
-  const user = parseUser(
-    await db.user.create({
-      data: {
-        role: "user",
-        email: validatedData.email,
-        passwordHash: await bycript.hash(validatedData.password, 10),
-        fullName: validatedData.fullName,
-        avatarImageFile: validatedData.avatarImageFile,
-        balance: 0,
-      },
-    })
-  );
+  const user = await db.user.create({
+    data: {
+      role: "user",
+      email: validatedData.email,
+      passwordHash: await bycript.hash(validatedData.password, 10),
+      fullName: validatedData.fullName,
+      avatarImageFile: validatedData.avatarImageFile,
+      balance: 0,
+    },
+  });
   return json<ActionData>({ id: user.id });
 };

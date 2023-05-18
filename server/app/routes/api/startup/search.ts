@@ -2,8 +2,6 @@ import type { LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { z } from "zod";
 import { db } from "~/db.server";
-import type { Startup } from "~/utils";
-import { parseStartup } from "~/utils";
 import { startupStatuses } from "~/utils";
 
 type LoaderData = {
@@ -13,7 +11,12 @@ type LoaderData = {
   totalPages: number;
   from: number;
   to: number;
-  data: Startup[];
+  data: {
+    id: string;
+    name: string;
+    description: string;
+    logoFile: string | null;
+  }[];
 };
 
 const searchSchema = z.object({
@@ -56,12 +59,12 @@ export const loader: LoaderFunction = async ({ request }) => {
   const total = await db.startup.count({ where });
   const size = validatedSearch.size ?? total;
   const page = validatedSearch.page ?? 0;
-  const startupsData = await db.startup.findMany({
+  const startups = await db.startup.findMany({
     where,
     skip: size * page,
     take: size,
+    select: { id: true, name: true, description: true, logoFile: true },
   });
-  const startups = startupsData.map(parseStartup);
   return json<LoaderData>({
     size,
     page,

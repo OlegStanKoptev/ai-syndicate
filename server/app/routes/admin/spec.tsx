@@ -17,14 +17,21 @@ export const action: ActionFunction = async () => {
 type LoaderData = {
   exampleStartupId: string;
   exampleStartuperId: string;
+  exampleVerificationStartupId: string;
 };
 
 export const loader: LoaderFunction = async () => {
   const startup = await db.startup.findFirst();
   const startuper = await db.user.findFirst({ where: { role: "user" } });
+  const startupVerification = await db.startup.findFirst({
+    where: { status: "verification" },
+  });
   return serialize<LoaderData>({
     exampleStartupId: startup ? startup.id : "",
     exampleStartuperId: startuper ? startuper.id : "",
+    exampleVerificationStartupId: startupVerification
+      ? startupVerification.id
+      : "",
   });
 };
 
@@ -143,6 +150,38 @@ export default function Spec() {
           {
             name: "For startupers",
             search: { startuperId: data.exampleStartuperId },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/verification/vote"
+        examples={[
+          {
+            name: "Yea",
+            path: { startupId: data.exampleVerificationStartupId },
+            body: { yea: true },
+          },
+          {
+            name: "Nay",
+            path: { startupId: data.exampleVerificationStartupId },
+            body: { yea: false, nayReason: "Bad idea" },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/verification_succeded/confirm"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+            body: {
+              targetFinancing: 100,
+              financingDeadline: new Date(2023, 6, 1),
+            },
           },
         ]}
         className="mt-4"

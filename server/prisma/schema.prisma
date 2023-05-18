@@ -40,10 +40,14 @@ model User {
   phone           String?
 
   startupsCreated Startup[]
+  votesNewStartup VoteNewStartup[]
 }
 
 enum StartupStatus {
   verification
+  verification_failed
+  verification_succeded
+  financing
 }
 
 model Startup {
@@ -51,8 +55,10 @@ model Startup {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  status      StartupStatus
-  startuperId String
+  status            StartupStatus
+  startuperId       String
+  targetFinancing   Int?
+  financingDeadline DateTime?
 
   name              String
   description       String
@@ -62,4 +68,19 @@ model Startup {
   presentationFile  String?
 
   startuper User @relation(fields: [startuperId], references: [id])
+}
+
+model VoteNewStartup {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  startupId String
+  expertId  String
+  yea       Boolean
+  nayReason String?
+
+  expert User @relation(fields: [expertId], references: [id])
+
+  @@unique([startupId, expertId])
 }
