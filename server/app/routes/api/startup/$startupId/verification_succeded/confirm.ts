@@ -2,7 +2,7 @@ import { json } from "@remix-run/node";
 import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
-import { requireCurrentUserForApi } from "~/utils.server";
+import { requireCurrentApiUser } from "~/utils.server";
 import invariant from "tiny-invariant";
 
 const requestBodySchema = z.object({
@@ -41,7 +41,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
   }
   const validatedData = dataValidationResult.data;
-  const user = await requireCurrentUserForApi(request);
+  const user = await requireCurrentApiUser(request);
   if (user.id !== startupData.startuperId) {
     return json({ message: "Must be the startup owner" }, { status: 403 });
   }

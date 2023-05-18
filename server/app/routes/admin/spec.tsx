@@ -39,10 +39,6 @@ export default function Spec() {
             name: "As expert",
             body: { email: "expert@expert.com", password: "expert" },
           },
-          {
-            name: "As admin",
-            body: { email: "admin@admin.com", password: "admin" },
-          },
         ]}
       />
       <Endpoint

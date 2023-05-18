@@ -13,7 +13,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button, InputWrapper, TextInput, UnexpectedError } from "~/components";
 import type { FormattedZodError } from "~/utils.server";
-import { formatZodError, requireCurrentModerator } from "~/utils.server";
+import { formatZodError, requireCurrentAdmin } from "~/utils.server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { db } from "~/db.server";
 import { useSpinDelay } from "spin-delay";
@@ -34,7 +34,7 @@ type ActionData = {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  await requireCurrentModerator(request);
+  await requireCurrentAdmin(request);
   const data = Object.fromEntries(await request.formData());
   const validationResult = schema.safeParse(data);
   if (!validationResult.success) {

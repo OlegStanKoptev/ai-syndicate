@@ -2,7 +2,7 @@ import { json } from "@remix-run/node";
 import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
-import { requireCurrentUserForApi } from "~/utils.server";
+import { requireCurrentApiUser } from "~/utils.server";
 import invariant from "tiny-invariant";
 import {
   startupVerificationNayThreshold,
@@ -42,7 +42,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
   }
   const validatedData = dataValidationResult.data;
-  const user = await requireCurrentUserForApi(request);
+  const user = await requireCurrentApiUser(request);
   if (user.role !== "expert") {
     return json(
       { message: "Must be an 'expert' to vote for a startup" },

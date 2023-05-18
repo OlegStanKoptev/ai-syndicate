@@ -4,7 +4,7 @@ import { useCatch, Outlet, Link } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { ExpectedError } from "~/components";
 import { db } from "~/db.server";
-import { requireCurrentModerator } from "~/utils.server";
+import { requireCurrentAdmin } from "~/utils.server";
 import { deserialize, serialize } from "~/utils";
 
 type LoaderData = {
@@ -17,7 +17,7 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { userId } = params;
   invariant(userId);
-  await requireCurrentModerator(request);
+  await requireCurrentAdmin(request);
   const user = await db.user.findUnique({
     where: { id: userId },
     select: { fullName: true, email: true },

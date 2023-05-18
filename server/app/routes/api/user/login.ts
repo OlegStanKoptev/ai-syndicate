@@ -3,7 +3,7 @@ import { json } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
 import bcrypt from "bcryptjs";
-import { loginForApi } from "~/utils.server";
+import { loginApiUser } from "~/utils.server";
 
 const requestBodySchema = z.object({
   email: z.string().email(),
@@ -24,7 +24,12 @@ export const action: ActionFunction = async ({ request }) => {
   const user = await db.user.findUnique({
     where: { email: validatedData.email },
   });
-  if (!user) {
+  if (
+    !user ||
+    (user.role !== "user" &&
+      user.role !== "developer" &&
+      user.role !== "expert")
+  ) {
     return json(
       {
         message: `User with this email not found: ${validatedData.email}`,
@@ -39,5 +44,5 @@ export const action: ActionFunction = async ({ request }) => {
   if (!isPasswordCorrect) {
     return json({ message: "Wrong password" }, { status: 401 });
   }
-  return loginForApi(request, user.id, validatedData.rememberMe);
+  return loginApiUser(request, user.id, validatedData.rememberMe);
 };

@@ -14,7 +14,7 @@ import {
 import invariant from "tiny-invariant";
 import { db } from "~/db.server";
 import bcrypt from "bcryptjs";
-import { getCurrentUser, login } from "~/utils.server";
+import { getCurrentAdmin, loginAdmin } from "~/utils.server";
 import {
   Button,
   Checkbox,
@@ -61,13 +61,13 @@ export const action: ActionFunction = async ({ request }) => {
       { status: 401 }
     );
   }
-  return await login(request, user.id, rememberMe, redirectTo || "/admin");
+  return await loginAdmin(request, user.id, rememberMe, redirectTo || "/admin");
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-  const user = await getCurrentUser(request);
-  if (user && user.role === "admin") {
+  const user = await getCurrentAdmin(request);
+  if (user) {
     return redirect(redirectTo ?? "/admin");
   }
   return null;

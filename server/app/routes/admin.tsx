@@ -15,15 +15,15 @@ import invariant from "tiny-invariant";
 import { Button, Nav, Spinner } from "~/components";
 import logoImgUrl from "~/images/logo.svg";
 import { deserialize, serialize } from "~/utils";
-import { getCurrentUser } from "~/utils.server";
+import { getCurrentAdmin } from "~/utils.server";
 
 type LoaderData = {
-  user: User | null;
+  admin: User | null;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getCurrentUser(request);
-  return serialize<LoaderData>({ user });
+  const admin = await getCurrentAdmin(request);
+  return serialize<LoaderData>({ admin });
 };
 
 export default function Private() {
@@ -48,9 +48,9 @@ export default function Private() {
           </div>
         </Link>
         <div className="ml-auto flex items-center gap-4">
-          {data.user && data.user.role === "admin" ? (
+          {data.admin ? (
             <>
-              {data.user.email}
+              {data.admin.email}
               <Form method="post" action="logout">
                 <input
                   type="hidden"
@@ -75,7 +75,7 @@ export default function Private() {
       <div className="h-[40px]" />
       <Nav
         navItems={
-          data.user && data.user.role === "admin"
+          data.admin
             ? [
                 {
                   path: "startups",

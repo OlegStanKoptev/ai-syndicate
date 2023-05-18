@@ -4,7 +4,7 @@ import { z } from "zod";
 import { db } from "~/db.server";
 import {
   getStartupTotalFinancing,
-  requireCurrentUserForApi,
+  requireCurrentApiUser,
 } from "~/utils.server";
 import invariant from "tiny-invariant";
 
@@ -34,7 +34,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
   }
   const validatedData = dataValidationResult.data;
-  const user = await requireCurrentUserForApi(request);
+  const user = await requireCurrentApiUser(request);
   if (user.role !== "user") {
     return json({ message: "You must be a 'user' to invest" }, { status: 403 });
   }

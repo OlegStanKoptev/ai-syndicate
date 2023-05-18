@@ -1,10 +1,7 @@
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useCatch, useLoaderData, useNavigate } from "@remix-run/react";
 import { db } from "~/db.server";
-import {
-  requireCurrentModerator,
-  validateRegistryParams,
-} from "~/utils.server";
+import { requireCurrentAdmin, validateRegistryParams } from "~/utils.server";
 import type { TableColumn } from "~/components";
 import { LinkButton } from "~/components";
 import {
@@ -45,7 +42,7 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  await requireCurrentModerator(request);
+  await requireCurrentAdmin(request);
   const { searchParams } = new URL(request.url);
   const { page, size, sortKey, orderBy } = validateRegistryParams(
     searchParams,

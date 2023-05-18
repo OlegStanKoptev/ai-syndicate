@@ -8,7 +8,7 @@ import {
 } from "@remix-run/react";
 import { db } from "~/db.server";
 import {
-  requireCurrentModerator,
+  requireCurrentAdmin,
   validateRegistryParams,
   validateSingleParameter,
 } from "~/utils.server";
@@ -61,7 +61,7 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  await requireCurrentModerator(request);
+  await requireCurrentAdmin(request);
   const { searchParams } = new URL(request.url);
   const { page, size, sortKey, orderBy } = validateRegistryParams(
     searchParams,

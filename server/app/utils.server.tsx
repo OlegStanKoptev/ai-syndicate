@@ -1,3 +1,4 @@
+import type { SessionStorage } from "@remix-run/node";
 import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import type { ZodEffects, ZodError, ZodSchema } from "zod";
@@ -7,9 +8,20 @@ import { orderByValues } from "./utils";
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 const USER_SESSION_KEY = "userId";
-const sessionStorage = createCookieSessionStorage({
+const sessionStorageAdmin = createCookieSessionStorage({
   cookie: {
-    name: "__session",
+    name: "__session_admin",
+    httpOnly: true,
+    maxAge: 0,
+    path: "/",
+    sameSite: "none",
+    secrets: [process.env.SESSION_SECRET],
+    secure: true, //process.env.NODE_ENV === "production",
+  },
+});
+const sessionStorageApiUser = createCookieSessionStorage({
+  cookie: {
+    name: "__session_api_user",
     httpOnly: true,
     maxAge: 0,
     path: "/",
@@ -19,21 +31,21 @@ const sessionStorage = createCookieSessionStorage({
   },
 });
 
-function getSession(request: Request) {
+function getSession(request: Request, sessionStorage: SessionStorage) {
   const cookie = request.headers.get("Cookie");
   return sessionStorage.getSession(cookie);
 }
 
-export async function login(
+export async function loginAdmin(
   request: Request,
   userId: string,
   rememberMe: boolean = false,
   redirectTo?: string
 ) {
-  const session = await getSession(request);
+  const session = await getSession(request, sessionStorageAdmin);
   session.set(USER_SESSION_KEY, userId);
   const headers = {
-    "Set-Cookie": await sessionStorage.commitSession(session, {
+    "Set-Cookie": await sessionStorageAdmin.commitSession(session, {
       maxAge: rememberMe
         ? 60 * 60 * 24 * 7 // 7 days
         : undefined,
@@ -47,15 +59,15 @@ export async function login(
   });
 }
 
-export async function loginForApi(
+export async function loginApiUser(
   request: Request,
   userId: string,
   rememberMe: boolean = false
 ) {
-  const session = await getSession(request);
+  const session = await getSession(request, sessionStorageApiUser);
   session.set(USER_SESSION_KEY, userId);
   const headers = {
-    "Set-Cookie": await sessionStorage.commitSession(session, {
+    "Set-Cookie": await sessionStorageApiUser.commitSession(session, {
       maxAge: rememberMe
         ? 60 * 60 * 24 * 7 // 7 days
         : undefined,
@@ -64,27 +76,30 @@ export async function loginForApi(
   return new Response(null, { headers });
 }
 
-export async function logout(request: Request, redirectTo?: string) {
-  const session = await getSession(request);
+export async function logoutAdmin(request: Request, redirectTo?: string) {
+  const session = await getSession(request, sessionStorageAdmin);
   const search = redirectTo ? `?redirectTo=${redirectTo}` : "";
   return redirect(`/admin/login${search}`, {
     headers: {
-      "Set-Cookie": await sessionStorage.destroySession(session),
+      "Set-Cookie": await sessionStorageAdmin.destroySession(session),
     },
   });
 }
 
-export async function logoutForApi(request: Request) {
-  const session = await getSession(request);
+export async function logoutApiUser(request: Request) {
+  const session = await getSession(request, sessionStorageApiUser);
   return new Response(null, {
     headers: {
-      "Set-Cookie": await sessionStorage.destroySession(session),
+      "Set-Cookie": await sessionStorageApiUser.destroySession(session),
     },
   });
 }
 
-export async function getCurrentUser(request: Request) {
-  const session = await getSession(request);
+async function getCurrentUser(
+  request: Request,
+  sessionStorage: SessionStorage
+) {
+  const session = await getSession(request, sessionStorage);
   const userId = session.get(USER_SESSION_KEY);
   if (!userId) {
     return null;
@@ -97,50 +112,27 @@ export async function getCurrentUser(request: Request) {
 }
 
 export async function getCurrentAdmin(request: Request) {
-  const user = await getCurrentUser(request);
-  if (!user || user.role !== "admin") {
-    return null;
+  return getCurrentUser(request, sessionStorageAdmin);
+}
+
+export async function getCurrentApiUser(request: Request) {
+  return getCurrentUser(request, sessionStorageApiUser);
+}
+
+export async function requireCurrentAdmin(request: Request) {
+  const user = await getCurrentAdmin(request);
+  if (!user) {
+    throw json({ message: "Authorization error" }, { status: 401 });
   }
   return user;
 }
 
-export async function requireCurrentUser(request: Request) {
-  const orThrow = () => {
-    const redirectTo = new URL(request.url).pathname;
-    return logout(request, redirectTo);
-  };
-  const user = await require(await getCurrentUser(request), orThrow);
-  return user;
-}
-
-export async function requireCurrentUserForApi(request: Request) {
-  const orThrow = () => {
-    return json({ message: "Authorization error" }, { status: 401 });
-  };
-  const user = await require(await getCurrentUser(request), orThrow);
-  return user;
-}
-
-export async function requireCurrentModerator(request: Request) {
-  const orThrow = () => {
-    const redirectTo = new URL(request.url).pathname;
-    return logout(request, redirectTo);
-  };
-  const user = await require(await getCurrentAdmin(request), orThrow);
-  return user;
-}
-
-export async function require<T>(
-  thing: T | null | undefined,
-  orThrow?: () => any
-) {
-  if (thing === null || thing === undefined) {
-    if (orThrow) {
-      throw await orThrow();
-    }
-    throw new Error("Something is required but is null");
+export async function requireCurrentApiUser(request: Request) {
+  const user = await getCurrentApiUser(request);
+  if (!user) {
+    throw json({ message: "Authorization error" }, { status: 401 });
   }
-  return thing;
+  return user;
 }
 
 export type FormattedZodError<T> = {

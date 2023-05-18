@@ -11,7 +11,7 @@ import {
   formatUrl,
   userRoleNames,
 } from "~/utils";
-import { requireCurrentModerator } from "~/utils.server";
+import { requireCurrentAdmin } from "~/utils.server";
 
 type LoaderData = {
   user: User;
@@ -20,7 +20,7 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { userId } = params;
   invariant(userId);
-  await requireCurrentModerator(request);
+  await requireCurrentAdmin(request);
   const user = await db.user.findUnique({
     where: { id: userId },
   });

@@ -1,9 +1,9 @@
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { requireCurrentModerator } from "~/utils.server";
+import { requireCurrentAdmin } from "~/utils.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  await requireCurrentModerator(request);
+  await requireCurrentAdmin(request);
   if (process.env.NODE_ENV !== "development") {
     throw new Response("Playground page only exists in development", {
       status: 404,

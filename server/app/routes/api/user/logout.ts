@@ -1,6 +1,6 @@
 import type { ActionFunction } from "@remix-run/node";
-import { logoutForApi } from "~/utils.server";
+import { logoutApiUser } from "~/utils.server";
 
 export const action: ActionFunction = async ({ request }) => {
-  return await logoutForApi(request);
+  return await logoutApiUser(request);
 };

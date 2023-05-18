@@ -10,7 +10,7 @@ import {
   serialize,
   startupStatusNames,
 } from "~/utils";
-import { requireCurrentModerator } from "~/utils.server";
+import { requireCurrentAdmin } from "~/utils.server";
 
 type LoaderData = {
   startup: Startup & {
@@ -25,7 +25,7 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { startupId } = params;
   invariant(startupId);
-  await requireCurrentModerator(request);
+  await requireCurrentAdmin(request);
   const startup = await db.startup.findUnique({
     where: { id: startupId },
     include: {

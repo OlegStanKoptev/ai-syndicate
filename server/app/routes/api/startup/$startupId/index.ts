@@ -13,6 +13,5 @@ export const loader: LoaderFunction = async ({ params }) => {
       { status: 404 }
     );
   }
-
   return json(startup);
 };
