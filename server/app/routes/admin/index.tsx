@@ -25,8 +25,8 @@ export default function HomePage() {
       {data.admin ? (
         <p className="text-base">
           See the{" "}
-          <Link to="startups" className="text-blue-400">
-            startups
+          <Link to="spec" className="text-blue-400">
+            API
           </Link>
         </p>
       ) : (

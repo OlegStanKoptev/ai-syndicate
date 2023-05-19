@@ -87,14 +87,6 @@ export default function Private() {
                   name: "API",
                 },
                 {
-                  path: "startups",
-                  name: "Startups",
-                },
-                {
-                  path: "users",
-                  name: "Users",
-                },
-                {
                   path: "newDeveloperApplications",
                   name: "New developer appplications",
                 },

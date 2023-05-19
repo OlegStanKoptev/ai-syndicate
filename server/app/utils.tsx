@@ -1,4 +1,4 @@
-import type { StartupStatus, UserRole } from "@prisma/client";
+import type { StartupStatus } from "@prisma/client";
 import { useSearchParams, useTransition } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { FieldValues, Path, UseFormSetFocus } from "react-hook-form";
@@ -20,28 +20,6 @@ export const startupStatuses: readonly [StartupStatus, ...StartupStatus[]] = [
   "financing_succeded",
   "developerApplication",
 ];
-export const startupStatusNames: { [K in StartupStatus]: string } = {
-  verification: "Verification",
-  verification_failed: "Verification failed",
-  verification_succeded: "Verification succeded",
-  financing: "Financing",
-  financing_failed: "Financing failed",
-  financing_succeded: "Financing succeded",
-  developerApplication: "Developer application",
-};
-
-export const userRoles: readonly [UserRole, ...UserRole[]] = [
-  "admin",
-  "developer",
-  "expert",
-  "user",
-];
-export const userRoleNames: { [K in UserRole]: string } = {
-  admin: "Admin",
-  developer: "Developer",
-  expert: "Expert",
-  user: "User",
-};
 
 export function serialize<T = any>(data: T) {
   return superjson.stringify(data);
