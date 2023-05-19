@@ -147,7 +147,7 @@ export default function Spec() {
             name: "Example",
             path: { startupId: "" },
             body: {
-              financingDeadline: new Date(2023, 6, 1),
+              financingDeadline: new Date(),
             },
           },
         ]}
@@ -175,7 +175,7 @@ export default function Spec() {
             name: "Example",
             path: { startupId: "" },
             body: {
-              developerApplicationDeadline: new Date(2023, 6, 7),
+              developerApplicationDeadline: new Date(),
             },
           },
         ]}

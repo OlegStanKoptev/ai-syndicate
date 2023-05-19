@@ -5,6 +5,8 @@ import type { ZodEffects, ZodError, ZodSchema } from "zod";
 import { z } from "zod";
 import { db } from "./db.server";
 import { orderByValues } from "./utils";
+import { scheduleJob } from "node-schedule";
+import * as dateFns from "date-fns";
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 const USER_SESSION_KEY = "userId";
@@ -238,4 +240,59 @@ export async function getNewStartupNaysTotal(id: string) {
     where: { startupId: id, yea: false },
   });
   return naysTotal;
+}
+
+export async function scheduleOrRunJob(date: Date, handle: () => any) {
+  if (dateFns.isFuture(date)) {
+    scheduleJob(date, handle);
+  } else {
+    handle();
+  }
+}
+
+export function scheduleStartupFinancingDeadline(id: string, deadline: Date) {
+  scheduleOrRunJob(deadline, async () => {
+    const startup = await db.startup.findUnique({
+      where: { id: id },
+    });
+    if (startup && startup.status === "financing") {
+      await db.startup.update({
+        where: { id: startup.id },
+        data: { status: "financing_failed" },
+      });
+      const investments = await db.investment.findMany({
+        where: { startupId: startup.id },
+      });
+      await Promise.all(
+        investments.map(
+          async (investment) =>
+            await db.user.update({
+              where: { id: investment.investorId },
+              data: { balance: { increment: investment.amount } },
+            })
+        )
+      );
+    }
+  });
+}
+
+async function schedule() {
+  const financingStartups = await db.startup.findMany({
+    where: { status: "financing" },
+  });
+  await Promise.all(
+    financingStartups.map(async (startup) => {
+      invariant(startup.financingDeadline);
+      scheduleStartupFinancingDeadline(startup.id, startup.financingDeadline);
+    })
+  );
+}
+
+declare global {
+  var scheduled: boolean | undefined;
+}
+
+if (!global.scheduled) {
+  schedule();
+  global.scheduled = true;
 }
