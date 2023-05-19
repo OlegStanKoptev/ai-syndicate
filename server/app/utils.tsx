@@ -13,6 +13,12 @@ export type OrderBy = (typeof orderByValues)[number];
 
 export const startupStatuses: readonly [StartupStatus, ...StartupStatus[]] = [
   "verification",
+  "verification_failed",
+  "verification_succeded",
+  "financing",
+  "financing_failed",
+  "financing_succeded",
+  "developerApplication",
 ];
 export const startupStatusNames: { [K in StartupStatus]: string } = {
   verification: "Verification",

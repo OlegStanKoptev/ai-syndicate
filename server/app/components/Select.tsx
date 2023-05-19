@@ -11,6 +11,7 @@ interface SelectProps {
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
   disabled?: boolean;
   clearable?: boolean;
+  placeholder?: string;
   className?: string;
 }
 
@@ -24,6 +25,7 @@ const Select: ForwardRefRenderFunction<any, SelectProps> = (
     onBlur,
     disabled,
     clearable,
+    placeholder = "Choose",
     className,
   },
   ref
@@ -58,7 +60,7 @@ const Select: ForwardRefRenderFunction<any, SelectProps> = (
           label,
           value: optionValue,
         }))}
-        placeholder={disabled ? "" : "Choose"}
+        placeholder={disabled ? "" : placeholder}
         id="long-value-select"
         instanceId="long-value-select" // This is why: https://github.com/trezor/trezor-suite/issues/290#issuecomment-874685255
         isDisabled={disabled}

@@ -59,10 +59,19 @@ export default function StartupIndex() {
           {startupStatusNames[data.startup.status]})
         </h1>
       </div>
-      <div className="mx-4 my-8 grid grid-cols-2 gap-16">
+      <h2 className="font-bold text-lg mt-8 ml-4">INFO</h2>
+      <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
         <div>
           <CardField name="Name">{data.startup.name}</CardField>
           <CardField name="Description">{data.startup.description}</CardField>
+          <CardField name="Target financing">
+            {data.startup.targetFinancing}
+          </CardField>
+          <CardField name="Status">
+            {startupStatusNames[data.startup.status]}
+          </CardField>
+        </div>
+        <div>
           <CardField name="Logo file">
             {data.startup.logoFile ? (
               <a
@@ -74,9 +83,6 @@ export default function StartupIndex() {
                 {data.startup.logoFile}
               </a>
             ) : null}
-          </CardField>
-          <CardField name="Status">
-            {startupStatusNames[data.startup.status]}
           </CardField>
           <CardField name="Specification file">
             <a
@@ -112,6 +118,8 @@ export default function StartupIndex() {
               </a>
             ) : null}
           </CardField>
+        </div>
+        <div>
           <CardField name="Startuper">
             <Link
               className="text-blue-400"

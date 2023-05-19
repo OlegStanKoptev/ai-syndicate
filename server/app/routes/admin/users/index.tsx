@@ -122,14 +122,13 @@ export default function UsersIndex() {
           Create expert
         </LinkButton>
       </div>
-      <div className="flex">
+      <div className="max-w-full overflow-auto">
         <Table
           data={tableData}
           columns={tableColumns}
           onRowClick={({ row }) => navigate(row.id)}
           sort={sort}
           noDataFallback="No results"
-          className="max-w-full overflow-auto"
         />
       </div>
       <Pagination

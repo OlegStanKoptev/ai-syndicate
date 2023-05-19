@@ -137,13 +137,14 @@ export default function StartupsIndex() {
   const { sizeChanging, onSizeChange } = usePaginationSize();
   const { startups: tableData } = data;
   const tableColumns: TableColumn<TableRowData, TableColumnKey>[] = [
-    { ...prepareColumn("id"), header: "Id", width: 210 },
+    { ...prepareColumn("id"), header: "Id", width: 250 },
     {
       ...prepareColumn("status"),
       header: "Status",
       cell: ({ row }) => startupStatusNames[row.status],
+      width: 200,
     },
-    { ...prepareColumn("name"), header: "Name" },
+    { ...prepareColumn("name"), header: "Name", width: 200 },
     {
       ...prepareColumn("startuper"),
       header: "Startuper",
@@ -170,33 +171,30 @@ export default function StartupsIndex() {
             ({data.from}-{data.to} out of {data.totalStartups})
           </span>
         </h1>
-        <label className="flex items-center gap-2 ml-auto">
-          Status
-          <Select
-            options={startupStatusNames}
-            clearable
-            defaultValue={searchParams.get("status") ?? undefined}
-            onChange={(value) => {
-              if (!value) {
-                searchParams.delete("status");
-              } else {
-                searchParams.set("status", value);
-              }
-              searchParams.delete("page");
-              setSearchParams(searchParams);
-            }}
-            className="min-w-[200px]"
-          />
-        </label>
+        <Select
+          options={startupStatusNames}
+          placeholder="Choose status"
+          clearable
+          defaultValue={searchParams.get("status") ?? undefined}
+          onChange={(value) => {
+            if (!value) {
+              searchParams.delete("status");
+            } else {
+              searchParams.set("status", value);
+            }
+            searchParams.delete("page");
+            setSearchParams(searchParams);
+          }}
+          className="min-w-[200px]"
+        />
       </div>
-      <div className="flex">
+      <div className="max-w-full overflow-auto">
         <Table
           data={tableData}
           columns={tableColumns}
           onRowClick={({ row }) => navigate(row.id)}
           sort={sort}
           noDataFallback="No results"
-          className="max-w-full overflow-auto"
         />
       </div>
       <Pagination

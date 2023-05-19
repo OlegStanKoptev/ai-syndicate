@@ -15,6 +15,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({
       ...commonFields,
       fullName: user.fullName,
+      balance: user.balance,
     });
   }
   if (user.role === "expert") {

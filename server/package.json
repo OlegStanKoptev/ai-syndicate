@@ -43,6 +43,7 @@
     "react-hook-form": "^7.43.5",
     "react-icons": "^4.8.0",
     "react-select": "^5.7.0",
+    "remix-utils": "^6.3.0",
     "spin-delay": "^1.2.0",
     "superjson": "^1.12.2",
     "tailwind-merge": "^1.10.0",
