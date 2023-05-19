@@ -37,6 +37,25 @@ async function seed() {
       fullName: "Expert Expertov",
     },
   });
+  await db.user.create({
+    data: {
+      role: "developer",
+      email: "developer@developer.com",
+      passwordHash: await bcrypt.hash("developer", 10),
+      phone: "+76666666666",
+      avatarImageFile: "avatar1.jpg",
+      orgName: "АО Разработчики программ ИИ",
+      shortOrgName: "Разработчики ИИ",
+      inn: "7734247100",
+      ogrn: "1027739098166",
+      kpp: "771401001",
+      legalAddress:
+        "115553, Московская обл., г. Москва, ул. 1-ый Нагатинский проезд, д. 11, корпус 1",
+      actualAddress:
+        "115553, Московская обл., г. Москва, ул. 1-ый Нагатинский проезд, д. 11, корпус 1",
+      website: "ii-developers.com",
+    },
+  });
 }
 
 seed();
