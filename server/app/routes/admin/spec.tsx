@@ -70,6 +70,30 @@ export default function Spec() {
       />
       <Endpoint
         method="post"
+        route="/api/user/developer/apply"
+        examples={[
+          {
+            name: "Example",
+            body: {
+              email: "developer228@developer228.com",
+              password: "developer228",
+              phone: null,
+              avatarImageFile: null,
+              orgName: "AO Developer 228 Team",
+              shortOrgName: "Developers 228",
+              inn: "5734241100",
+              ogrn: "9027539198166",
+              kpp: "271601001",
+              legalAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
+              actualAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
+              website: "developers-228.com",
+            },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
         route="/api/user/deposit"
         examples={[
           {

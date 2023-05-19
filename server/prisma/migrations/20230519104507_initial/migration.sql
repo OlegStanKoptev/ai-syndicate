@@ -4,6 +4,9 @@ CREATE TYPE "UserRole" AS ENUM ('user', 'expert', 'admin', 'developer');
 -- CreateEnum
 CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded', 'developerApplication');
 
+-- CreateEnum
+CREATE TYPE "ApplicationNewDeveloperStatus" AS ENUM ('new', 'approved', 'declined');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -71,6 +74,29 @@ CREATE TABLE "Investment" (
     "startupId" TEXT NOT NULL,
 
     CONSTRAINT "Investment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ApplicationNewDeveloper" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "status" "ApplicationNewDeveloperStatus" NOT NULL,
+    "declineReason" TEXT,
+    "email" TEXT NOT NULL,
+    "passwordHash" TEXT NOT NULL,
+    "avatarImageFile" TEXT,
+    "orgName" TEXT NOT NULL,
+    "shortOrgName" TEXT NOT NULL,
+    "inn" TEXT NOT NULL,
+    "ogrn" TEXT NOT NULL,
+    "kpp" TEXT NOT NULL,
+    "legalAddress" TEXT NOT NULL,
+    "actualAddress" TEXT NOT NULL,
+    "website" TEXT NOT NULL,
+    "phone" TEXT,
+
+    CONSTRAINT "ApplicationNewDeveloper_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex

@@ -39,7 +39,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       status: 404,
     });
   }
-  return new Response(serialize<LoaderData>({ startup }));
+  return new Response(serialize<LoaderData>({ startup } as any));
 };
 
 export const meta: MetaFunction = (args) => {

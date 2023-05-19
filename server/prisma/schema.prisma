@@ -104,3 +104,31 @@ model Investment {
   investor User    @relation(fields: [investorId], references: [id])
   startup  Startup @relation(fields: [startupId], references: [id])
 }
+
+enum ApplicationNewDeveloperStatus {
+  new
+  approved
+  declined
+}
+
+model ApplicationNewDeveloper {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status        ApplicationNewDeveloperStatus
+  declineReason String?
+
+  email           String
+  passwordHash    String
+  avatarImageFile String?
+  orgName         String
+  shortOrgName    String
+  inn             String
+  ogrn            String
+  kpp             String
+  legalAddress    String
+  actualAddress   String
+  website         String
+  phone           String?
+}

@@ -78,6 +78,10 @@ export default function Private() {
           data.admin
             ? [
                 {
+                  path: "spec",
+                  name: "Specification",
+                },
+                {
                   path: "startups",
                   name: "Startups",
                 },
@@ -86,8 +90,8 @@ export default function Private() {
                   name: "Users",
                 },
                 {
-                  path: "spec",
-                  name: "Specification",
+                  path: "newDeveloperApplications",
+                  name: "New developer appplications",
                 },
                 ...(process.env.NODE_ENV === "development"
                   ? [
