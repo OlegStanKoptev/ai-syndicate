@@ -39,9 +39,10 @@ model User {
   website         String?
   phone           String?
 
-  startupsCreated Startup[]
-  votesNewStartup VoteNewStartup[]
-  investments     Investment[]
+  startupsCreated       Startup[]
+  votesNewStartup       VoteNewStartup[]
+  investments           Investment[]
+  applicationsDeveloper ApplicationDeveloper[]
 }
 
 enum StartupStatus {
@@ -72,9 +73,10 @@ model Startup {
   financingDeadline            DateTime?
   developerApplicationDeadline DateTime?
 
-  startuper       User             @relation(fields: [startuperId], references: [id])
-  investments     Investment[]
-  votesNewStartup VoteNewStartup[]
+  startuper             User                   @relation(fields: [startuperId], references: [id])
+  investments           Investment[]
+  votesNewStartup       VoteNewStartup[]
+  applicationsDeveloper ApplicationDeveloper[]
 }
 
 model VoteNewStartup {
@@ -131,4 +133,22 @@ model ApplicationNewDeveloper {
   actualAddress   String
   website         String
   phone           String?
+}
+
+enum ApplicationDeveloperStatus {
+  new
+}
+
+model ApplicationDeveloper {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  startupId   String
+  developerId String
+  status      ApplicationDeveloperStatus
+  message     String
+
+  startup   Startup @relation(fields: [startupId], references: [id])
+  developer User    @relation(fields: [developerId], references: [id])
 }
