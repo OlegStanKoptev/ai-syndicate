@@ -10,18 +10,22 @@ export const action: ActionFunction = async () => {
 };
 
 export const handle = {
-  breadcrumb: () => <Link to="spec">Specification</Link>,
+  breadcrumb: () => <Link to="spec">API</Link>,
 };
 
 export const meta: MetaFunction = () => {
   return {
-    title: "AI Syndicate (admin) | Specification",
+    title: "AI Syndicate (admin) | API",
   };
 };
 
 export default function Spec() {
   return (
     <main className="m-5">
+      <p className="text-lg">
+        Here are all endpoints of the API and for you to test. You can also see
+        examples of their use
+      </p>
       <h1 className="mt-14 font-bold text-lg">User</h1>
       <Endpoint
         method="post"
@@ -45,6 +49,7 @@ export default function Spec() {
         method="post"
         route="/api/user/logout"
         examples={[{ name: "Example" }]}
+        className="mt-4"
       />
       <Endpoint
         method="get"

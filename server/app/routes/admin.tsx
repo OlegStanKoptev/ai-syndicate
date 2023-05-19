@@ -3,6 +3,7 @@ import type { LoaderFunction } from "@remix-run/node";
 import {
   Form,
   Link,
+  NavLink,
   Outlet,
   useLoaderData,
   useLocation,
@@ -39,14 +40,18 @@ export default function Private() {
   return (
     <div className="flex min-h-full flex-col">
       <header className="fixed z-10 flex h-[40px] w-full items-center justify-between gap-4 bg-white/90 px-6 py-3 shadow-md ">
-        <Link to="">
+        <NavLink
+          to="/admin"
+          end
+          className={({ isActive }) => (isActive ? "text-blue-400" : undefined)}
+        >
           <div className="flex items-center p-1">
             <img width={24} height={24} src={logoImgUrl} alt="Logo" />
             <h1 className="mx-2 whitespace-nowrap text-base font-bold">
               AI Syndicate | Admin
             </h1>
           </div>
-        </Link>
+        </NavLink>
         <div className="ml-auto flex items-center gap-4">
           {data.admin ? (
             <>
@@ -79,7 +84,7 @@ export default function Private() {
             ? [
                 {
                   path: "spec",
-                  name: "Specification",
+                  name: "API",
                 },
                 {
                   path: "startups",
