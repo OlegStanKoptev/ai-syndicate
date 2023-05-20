@@ -246,12 +246,12 @@ export async function populate() {
   });
   const { id: applicationId } = await axios
     .post("/api/user/developer/apply", {
-      email: "developer228@developer228.com",
-      password: "developer228",
+      email: "developer@developer.com",
+      password: "developer",
       phone: null,
       avatarImageFile: null,
-      orgName: "AO Developer 228 Team",
-      shortOrgName: "Developers 228",
+      orgName: "AO Good Developers",
+      shortOrgName: "Good Devs",
       inn: "5734241100",
       ogrn: "9027539198166",
       kpp: "271601001",
@@ -272,6 +272,13 @@ export async function populate() {
       headers: { "Content-Type": "multipart/form-data" },
     }
   );
+  await axios.post("/api/user/login", {
+    email: "developer@developer.com",
+    password: "developer",
+  });
+  await axios.post(`/api/startup/${startupId}/developer-application/new`, {
+    message: "I will do it well",
+  });
   await axios.post("/api/user/login", {
     email: "startuper@startuper.com",
     password: "startuper",
