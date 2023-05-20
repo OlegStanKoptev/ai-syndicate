@@ -14,7 +14,7 @@ import {
 import invariant from "tiny-invariant";
 import { db } from "~/db.server";
 import bcrypt from "bcryptjs";
-import { getCurrentAdmin, loginAdmin } from "~/utils.server";
+import { commitSession, getCurrentAdmin, getSession } from "~/utils.server";
 import {
   Button,
   Checkbox,
@@ -61,7 +61,17 @@ export const action: ActionFunction = async ({ request }) => {
       { status: 401 }
     );
   }
-  return await loginAdmin(request, user.id, rememberMe, redirectTo || "/admin");
+  const session = await getSession(request);
+  session.set("adminId", user.id);
+  return redirect(redirectTo || "/admin", {
+    headers: {
+      "Set-Cookie": await commitSession(session, {
+        maxAge: rememberMe
+          ? 60 * 60 * 24 * 7 // 7 days
+          : undefined,
+      }),
+    },
+  });
 };
 
 export const loader: LoaderFunction = async ({ request }) => {

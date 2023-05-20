@@ -87,8 +87,12 @@ export default function Private() {
                   name: "API",
                 },
                 {
-                  path: "newDeveloperApplications",
+                  path: "new-developer-applications",
                   name: "New developer appplications",
+                },
+                {
+                  path: "new-expert",
+                  name: "New expert",
                 },
                 ...(process.env.NODE_ENV === "development"
                   ? [
@@ -100,10 +104,14 @@ export default function Private() {
                   : []),
               ]
             : [
-                {
-                  path: "spec",
-                  name: "Specification",
-                },
+                ...(process.env.NODE_ENV === "development"
+                  ? [
+                      {
+                        path: "playground",
+                        name: "Playground",
+                      },
+                    ]
+                  : []),
               ]
         }
         className="border-b-2"

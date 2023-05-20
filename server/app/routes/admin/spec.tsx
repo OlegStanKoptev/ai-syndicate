@@ -1,12 +1,46 @@
-import type { ActionFunction, MetaFunction } from "@remix-run/node";
-import { Link, useFetcher } from "@remix-run/react";
+import type { User } from "@prisma/client";
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Response } from "@remix-run/node";
+import {
+  Form,
+  Link,
+  useFetcher,
+  useLoaderData,
+  useTransition,
+} from "@remix-run/react";
 import { useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { InputWrapper } from "~/components";
-import { startupStatuses, useHydrated } from "~/utils";
+import { Button, InputWrapper, useSpinDelay } from "~/components";
+import {
+  deserialize,
+  populate,
+  serialize,
+  startupStatuses,
+  useHydrated,
+} from "~/utils";
+import {
+  clearDb,
+  getCurrentApiUser,
+  requireCurrentAdmin,
+} from "~/utils.server";
 
-export const action: ActionFunction = async () => {
-  return null;
+export const action: ActionFunction = async ({ request }) => {
+  await requireCurrentAdmin(request);
+  const data = Object.fromEntries(await request.formData());
+  const { __action } = data;
+  if (__action === "invalidate") {
+    return new Response();
+  }
+  if (__action === "clear") {
+    await clearDb();
+    return new Response();
+  }
+  throw new Error(`Unknown action: ${__action}`);
 };
 
 export const handle = {
@@ -19,14 +53,86 @@ export const meta: MetaFunction = () => {
   };
 };
 
+type LoaderData = {
+  apiUser: User | null;
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  await requireCurrentAdmin(request);
+  const apiUser = await getCurrentApiUser(request);
+  return json(serialize<LoaderData>({ apiUser }));
+};
+
 export default function Spec() {
+  const data = deserialize<LoaderData>(useLoaderData());
+  const fetcher = useFetcher();
+  const transition = useTransition();
+  const isClearing = useSpinDelay(
+    transition.state === "submitting" &&
+      transition.submission.formData.get("__action") === "clear"
+  );
+  const [isPopulatingState, setIsPopulatingState] = useState(false);
+  const isPopulating = useSpinDelay(isPopulatingState);
+  const [didPopulationFail, setDidPopulationFail] = useState(false);
+  const [didPopulationSucceed, setDidPopulationSucceed] = useState(false);
   return (
     <main className="m-5">
       <p className="text-lg">
-        Here are all endpoints of the API and for you to test. You can also see
-        examples of their use
+        Here are all <span className="font-bold">endpoints of the API</span> and
+        for you to test. You can also see{" "}
+        <span className="font-bold">examples</span> of their use
       </p>
-      <h1 className="mt-14 font-bold text-lg">User</h1>
+      {data.apiUser ? (
+        <p>
+          You are logged in as{" "}
+          <span className="font-bold">'{data.apiUser.role}'</span> with this
+          email: <span className="font-bold">{data.apiUser.email}</span>
+        </p>
+      ) : (
+        <p>
+          Right now you are <span className="font-bold">not</span> logged in as
+          any API user
+        </p>
+      )}
+      <div className="mt-4 flex gap-4">
+        <Button
+          size="sm"
+          loading={isPopulating}
+          onClick={() => {
+            setIsPopulatingState(true);
+            setDidPopulationFail(false);
+            setDidPopulationSucceed(false);
+            populate()
+              .then(() => setDidPopulationSucceed(true))
+              .catch(() => setDidPopulationFail(true))
+              .finally(() => {
+                setIsPopulatingState(false);
+                fetcher.submit({ __action: "invalidate" }, { method: "post" });
+              });
+          }}
+        >
+          Populate
+        </Button>
+        <Form method="post">
+          <Button
+            size="sm"
+            type="submit"
+            name="__action"
+            value="clear"
+            loading={isClearing}
+          >
+            Clear
+          </Button>
+        </Form>
+      </div>
+      {didPopulationSucceed ? (
+        <div className="text-green-400">Populated</div>
+      ) : didPopulationFail ? (
+        <div className="text-red-400">Could not populate</div>
+      ) : (
+        <div>&nbsp;</div>
+      )}
+      <h1 className="mt-8 font-bold text-lg">User</h1>
       <Endpoint
         method="post"
         route="/api/user/login"
@@ -176,7 +282,7 @@ export default function Spec() {
             name: "Example",
             path: { startupId: "" },
             body: {
-              financingDeadline: new Date(),
+              financingDeadline: "2023-05-26T07:04:15.641Z",
             },
           },
         ]}
@@ -204,7 +310,21 @@ export default function Spec() {
             name: "Example",
             path: { startupId: "" },
             body: {
-              developerApplicationDeadline: new Date(),
+              developerApplicationDeadline: "2023-05-27T07:04:15.641Z",
+            },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/developer-application/new"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+            body: {
+              message: "I will do it well",
             },
           },
         ]}
@@ -354,7 +474,7 @@ function EndpointExample({
               body: form ? formData : body,
             }
           );
-          fetcher.submit(null, { method: "post" });
+          fetcher.submit({ __action: "invalidate" }, { method: "post" });
           try {
             setResponse({
               status: response.status,

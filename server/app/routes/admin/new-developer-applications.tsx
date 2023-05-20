@@ -1,6 +1,10 @@
 import type { ApplicationNewDeveloper } from "@prisma/client";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
+import { Form, Link, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { Button, TextInput } from "~/components";
 import { db } from "~/db.server";
@@ -52,7 +56,6 @@ export const action: ActionFunction = async ({ request }) => {
   }
   if (__action === "decline") {
     const { declineReason } = data;
-    console.log(declineReason);
     invariant(typeof declineReason === "string" && declineReason.length > 0);
     await db.applicationNewDeveloper.update({
       where: { id: applicationId },
@@ -61,6 +64,20 @@ export const action: ActionFunction = async ({ request }) => {
     return new Response();
   }
   throw new Error(`Invalid action: ${__action}`);
+};
+
+export const meta: MetaFunction = () => {
+  return {
+    title: "AI Syndicate (admin) | New developer applications",
+  };
+};
+
+export const handle = {
+  breadcrumb: () => (
+    <Link to="/admin/new-developer-applications">
+      New developer applications
+    </Link>
+  ),
 };
 
 type LoaderData = {

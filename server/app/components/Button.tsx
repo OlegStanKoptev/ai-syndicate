@@ -32,6 +32,7 @@ const Button: ForwardRefRenderFunction<HTMLButtonElement, ButtonProps> = (
       className={twMerge(
         getButtonClassName({ variant, size }),
         "relative",
+        "disabled:brightness-75",
         className
       )}
       {...props}

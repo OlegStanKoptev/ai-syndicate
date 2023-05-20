@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { FieldValues, Path, UseFormSetFocus } from "react-hook-form";
 import { useSpinDelay } from "~/components";
 import superjson from "superjson";
+import axios from "axios";
 
 export const startupVerificationYeaThreshold = 1; // 7
 export const startupVerificationNayThreshold = 1; // 3
@@ -171,4 +172,108 @@ export function prepareTable<T extends string, U extends T>({
     return { id, sortable: (sortKeys as T[]).includes(id) };
   };
   return { columns, sortKeys, prepareColumn };
+}
+
+export async function populate() {
+  await axios.post("/api/user/join", {
+    email: "startuper@startuper.com",
+    password: "startuper",
+    fullName: "Startuper Startuperov",
+    avatarImageFile: null,
+  });
+  await axios.post("/api/user/login", {
+    email: "startuper@startuper.com",
+    password: "startuper",
+  });
+  const { id: startupId } = await axios
+    .post("/api/startup/new", {
+      name: "Startup with AI",
+      description: "Please invest",
+      logoFile: null,
+      specificationFile: "tz4.pdf",
+      businessPlanFile: null,
+      presentationFile: null,
+      targetFinancing: 300,
+    })
+    .then(({ data }) => data);
+  await axios.post(
+    "/admin/new-expert",
+    (() => {
+      const formData = new FormData();
+      formData.set("email", "expert@expert.com");
+      formData.set("password", "expert");
+      formData.set("fullName", "Expert Expertov");
+      return formData;
+    })(),
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+  await axios.post("/api/user/login", {
+    email: "expert@expert.com",
+    password: "expert",
+  });
+  await axios.post(`/api/startup/${startupId}/verification/vote`, {
+    yea: true,
+  });
+  await axios.post("/api/user/login", {
+    email: "startuper@startuper.com",
+    password: "startuper",
+  });
+  await axios.post(`/api/startup/${startupId}/verification_succeded/confirm`, {
+    financingDeadline: "2023-05-26T07:04:15.641Z",
+  });
+  await axios.post("/api/user/join", {
+    email: "investor@investor.com",
+    password: "investor",
+    fullName: "Investor Investorov",
+    avatarImageFile: null,
+  });
+  await axios.post("/api/user/login", {
+    email: "investor@investor.com",
+    password: "investor",
+  });
+  await axios.post("/api/user/deposit", { amount: 1000 });
+  await axios.post(`/api/startup/${startupId}/financing/invest`, {
+    amount: 300,
+  });
+  await axios.post("/api/user/login", {
+    email: "startuper@startuper.com",
+    password: "startuper",
+  });
+  await axios.post(`/api/startup/${startupId}/financing_succeded/confirm`, {
+    developerApplicationDeadline: "2023-05-27T07:04:15.641Z",
+  });
+  const { id: applicationId } = await axios
+    .post("/api/user/developer/apply", {
+      email: "developer228@developer228.com",
+      password: "developer228",
+      phone: null,
+      avatarImageFile: null,
+      orgName: "AO Developer 228 Team",
+      shortOrgName: "Developers 228",
+      inn: "5734241100",
+      ogrn: "9027539198166",
+      kpp: "271601001",
+      legalAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
+      actualAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
+      website: "developers-228.com",
+    })
+    .then(({ data }) => data);
+  await axios.post(
+    "/admin/new-developer-applications",
+    (() => {
+      const formData = new FormData();
+      formData.set("__action", "approve");
+      formData.set("applicationId", applicationId);
+      return formData;
+    })(),
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+  await axios.post("/api/user/login", {
+    email: "startuper@startuper.com",
+    password: "startuper",
+  });
 }

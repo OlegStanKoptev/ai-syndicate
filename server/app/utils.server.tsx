@@ -1,4 +1,3 @@
-import type { SessionStorage } from "@remix-run/node";
 import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import type { ZodEffects, ZodError, ZodSchema } from "zod";
@@ -7,12 +6,13 @@ import { db } from "./db.server";
 import { orderByValues } from "./utils";
 import { scheduleJob } from "node-schedule";
 import * as dateFns from "date-fns";
+import { execSync } from "child_process";
+import { PrismaClient } from "@prisma/client";
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
-const USER_SESSION_KEY = "userId";
-const sessionStorageAdmin = createCookieSessionStorage({
+const sessionStorage = createCookieSessionStorage({
   cookie: {
-    name: "__session_admin",
+    name: "__session",
     httpOnly: true,
     maxAge: 0,
     path: "/",
@@ -21,88 +21,16 @@ const sessionStorageAdmin = createCookieSessionStorage({
     secure: true, //process.env.NODE_ENV === "production",
   },
 });
-const sessionStorageApiUser = createCookieSessionStorage({
-  cookie: {
-    name: "__session_api_user",
-    httpOnly: true,
-    maxAge: 0,
-    path: "/",
-    sameSite: "none",
-    secrets: [process.env.SESSION_SECRET],
-    secure: true, //process.env.NODE_ENV === "production",
-  },
-});
-
-function getSession(request: Request, sessionStorage: SessionStorage) {
+export function getSession(request: Request) {
   const cookie = request.headers.get("Cookie");
   return sessionStorage.getSession(cookie);
 }
+export const commitSession = sessionStorage.commitSession;
+export const destroySession = sessionStorage.destroySession;
 
-export async function loginAdmin(
-  request: Request,
-  userId: string,
-  rememberMe: boolean = false,
-  redirectTo?: string
-) {
-  const session = await getSession(request, sessionStorageAdmin);
-  session.set(USER_SESSION_KEY, userId);
-  const headers = {
-    "Set-Cookie": await sessionStorageAdmin.commitSession(session, {
-      maxAge: rememberMe
-        ? 60 * 60 * 24 * 7 // 7 days
-        : undefined,
-    }),
-  };
-  if (!redirectTo) {
-    return new Response(null, { headers });
-  }
-  return redirect(redirectTo, {
-    headers,
-  });
-}
-
-export async function loginApiUser(
-  request: Request,
-  userId: string,
-  rememberMe: boolean = false
-) {
-  const session = await getSession(request, sessionStorageApiUser);
-  session.set(USER_SESSION_KEY, userId);
-  const headers = {
-    "Set-Cookie": await sessionStorageApiUser.commitSession(session, {
-      maxAge: rememberMe
-        ? 60 * 60 * 24 * 7 // 7 days
-        : undefined,
-    }),
-  };
-  return new Response(null, { headers });
-}
-
-export async function logoutAdmin(request: Request, redirectTo?: string) {
-  const session = await getSession(request, sessionStorageAdmin);
-  const search = redirectTo ? `?redirectTo=${redirectTo}` : "";
-  return redirect(`/admin/login${search}`, {
-    headers: {
-      "Set-Cookie": await sessionStorageAdmin.destroySession(session),
-    },
-  });
-}
-
-export async function logoutApiUser(request: Request) {
-  const session = await getSession(request, sessionStorageApiUser);
-  return new Response(null, {
-    headers: {
-      "Set-Cookie": await sessionStorageApiUser.destroySession(session),
-    },
-  });
-}
-
-async function getCurrentUser(
-  request: Request,
-  sessionStorage: SessionStorage
-) {
-  const session = await getSession(request, sessionStorage);
-  const userId = session.get(USER_SESSION_KEY);
+export async function getCurrentAdmin(request: Request) {
+  const session = await getSession(request);
+  const userId = session.get("adminId");
   if (!userId) {
     return null;
   }
@@ -113,18 +41,31 @@ async function getCurrentUser(
   return user;
 }
 
-export async function getCurrentAdmin(request: Request) {
-  return getCurrentUser(request, sessionStorageAdmin);
-}
-
 export async function getCurrentApiUser(request: Request) {
-  return getCurrentUser(request, sessionStorageApiUser);
+  const session = await getSession(request);
+  const userId = session.get("apiUserId");
+  if (!userId) {
+    return null;
+  }
+  const user = await db.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    return null;
+  }
+  return user;
 }
 
 export async function requireCurrentAdmin(request: Request) {
   const user = await getCurrentAdmin(request);
   if (!user) {
-    throw json({ message: "Authorization error" }, { status: 401 });
+    const redirectTo = new URL(request.url).pathname;
+    const search = redirectTo ? `?redirectTo=${redirectTo}` : "";
+    const session = await getSession(request);
+    session.unset("adminId");
+    throw redirect(`/admin/login${search}`, {
+      headers: {
+        "Set-Cookie": await commitSession(session),
+      },
+    });
   }
   return user;
 }
@@ -295,4 +236,10 @@ declare global {
 if (!global.scheduled) {
   schedule();
   global.scheduled = true;
+}
+
+export async function clearDb() {
+  await global.__db?.$disconnect();
+  execSync(`npx prisma migrate reset --force`);
+  global.__db = new PrismaClient();
 }

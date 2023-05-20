@@ -3,7 +3,7 @@ import { json } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
 import bcrypt from "bcryptjs";
-import { loginApiUser } from "~/utils.server";
+import { commitSession, getSession } from "~/utils.server";
 
 const requestBodySchema = z.object({
   email: z.string().email(),
@@ -44,5 +44,15 @@ export const action: ActionFunction = async ({ request }) => {
   if (!isPasswordCorrect) {
     return json({ message: "Wrong password" }, { status: 401 });
   }
-  return loginApiUser(request, user.id, validatedData.rememberMe);
+  const session = await getSession(request);
+  session.set("apiUserId", user.id);
+  return new Response(null, {
+    headers: {
+      "Set-Cookie": await commitSession(session, {
+        maxAge: validatedData.rememberMe
+          ? 60 * 60 * 24 * 7 // 7 days
+          : undefined,
+      }),
+    },
+  });
 };

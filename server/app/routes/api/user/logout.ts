@@ -1,6 +1,12 @@
 import type { ActionFunction } from "@remix-run/node";
-import { logoutApiUser } from "~/utils.server";
+import { commitSession, getSession } from "~/utils.server";
 
 export const action: ActionFunction = async ({ request }) => {
-  return await logoutApiUser(request);
+  const session = await getSession(request);
+  session.unset("apiUserId");
+  return new Response(null, {
+    headers: {
+      "Set-Cookie": await commitSession(session),
+    },
+  });
 };

@@ -161,7 +161,19 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       if (!(startup.status === "developerApplication")) {
         return null;
       }
-      return {};
+      return {
+        applications: await db.applicationDeveloper.findMany({
+          where: { startupId },
+          select: {
+            id: true,
+            message: true,
+            status: true,
+            developer: {
+              select: { id: true, shortOrgName: true, email: true },
+            },
+          },
+        }),
+      };
     })(),
   };
 };

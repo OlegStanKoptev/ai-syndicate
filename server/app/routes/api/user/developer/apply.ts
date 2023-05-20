@@ -6,7 +6,7 @@ import bycript from "bcryptjs";
 
 const requestBodySchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8).max(32),
+  password: z.string().min(1),
   phone: z.string().optional().nullable(),
   avatarImageFile: z.string().optional().nullable(),
   orgName: z.string().min(1),

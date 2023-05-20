@@ -7,6 +7,9 @@ CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'ver
 -- CreateEnum
 CREATE TYPE "ApplicationNewDeveloperStatus" AS ENUM ('new', 'approved', 'declined');
 
+-- CreateEnum
+CREATE TYPE "ApplicationDeveloperStatus" AS ENUM ('new');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -99,6 +102,19 @@ CREATE TABLE "ApplicationNewDeveloper" (
     CONSTRAINT "ApplicationNewDeveloper_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ApplicationDeveloper" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "startupId" TEXT NOT NULL,
+    "developerId" TEXT NOT NULL,
+    "status" "ApplicationDeveloperStatus" NOT NULL,
+    "message" TEXT NOT NULL,
+
+    CONSTRAINT "ApplicationDeveloper_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -119,3 +135,9 @@ ALTER TABLE "Investment" ADD CONSTRAINT "Investment_investorId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "Investment" ADD CONSTRAINT "Investment_startupId_fkey" FOREIGN KEY ("startupId") REFERENCES "Startup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ApplicationDeveloper" ADD CONSTRAINT "ApplicationDeveloper_startupId_fkey" FOREIGN KEY ("startupId") REFERENCES "Startup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ApplicationDeveloper" ADD CONSTRAINT "ApplicationDeveloper_developerId_fkey" FOREIGN KEY ("developerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
