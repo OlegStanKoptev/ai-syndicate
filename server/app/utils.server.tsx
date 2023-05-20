@@ -2,12 +2,11 @@ import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import type { ZodEffects, ZodError, ZodSchema } from "zod";
 import { z } from "zod";
-import { db } from "./db.server";
+import { db, reconnectDb } from "./db.server";
 import { orderByValues } from "./utils";
 import { scheduleJob } from "node-schedule";
 import * as dateFns from "date-fns";
 import { execSync } from "child_process";
-import { PrismaClient } from "@prisma/client";
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 const sessionStorage = createCookieSessionStorage({
@@ -239,7 +238,7 @@ if (!global.scheduled) {
 }
 
 export async function clearDb() {
-  await global.__db?.$disconnect();
+  await db.$disconnect();
   execSync(`npx prisma migrate reset --force`);
-  global.__db = new PrismaClient();
+  reconnectDb();
 }
