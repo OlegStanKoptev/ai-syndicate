@@ -2,22 +2,27 @@ name: Deployment
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-
   build:
-
     runs-on: self-hosted
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    
-    - name: Remove containers
-      run: docker compose rm -f
-    
-    - name: Build and run the Docker image
-      run: docker compose up -d --build
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: "Create env file"
+        run: |
+          touch server/.env
+          echo SESSION_SECRET="aa65f665ceb2626641a9ce7901b73f37" >> server/.env
+          echo DATABASE_URL="postgresql://syndycate2022vkr:YhP*x5xzQTNkZgcf@167.86.72.50:5432/syndycate2022vkr?schema=public" >> server/.env
+          cat server/.env
+
+      - name: Remove containers
+        run: docker compose rm -f
+
+      - name: Build and run the Docker image
+        run: docker compose up -d --build
