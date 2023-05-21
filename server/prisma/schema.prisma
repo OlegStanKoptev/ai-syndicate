@@ -40,12 +40,14 @@ model User {
   website         String?
   phone           String?
 
-  startupsCreated       Startup[]
-  votesNewStartup       VoteNewStartup[]
-  investments           Investment[]
-  applicationsDeveloper ApplicationDeveloper[]
-  creatorOf             User[]                 @relation(name: "AdminExpertCreation")
-  createdBy             User?                  @relation(name: "AdminExpertCreation", fields: [createdById], references: [id])
+  startupsCreated                            Startup[]
+  votesNewStartup                            VoteNewStartup[]
+  investments                                Investment[]
+  applicationsDeveloper                      ApplicationDeveloper[]
+  creatorOf                                  User[]                    @relation(name: "AdminExpertCreation")
+  createdBy                                  User?                     @relation(name: "AdminExpertCreation", fields: [createdById], references: [id])
+  approvedOrDeclinedApplicationsNewDeveloper ApplicationNewDeveloper[]
+  createdFromApplication                     ApplicationNewDeveloper?  @relation(name: "a")
 }
 
 enum StartupStatus {
@@ -123,8 +125,11 @@ model ApplicationNewDeveloper {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  status        ApplicationNewDeveloperStatus
-  declineReason String?
+  status                 ApplicationNewDeveloperStatus
+  declineReason          String?
+  approvedOrDeclinedById String?                       @unique
+  approvedOrDeclinedAt   DateTime?
+  createdDeveloperId     String?
 
   email           String
   passwordHash    String
@@ -138,6 +143,9 @@ model ApplicationNewDeveloper {
   actualAddress   String
   website         String
   phone           String?
+
+  approvedOrDeclinedBy User? @relation(name: "a", fields: [approvedOrDeclinedById], references: [id])
+  createdDeveloper     User? @relation(fields: [createdDeveloperId], references: [id])
 }
 
 enum ApplicationDeveloperStatus {

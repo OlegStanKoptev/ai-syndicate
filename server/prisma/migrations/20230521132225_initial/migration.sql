@@ -88,6 +88,9 @@ CREATE TABLE "ApplicationNewDeveloper" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "status" "ApplicationNewDeveloperStatus" NOT NULL,
     "declineReason" TEXT,
+    "approvedOrDeclinedById" TEXT,
+    "approvedOrDeclinedAt" TIMESTAMP(3),
+    "createdDeveloperId" TEXT,
     "email" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
     "avatarImageFile" TEXT,
@@ -123,6 +126,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "VoteNewStartup_startupId_expertId_key" ON "VoteNewStartup"("startupId", "expertId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "ApplicationNewDeveloper_approvedOrDeclinedById_key" ON "ApplicationNewDeveloper"("approvedOrDeclinedById");
+
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -140,6 +146,12 @@ ALTER TABLE "Investment" ADD CONSTRAINT "Investment_investorId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "Investment" ADD CONSTRAINT "Investment_startupId_fkey" FOREIGN KEY ("startupId") REFERENCES "Startup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ApplicationNewDeveloper" ADD CONSTRAINT "ApplicationNewDeveloper_approvedOrDeclinedById_fkey" FOREIGN KEY ("approvedOrDeclinedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ApplicationNewDeveloper" ADD CONSTRAINT "ApplicationNewDeveloper_createdDeveloperId_fkey" FOREIGN KEY ("createdDeveloperId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ApplicationDeveloper" ADD CONSTRAINT "ApplicationDeveloper_startupId_fkey" FOREIGN KEY ("startupId") REFERENCES "Startup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

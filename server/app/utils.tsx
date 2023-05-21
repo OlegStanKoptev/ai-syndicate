@@ -1,4 +1,8 @@
-import type { StartupStatus, UserRole } from "@prisma/client";
+import type {
+  ApplicationNewDeveloperStatus,
+  StartupStatus,
+  UserRole,
+} from "@prisma/client";
 import { useSearchParams, useTransition } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { FieldValues, Path, UseFormSetFocus } from "react-hook-form";
@@ -44,6 +48,18 @@ export const userRoleNames: { [K in UserRole]: string } = {
   developer: "Developer",
   expert: "Expert",
   user: "User",
+};
+
+export const applicationNewDeveloperStatuses: readonly [
+  ApplicationNewDeveloperStatus,
+  ...ApplicationNewDeveloperStatus[]
+] = ["new", "declined", "approved"];
+export const applicationNewDeveloperStatusNames: {
+  [K in ApplicationNewDeveloperStatus]: string;
+} = {
+  new: "New",
+  declined: "Declined",
+  approved: "Approved",
 };
 
 export function serialize<T = any>(data: T) {
@@ -209,102 +225,102 @@ export async function populate() {
     email: "startuper@startuper.com",
     password: "startuper",
   });
-  const { id: startupId } = await axios
-    .post("/api/startup/new", {
-      name: "Startup with AI",
-      description: "Please invest",
-      logoFile: null,
-      specificationFile: "tz4.pdf",
-      businessPlanFile: null,
-      presentationFile: null,
-      targetFinancing: 300,
-    })
-    .then(({ data }) => data);
-  await axios.post(
-    "/admin/new-expert",
-    (() => {
-      const formData = new FormData();
-      formData.set("email", "expert@expert.com");
-      formData.set("password", "expert");
-      formData.set("fullName", "Expert Expertov");
-      return formData;
-    })(),
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-    }
-  );
-  await axios.post("/api/user/login", {
-    email: "expert@expert.com",
-    password: "expert",
-  });
-  await axios.post(`/api/startup/${startupId}/verification/vote`, {
-    yea: true,
-  });
-  await axios.post("/api/user/login", {
-    email: "startuper@startuper.com",
-    password: "startuper",
-  });
-  await axios.post(`/api/startup/${startupId}/verification_succeded/confirm`, {
-    financingDeadline: "2023-05-26T07:04:15.641Z",
-  });
-  await axios.post("/api/user/join", {
-    email: "investor@investor.com",
-    password: "investor",
-    fullName: "Investor Investorov",
-    avatarImageFile: null,
-  });
-  await axios.post("/api/user/login", {
-    email: "investor@investor.com",
-    password: "investor",
-  });
-  await axios.post("/api/user/deposit", { amount: 1000 });
-  await axios.post(`/api/startup/${startupId}/financing/invest`, {
-    amount: 300,
-  });
-  await axios.post("/api/user/login", {
-    email: "startuper@startuper.com",
-    password: "startuper",
-  });
-  await axios.post(`/api/startup/${startupId}/financing_succeded/confirm`, {
-    developerApplicationDeadline: "2023-05-27T07:04:15.641Z",
-  });
-  const { id: applicationId } = await axios
-    .post("/api/user/developer/apply", {
-      email: "developer@developer.com",
-      password: "developer",
-      phone: null,
-      avatarImageFile: null,
-      orgName: "AO Good Developers",
-      shortOrgName: "Good Devs",
-      inn: "5734241100",
-      ogrn: "9027539198166",
-      kpp: "271601001",
-      legalAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
-      actualAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
-      website: "developers-228.com",
-    })
-    .then(({ data }) => data);
-  await axios.post(
-    "/admin/new-developer-applications",
-    (() => {
-      const formData = new FormData();
-      formData.set("__action", "approve");
-      formData.set("applicationId", applicationId);
-      return formData;
-    })(),
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-    }
-  );
-  await axios.post("/api/user/login", {
-    email: "developer@developer.com",
-    password: "developer",
-  });
-  await axios.post(`/api/startup/${startupId}/developer-application/new`, {
-    message: "I will do it well",
-  });
-  await axios.post("/api/user/login", {
-    email: "startuper@startuper.com",
-    password: "startuper",
-  });
+  // const { id: startupId } = await axios
+  //   .post("/api/startup/new", {
+  //     name: "Startup with AI",
+  //     description: "Please invest",
+  //     logoFile: null,
+  //     specificationFile: "tz4.pdf",
+  //     businessPlanFile: null,
+  //     presentationFile: null,
+  //     targetFinancing: 300,
+  //   })
+  //   .then(({ data }) => data);
+  // await axios.post(
+  //   "/admin/users/new-expert",
+  //   (() => {
+  //     const formData = new FormData();
+  //     formData.set("email", "expert@expert.com");
+  //     formData.set("password", "expert");
+  //     formData.set("fullName", "Expert Expertov");
+  //     return formData;
+  //   })(),
+  //   {
+  //     headers: { "Content-Type": "multipart/form-data" },
+  //   }
+  // );
+  // await axios.post("/api/user/login", {
+  //   email: "expert@expert.com",
+  //   password: "expert",
+  // });
+  // await axios.post(`/api/startup/${startupId}/verification/vote`, {
+  //   yea: true,
+  // });
+  // await axios.post("/api/user/login", {
+  //   email: "startuper@startuper.com",
+  //   password: "startuper",
+  // });
+  // await axios.post(`/api/startup/${startupId}/verification_succeded/confirm`, {
+  //   financingDeadline: "2023-05-26T07:04:15.641Z",
+  // });
+  // await axios.post("/api/user/join", {
+  //   email: "investor@investor.com",
+  //   password: "investor",
+  //   fullName: "Investor Investorov",
+  //   avatarImageFile: null,
+  // });
+  // await axios.post("/api/user/login", {
+  //   email: "investor@investor.com",
+  //   password: "investor",
+  // });
+  // await axios.post("/api/user/deposit", { amount: 1000 });
+  // await axios.post(`/api/startup/${startupId}/financing/invest`, {
+  //   amount: 300,
+  // });
+  // await axios.post("/api/user/login", {
+  //   email: "startuper@startuper.com",
+  //   password: "startuper",
+  // });
+  // await axios.post(`/api/startup/${startupId}/financing_succeded/confirm`, {
+  //   developerApplicationDeadline: "2023-05-27T07:04:15.641Z",
+  // });
+  // const { id: applicationId } = await axios
+  //   .post("/api/user/developer/apply", {
+  //     email: "developer@developer.com",
+  //     password: "developer",
+  //     phone: null,
+  //     avatarImageFile: null,
+  //     orgName: "AO Good Developers",
+  //     shortOrgName: "Good Devs",
+  //     inn: "5734241100",
+  //     ogrn: "9027539198166",
+  //     kpp: "271601001",
+  //     legalAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
+  //     actualAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
+  //     website: "developers-228.com",
+  //   })
+  //   .then(({ data }) => data);
+  // await axios.post(
+  //   "/admin/application-new-developers",
+  //   (() => {
+  //     const formData = new FormData();
+  //     formData.set("_action", "approve");
+  //     formData.set("applicationId", applicationId);
+  //     return formData;
+  //   })(),
+  //   {
+  //     headers: { "Content-Type": "multipart/form-data" },
+  //   }
+  // );
+  // await axios.post("/api/user/login", {
+  //   email: "developer@developer.com",
+  //   password: "developer",
+  // });
+  // await axios.post(`/api/startup/${startupId}/developer-application/new`, {
+  //   message: "I will do it well",
+  // });
+  // await axios.post("/api/user/login", {
+  //   email: "startuper@startuper.com",
+  //   password: "startuper",
+  // });
 }

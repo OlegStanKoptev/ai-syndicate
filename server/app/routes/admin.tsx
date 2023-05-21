@@ -95,7 +95,7 @@ export default function Private() {
                   name: "Startups",
                 },
                 {
-                  path: "new-developer-applications",
+                  path: "applications-new-developer",
                   name: "New developer appplications",
                 },
                 ...(process.env.NODE_ENV === "development"

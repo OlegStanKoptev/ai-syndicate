@@ -32,15 +32,15 @@ import {
 export const action: ActionFunction = async ({ request }) => {
   await requireCurrentAdmin(request);
   const data = Object.fromEntries(await request.formData());
-  const { __action } = data;
-  if (__action === "invalidate") {
+  const { _action } = data;
+  if (_action === "invalidate") {
     return new Response();
   }
-  if (__action === "clear") {
+  if (_action === "clear") {
     await clearDb();
     return new Response();
   }
-  throw new Error(`Unknown action: ${__action}`);
+  throw new Error(`Unknown action: ${_action}`);
 };
 
 export const handle = {
@@ -69,7 +69,7 @@ export default function Spec() {
   const transition = useTransition();
   const isClearing = useSpinDelay(
     transition.state === "submitting" &&
-      transition.submission.formData.get("__action") === "clear"
+      transition.submission.formData.get("_action") === "clear"
   );
   const [isPopulatingState, setIsPopulatingState] = useState(false);
   const isPopulating = useSpinDelay(isPopulatingState);
@@ -107,17 +107,17 @@ export default function Spec() {
               .catch(() => setDidPopulationFail(true))
               .finally(() => {
                 setIsPopulatingState(false);
-                fetcher.submit({ __action: "invalidate" }, { method: "post" });
+                fetcher.submit({ _action: "invalidate" }, { method: "post" });
               });
           }}
         >
           Populate
         </Button>
-        <Form method="post">
+        <Form method="post" replace>
           <Button
             size="sm"
             type="submit"
-            name="__action"
+            name="_action"
             value="clear"
             loading={isClearing}
           >
@@ -474,7 +474,7 @@ function EndpointExample({
               body: form ? formData : body,
             }
           );
-          fetcher.submit({ __action: "invalidate" }, { method: "post" });
+          fetcher.submit({ _action: "invalidate" }, { method: "post" });
           try {
             setResponse({
               status: response.status,
