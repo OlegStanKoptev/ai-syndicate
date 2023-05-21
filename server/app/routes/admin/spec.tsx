@@ -126,7 +126,7 @@ export default function Spec() {
         </Form>
       </div>
       {didPopulationSucceed ? (
-        <div className="text-green-400">Populated</div>
+        <div className="text-green-600">Populated</div>
       ) : didPopulationFail ? (
         <div className="text-red-400">Could not populate</div>
       ) : (

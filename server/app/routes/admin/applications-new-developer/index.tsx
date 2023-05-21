@@ -78,18 +78,17 @@ export const loader: LoaderFunction = async ({ request }) => {
       status: 400,
     });
   }
-  const applicationsNewDeveloper: any =
-    await db.applicationNewDeveloper.findMany({
-      where,
-      orderBy: (() => {
-        if (!sortKey) {
-          return { updatedAt: orderBy };
-        }
-        return { [sortKey]: orderBy };
-      })(),
-      skip: size * page,
-      take: size,
-    });
+  const applicationsNewDeveloper = await db.applicationNewDeveloper.findMany({
+    where,
+    orderBy: (() => {
+      if (!sortKey) {
+        return { updatedAt: orderBy };
+      }
+      return { [sortKey]: orderBy };
+    })(),
+    skip: size * page,
+    take: size,
+  });
   const from = Math.min(totalApplicationsNewDeveloper, size * page + 1);
   const to = Math.min(totalApplicationsNewDeveloper, size * (page + 1));
   return new Response(

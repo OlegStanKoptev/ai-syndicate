@@ -24,7 +24,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       status: 404,
     });
   }
-  return new Response(serialize<LoaderData>({ user } as any));
+  return new Response(serialize<LoaderData>({ user }));
 };
 
 export const handle = {

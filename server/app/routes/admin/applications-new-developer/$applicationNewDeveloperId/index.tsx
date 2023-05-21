@@ -149,7 +149,7 @@ export default function ApplicationNewDeveloperIndex() {
       </div>
       {data.applicationNewDeveloper.status === "new" && (
         <>
-          <p className="mt-4">
+          <p className="text-base mt-4">
             You can either approve or decline (and specify reason) the
             application
           </p>

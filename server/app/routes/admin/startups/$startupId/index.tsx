@@ -1,4 +1,4 @@
-import type { Startup } from "@prisma/client";
+import type { Startup, User, VoteNewStartup } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -9,16 +9,21 @@ import {
   formatDate,
   serialize,
   startupStatusNames,
+  startupVerificationNayThreshold,
+  startupVerificationYeaThreshold,
 } from "~/utils";
-import { requireCurrentAdmin } from "~/utils.server";
+import {
+  getNewStartupNaysTotal,
+  getNewStartupYeasTotal,
+  requireCurrentAdmin,
+} from "~/utils.server";
 
 type LoaderData = {
   startup: Startup & {
-    startuper: {
-      id: string;
-      fullName: string;
-      email: string;
-    };
+    startuper: User;
+    votesNewStartup: VoteNewStartup[];
+    yeasTotal: number;
+    naysTotal: number;
   };
 };
 
@@ -29,9 +34,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const startup = await db.startup.findUnique({
     where: { id: startupId },
     include: {
-      startuper: {
-        select: { id: true, fullName: true, email: true },
-      },
+      startuper: true,
+      votesNewStartup: true,
     },
   });
   if (!startup) {
@@ -39,7 +43,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       status: 404,
     });
   }
-  return new Response(serialize<LoaderData>({ startup } as any));
+  return new Response(
+    serialize<LoaderData>({
+      startup: {
+        ...startup,
+        yeasTotal: await getNewStartupYeasTotal(startupId),
+        naysTotal: await getNewStartupNaysTotal(startupId),
+      },
+    })
+  );
 };
 
 export const meta: MetaFunction = (args) => {
@@ -59,8 +71,30 @@ export default function StartupIndex() {
           {startupStatusNames[data.startup.status]})
         </h1>
       </div>
-      <h2 className="font-bold text-lg mt-8 ml-4">INFO</h2>
-      <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
+      {data.startup.status === "verification" && (
+        <>
+          <p className="text-base mt-4">
+            Right now <span className="font-bold">experts</span> are deciding
+            whether or not this startup is{" "}
+            <span className="font-bold">good enough</span>. They are voting
+            either 'yea' or 'nay'
+          </p>
+          <p>
+            <span className="font-bold">{startupVerificationYeaThreshold}</span>{" "}
+            'yeas' is enough for the startup to pass. However,{" "}
+            <span className="font-bold">{startupVerificationNayThreshold}</span>{" "}
+            'nays' make startup become declined
+          </p>
+          <p className="text-base mt-4">
+            Currently, there are{" "}
+            <span className="text-green-600">{data.startup.yeasTotal}</span>{" "}
+            'yeas' and{" "}
+            <span className="text-red-400">{data.startup.naysTotal}</span>{" "}
+            'nays'
+          </p>
+        </>
+      )}
+      <div className="mx-4 mt-8 grid grid-cols-2 gap-16">
         <div>
           <CardField name="Name">{data.startup.name}</CardField>
           <CardField name="Description">{data.startup.description}</CardField>

@@ -63,63 +63,66 @@ export default function UserIndex() {
           </div>
         </div>
       ) : data.user.role === "user" ? (
-        <div className="mx-4 my-8 grid grid-cols-2 gap-16">
-          <div>
-            <CardField name="Full name">{data.user.fullName}</CardField>
-            <CardField name="Email">{data.user.email}</CardField>
-            <CardField name="Avatar image file">
-              {data.user.avatarImageFile ? (
-                <a
-                  href={`/files/${data.user.avatarImageFile}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-400"
-                >
-                  {data.user.avatarImageFile}
-                </a>
-              ) : null}
-            </CardField>
+        <>
+          <div className="mx-4 my-8 grid grid-cols-2 gap-16">
+            <div>
+              <CardField name="Full name">{data.user.fullName}</CardField>
+              <CardField name="Email">{data.user.email}</CardField>
+              <CardField name="Avatar image file">
+                {data.user.avatarImageFile ? (
+                  <a
+                    href={`/files/${data.user.avatarImageFile}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-400"
+                  >
+                    {data.user.avatarImageFile}
+                  </a>
+                ) : null}
+              </CardField>
+              <CardField name="Registered at">
+                {formatDate(data.user.createdAt, { time: true })}
+              </CardField>
+            </div>
           </div>
-          <div />
-          <div>
-            <h2 className="font-bold text-lg mb-4">STARTUPS CREATED</h2>
-            <Table
-              data={data.user.startupsCreated}
-              columns={[
-                { id: "id", header: "Id" },
-                { id: "name", header: "Name" },
-                {
-                  id: "status",
-                  header: "Status",
-                  cell: ({ row }) => startupStatusNames[row.status],
-                },
-              ]}
-              onRowClick={({ row }) => navigate(`/admin/startups/${row.id}`)}
-            />
+          <div className="mx-4 my-8 grid grid-cols-2 gap-16">
+            <div>
+              <h2 className="font-bold text-lg mb-4">STARTUPS CREATED</h2>
+              <Table
+                data={data.user.startupsCreated}
+                columns={[
+                  { id: "id", header: "Id" },
+                  { id: "name", header: "Name" },
+                  {
+                    id: "status",
+                    header: "Status",
+                    cell: ({ row }) => startupStatusNames[row.status],
+                  },
+                ]}
+                onRowClick={({ row }) => navigate(`/admin/startups/${row.id}`)}
+              />
+            </div>
           </div>
-        </div>
+        </>
       ) : data.user.role === "expert" ? (
-        <div className="mx-4 my-8 grid grid-cols-2 gap-16">
-          <div>
-            <CardField name="Full name">{data.user.fullName}</CardField>
-            <CardField name="Email">{data.user.email}</CardField>
+        <>
+          <p>
+            Created by{" "}
+            <Link
+              to={`/admin/users/${data.user.createdBy!.id}`}
+              className="text-blue-400"
+            >
+              {data.user.createdBy!.fullName} ({data.user.createdBy!.email})
+            </Link>{" "}
+            at {formatDate(data.user.createdAt, { time: true })}
+          </p>
+          <div className="mx-4 my-8 grid grid-cols-2 gap-16">
+            <div>
+              <CardField name="Full name">{data.user.fullName}</CardField>
+              <CardField name="Email">{data.user.email}</CardField>
+            </div>
           </div>
-          <div />
-          <div>
-            <h2 className="font-bold text-lg mb-4">CREATION</h2>
-            <CardField name="Created at">
-              {formatDate(data.user.createdAt, { time: true })}
-            </CardField>
-            <CardField name="By">
-              <Link
-                to={`/admin/users/${data.user.createdBy!.id}`}
-                className="text-blue-400"
-              >
-                {data.user.createdBy!.fullName} ({data.user.createdBy!.email})
-              </Link>
-            </CardField>
-          </div>
-        </div>
+        </>
       ) : data.user.role === "developer" ? (
         <div className="mx-4 my-8 grid grid-cols-2 gap-16">
           <div>

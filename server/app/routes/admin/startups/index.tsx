@@ -31,7 +31,7 @@ import {
   useSort,
 } from "~/utils";
 import type { OrderBy } from "~/utils";
-import type { Startup } from "@prisma/client";
+import type { Startup, User } from "@prisma/client";
 import { z } from "zod";
 
 const { columns, sortKeys, prepareColumn } = prepareTable({
@@ -43,11 +43,7 @@ type SortableColumnKey = (typeof sortKeys)[number];
 
 type LoaderData = {
   startups: (Startup & {
-    startuper: {
-      id: string;
-      email: string;
-      fullName: string;
-    };
+    startuper: User;
   })[];
   from: number;
   to: number;
@@ -83,7 +79,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       status: 400,
     });
   }
-  const startups: any = await db.startup.findMany({
+  const startups = await db.startup.findMany({
     where,
     orderBy: (() => {
       if (!sortKey) {
@@ -93,11 +89,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     })(),
     skip: size * page,
     take: size,
-    include: {
-      startuper: {
-        select: { id: true, fullName: true, email: true },
-      },
-    },
+    include: { startuper: true },
   });
   const from = Math.min(totalStartups, size * page + 1);
   const to = Math.min(totalStartups, size * (page + 1));
