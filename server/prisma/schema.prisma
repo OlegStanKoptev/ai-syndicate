@@ -44,7 +44,7 @@ model User {
   votesNewStartup                            VoteNewStartup[]
   investments                                Investment[]
   applicationsDeveloper                      ApplicationDeveloper[]
-  creatorOf                                  User[]                    @relation(name: "AdminExpertCreation")
+  creatorOfExperts                           User[]                    @relation(name: "AdminExpertCreation")
   createdBy                                  User?                     @relation(name: "AdminExpertCreation", fields: [createdById], references: [id])
   approvedOrDeclinedApplicationsNewDeveloper ApplicationNewDeveloper[]
   createdFromApplication                     ApplicationNewDeveloper?  @relation(name: "a")

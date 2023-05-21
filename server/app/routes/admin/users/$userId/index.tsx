@@ -1,8 +1,8 @@
-import type { User } from "@prisma/client";
+import type { Startup, User } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
-import { Link, useCatch, useLoaderData } from "@remix-run/react";
+import { Link, useCatch, useLoaderData, useNavigate } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import { CardField, ExpectedError, UnexpectedError } from "~/components";
+import { CardField, ExpectedError, Table, UnexpectedError } from "~/components";
 import { db } from "~/db.server";
 import {
   deserialize,
@@ -10,12 +10,14 @@ import {
   formatUrl,
   userRoleNames,
   formatDate,
+  startupStatusNames,
 } from "~/utils";
 import { requireCurrentAdmin } from "~/utils.server";
 
 type LoaderData = {
   user: User & {
     createdBy: User | null;
+    startupsCreated: Startup[];
   };
 };
 
@@ -25,7 +27,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   await requireCurrentAdmin(request);
   const user = await db.user.findUnique({
     where: { id: userId },
-    include: { createdBy: true },
+    include: { createdBy: true, startupsCreated: true },
   });
   if (!user) {
     throw new Response(`User with this id: ${userId} not found`, {
@@ -44,6 +46,7 @@ export const meta: MetaFunction = (args) => {
 
 export default function UserIndex() {
   const data = deserialize<LoaderData>(useLoaderData());
+  const navigate = useNavigate();
   return (
     <div className="m-4">
       <div className="flex items-center gap-4">
@@ -76,6 +79,23 @@ export default function UserIndex() {
                 </a>
               ) : null}
             </CardField>
+          </div>
+          <div />
+          <div>
+            <h2 className="font-bold text-lg mb-4">STARTUPS CREATED</h2>
+            <Table
+              data={data.user.startupsCreated}
+              columns={[
+                { id: "id", header: "Id" },
+                { id: "name", header: "Name" },
+                {
+                  id: "status",
+                  header: "Status",
+                  cell: ({ row }) => startupStatusNames[row.status],
+                },
+              ]}
+              onRowClick={({ row }) => navigate(`/admin/startups/${row.id}`)}
+            />
           </div>
         </div>
       ) : data.user.role === "expert" ? (

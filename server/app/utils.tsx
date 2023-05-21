@@ -215,27 +215,42 @@ export function prepareTable<T extends string, U extends T>({
 }
 
 export async function populate() {
+  for (let i = 0; i < 15; i++) {
+    await axios.post(
+      "/admin/users/new-expert",
+      (() => {
+        const formData = new FormData();
+        formData.set("email", `expert${i}@expert${i}.com`);
+        formData.set("password", `expert${i}`);
+        formData.set("fullName", `Expert ${i}`);
+        return formData;
+      })(),
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+  }
   await axios.post("/api/user/join", {
-    email: "startuper@startuper.com",
-    password: "startuper",
-    fullName: "Startuper Startuperov",
+    email: "user0@user0.com",
+    password: "user0",
+    fullName: "User 0",
     avatarImageFile: null,
   });
   await axios.post("/api/user/login", {
-    email: "startuper@startuper.com",
-    password: "startuper",
+    email: "user0@user0.com",
+    password: "user0",
   });
-  // const { id: startupId } = await axios
-  //   .post("/api/startup/new", {
-  //     name: "Startup with AI",
-  //     description: "Please invest",
-  //     logoFile: null,
-  //     specificationFile: "tz4.pdf",
-  //     businessPlanFile: null,
-  //     presentationFile: null,
-  //     targetFinancing: 300,
-  //   })
-  //   .then(({ data }) => data);
+  await axios
+    .post("/api/startup/new", {
+      name: "Startup 0",
+      description: "This is startup 0",
+      logoFile: null,
+      specificationFile: "tz1.pdf",
+      businessPlanFile: null,
+      presentationFile: null,
+      targetFinancing: 300,
+    })
+    .then(({ data }) => data);
   // await axios.post(
   //   "/admin/users/new-expert",
   //   (() => {
