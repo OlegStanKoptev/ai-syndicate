@@ -114,7 +114,11 @@ export default function Table<
                           typeof element === "string" ||
                           typeof element === "number"
                         ) {
-                          return <Clamp className="h-10">{element}</Clamp>;
+                          return (
+                            <Clamp className="h-10 text-center">
+                              {element}
+                            </Clamp>
+                          );
                         }
                         return (
                           <div className="flex h-10 items-center">
