@@ -22,8 +22,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  role    UserRole
-  balance Int?
+  role        UserRole
+  balance     Int?
+  createdById String?
 
   email           String  @unique
   passwordHash    String
@@ -43,6 +44,8 @@ model User {
   votesNewStartup       VoteNewStartup[]
   investments           Investment[]
   applicationsDeveloper ApplicationDeveloper[]
+  creatorOf             User[]                 @relation(name: "AdminExpertCreation")
+  createdBy             User?                  @relation(name: "AdminExpertCreation", fields: [createdById], references: [id])
 }
 
 enum StartupStatus {

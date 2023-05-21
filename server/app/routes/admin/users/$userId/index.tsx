@@ -4,11 +4,19 @@ import { Link, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { CardField, ExpectedError, UnexpectedError } from "~/components";
 import { db } from "~/db.server";
-import { deserialize, serialize, formatUrl, userRoleNames } from "~/utils";
+import {
+  deserialize,
+  serialize,
+  formatUrl,
+  userRoleNames,
+  formatDate,
+} from "~/utils";
 import { requireCurrentAdmin } from "~/utils.server";
 
 type LoaderData = {
-  user: User;
+  user: User & {
+    createdBy: User | null;
+  };
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -17,6 +25,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   await requireCurrentAdmin(request);
   const user = await db.user.findUnique({
     where: { id: userId },
+    include: { createdBy: true },
   });
   if (!user) {
     throw new Response(`User with this id: ${userId} not found`, {
@@ -74,6 +83,21 @@ export default function UserIndex() {
           <div>
             <CardField name="Full name">{data.user.fullName}</CardField>
             <CardField name="Email">{data.user.email}</CardField>
+          </div>
+          <div />
+          <div>
+            <h2 className="font-bold text-lg mb-4">CREATION</h2>
+            <CardField name="Created at">
+              {formatDate(data.user.createdAt, { time: true })}
+            </CardField>
+            <CardField name="By">
+              <Link
+                to={`/admin/users/${data.user.createdBy!.id}`}
+                className="text-blue-400"
+              >
+                {data.user.createdBy!.fullName} ({data.user.createdBy!.email})
+              </Link>
+            </CardField>
           </div>
         </div>
       ) : data.user.role === "developer" ? (

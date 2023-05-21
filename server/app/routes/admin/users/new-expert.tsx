@@ -38,7 +38,7 @@ type ActionData = {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  await requireCurrentAdmin(request);
+  const admin = await requireCurrentAdmin(request);
   const data = Object.fromEntries(await request.formData());
   const validationResult = schema.safeParse(data);
   if (!validationResult.success) {
@@ -64,6 +64,7 @@ export const action: ActionFunction = async ({ request }) => {
       email: validatedData.email,
       passwordHash: await bycript.hash(validatedData.password, 10),
       fullName: validatedData.fullName,
+      createdById: admin.id,
     },
   });
   return redirect(`/admin/users/${expert.id}`);
