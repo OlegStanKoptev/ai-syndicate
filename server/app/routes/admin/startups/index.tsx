@@ -167,19 +167,17 @@ export default function StartupsIndex() {
         </h1>
         <Select
           options={startupStatusNames}
-          placeholder="Choose status"
-          clearable
           defaultValue={searchParams.get("status") ?? undefined}
-          onChange={(value) => {
-            if (!value) {
+          emptyOptionName="All"
+          onChange={(e) => {
+            if (!e.target.value) {
               searchParams.delete("status");
             } else {
-              searchParams.set("status", value);
+              searchParams.set("status", e.target.value);
             }
             searchParams.delete("page");
             setSearchParams(searchParams);
           }}
-          className="min-w-[200px]"
         />
       </div>
       <div className="max-w-full overflow-auto">

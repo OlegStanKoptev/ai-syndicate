@@ -1,8 +1,19 @@
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
-import { Link, useCatch, useLoaderData, useNavigate } from "@remix-run/react";
+import {
+  Link,
+  useCatch,
+  useLoaderData,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
 import { db } from "~/db.server";
-import { requireCurrentAdmin, validateRegistryParams } from "~/utils.server";
+import {
+  requireCurrentAdmin,
+  validateRegistryParams,
+  validateSingleParameter,
+} from "~/utils.server";
 import type { TableColumn } from "~/components";
+import { Select } from "~/components";
 import { LinkButton } from "~/components";
 import {
   ExpectedError,
@@ -17,9 +28,11 @@ import {
   usePaginationSize,
   useSort,
   userRoleNames,
+  userRoles,
 } from "~/utils";
 import type { OrderBy } from "~/utils";
 import type { User } from "@prisma/client";
+import { z } from "zod";
 
 const { columns, sortKeys, prepareColumn } = prepareTable({
   columns: ["id", "name", "email", "role"],
@@ -48,7 +61,15 @@ export const loader: LoaderFunction = async ({ request }) => {
     searchParams,
     sortKeys
   );
-  const where = {};
+  const role = validateSingleParameter({
+    value: searchParams.get("role") ?? undefined,
+    schema: z.enum(userRoles).optional(),
+    throw_: new Response(
+      `Parameter role is incorrect: ${searchParams.get("role")}`,
+      { status: 400 }
+    ),
+  });
+  const where = { role };
   const totalUsers = await db.user.count({ where });
   const totalPages = Math.ceil(totalUsers / size);
   if (totalUsers > 0 && page + 1 > totalPages) {
@@ -94,6 +115,7 @@ type TableRowData = LoaderData["users"][number];
 export default function UsersIndex() {
   const data = deserialize<LoaderData>(useLoaderData());
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const sort = useSort({ sort: data.sort });
   const { sizeChanging, onSizeChange } = usePaginationSize();
   const { users: tableData } = data;
@@ -122,6 +144,20 @@ export default function UsersIndex() {
             ({data.from}-{data.to} out of {data.totalUsers})
           </span>
         </h1>
+        <Select
+          options={userRoleNames}
+          defaultValue={searchParams.get("role") ?? undefined}
+          emptyOptionName="All"
+          onChange={(e) => {
+            if (!e.target.value) {
+              searchParams.delete("role");
+            } else {
+              searchParams.set("role", e.target.value);
+            }
+            searchParams.delete("page");
+            setSearchParams(searchParams);
+          }}
+        />
         <LinkButton to="new-expert" size="sm">
           Create expert
         </LinkButton>
