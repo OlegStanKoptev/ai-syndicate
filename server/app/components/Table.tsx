@@ -121,13 +121,13 @@ export default function Table<
                           );
                         }
                         return (
-                          <div className="flex h-10 items-center">
+                          <div className="flex h-10 items-center text-center">
                             {element}
                           </div>
                         );
                       })()
                     ) : (
-                      <Clamp className="h-10">
+                      <Clamp className="h-10 text-center">
                         {row[id as keyof TData] as ReactNode}
                       </Clamp>
                     )}

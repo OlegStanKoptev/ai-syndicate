@@ -91,6 +91,10 @@ export default function Private() {
                   name: "Users",
                 },
                 {
+                  path: "startups",
+                  name: "Startups",
+                },
+                {
                   path: "new-developer-applications",
                   name: "New developer appplications",
                 },
