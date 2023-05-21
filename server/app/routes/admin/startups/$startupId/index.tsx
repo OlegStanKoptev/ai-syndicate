@@ -2,11 +2,18 @@ import type { Startup, User, VoteNewStartup } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import { CardField, ExpectedError, UnexpectedError } from "~/components";
+import {
+  CardField,
+  ExpectedError,
+  ProgressBar,
+  Table,
+  UnexpectedError,
+} from "~/components";
 import { db } from "~/db.server";
 import {
   deserialize,
   formatDate,
+  isStartupStatusSameOrLaterThan,
   serialize,
   startupStatusNames,
   startupVerificationNayThreshold,
@@ -21,7 +28,9 @@ import {
 type LoaderData = {
   startup: Startup & {
     startuper: User;
-    votesNewStartup: VoteNewStartup[];
+    votesNewStartup: (VoteNewStartup & {
+      expert: User;
+    })[];
     yeasTotal: number;
     naysTotal: number;
   };
@@ -35,7 +44,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     where: { id: startupId },
     include: {
       startuper: true,
-      votesNewStartup: true,
+      votesNewStartup: {
+        orderBy: { updatedAt: "desc" },
+        include: { expert: true },
+      },
     },
   });
   if (!startup) {
@@ -79,18 +91,22 @@ export default function StartupIndex() {
             <span className="font-bold">good enough</span>. They are voting
             either 'yea' or 'nay'
           </p>
-          <p>
+          <p className="text-base">
             <span className="font-bold">{startupVerificationYeaThreshold}</span>{" "}
-            'yeas' is enough for the startup to pass. However,{" "}
+            'yeas' is enough for the startup to pass. However, it takes{" "}
             <span className="font-bold">{startupVerificationNayThreshold}</span>{" "}
-            'nays' make startup become declined
+            'nays' to decline the startup
           </p>
           <p className="text-base mt-4">
             Currently, there are{" "}
-            <span className="text-green-600">{data.startup.yeasTotal}</span>{" "}
+            <span className="text-green-600 font-bold">
+              {data.startup.yeasTotal}
+            </span>{" "}
             'yeas' and{" "}
-            <span className="text-red-400">{data.startup.naysTotal}</span>{" "}
-            'nays'
+            <span className="text-red-400 font-bold">
+              {data.startup.naysTotal}
+            </span>{" "}
+            'nays'.
           </p>
         </>
       )}
@@ -173,6 +189,75 @@ export default function StartupIndex() {
           </CardField>
         </div>
       </div>
+      {isStartupStatusSameOrLaterThan(data.startup.status, "verification") && (
+        <>
+          <h2 className="font-bold text-lg mb-4 mt-8">VERIFICATION</h2>
+          <div className="flex gap-4 items-center">
+            <ProgressBar
+              progress={
+                (data.startup.yeasTotal / startupVerificationYeaThreshold) * 100
+              }
+              label={data.startup.yeasTotal}
+              className="w-1/2"
+              barClassName="bg-green-600"
+            />
+            <p className="text-base">
+              Yeas:{" "}
+              <span className="text-green-600 font-bold">
+                {data.startup.yeasTotal}
+              </span>{" "}
+              / {startupVerificationYeaThreshold}
+            </p>
+          </div>
+          <div className="flex gap-4 items-center mt-2">
+            <ProgressBar
+              progress={
+                (data.startup.naysTotal / startupVerificationNayThreshold) * 100
+              }
+              label={data.startup.naysTotal}
+              className="w-1/2"
+              barClassName="bg-red-400"
+            />
+            <p className="text-base">
+              Nays:{" "}
+              <span className="text-red-400 font-bold">
+                {data.startup.naysTotal}
+              </span>{" "}
+              / {startupVerificationNayThreshold}
+            </p>
+          </div>
+          <h3 className="font-bold text-base mb-4 mt-4">Votes</h3>
+          <Table
+            data={data.startup.votesNewStartup}
+            columns={[
+              { id: "id", header: "Id" },
+              {
+                id: "expert",
+                header: "Expert",
+                cell: ({ row }) => (
+                  <Link
+                    to={`/admin/users/${row.expert.id}`}
+                    className="text-blue-400"
+                  >
+                    {row.expert.fullName} ({row.expert.email})
+                  </Link>
+                ),
+                width: 300,
+              },
+              {
+                id: "vote",
+                header: "Vote",
+                cell: ({ row }) => (row.yea ? "yea" : "nay"),
+              },
+              {
+                id: "date",
+                header: "Date",
+                cell: ({ row }) => formatDate(row.updatedAt, { time: true }),
+              },
+            ]}
+          />
+        </>
+      )}
     </div>
   );
 }

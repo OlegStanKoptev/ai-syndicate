@@ -10,8 +10,8 @@ import { useSpinDelay } from "~/components";
 import superjson from "superjson";
 import axios from "axios";
 
-export const startupVerificationYeaThreshold = 1; // 7
-export const startupVerificationNayThreshold = 1; // 3
+export const startupVerificationYeaThreshold = 7;
+export const startupVerificationNayThreshold = 3;
 
 export const orderByValues = ["desc", "asc"] as const;
 export type OrderBy = (typeof orderByValues)[number];
@@ -36,6 +36,57 @@ export const startupStatusNames: { [K in StartupStatus]: string } = {
   developerApplication: "Developer application",
   developerVoting: "Developer voting",
 };
+type StartupStatusTree = { status: StartupStatus; after?: StartupStatusTree[] };
+const startupStatusTree: StartupStatusTree = {
+  status: "verification",
+  after: [
+    { status: "verification_failed" },
+    {
+      status: "verification_succeded",
+      after: [
+        {
+          status: "financing",
+          after: [
+            { status: "financing_failed" },
+            {
+              status: "financing_succeded",
+              after: [
+                {
+                  status: "developerApplication",
+                  after: [{ status: "developerVoting" }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+function getStartupStatusTree(
+  status: StartupStatus,
+  startupStatusTree: StartupStatusTree
+): StartupStatusTree | null {
+  if (startupStatusTree.status === status) {
+    return startupStatusTree;
+  }
+  if (!startupStatusTree.after) {
+    return null;
+  }
+  const afterResults = startupStatusTree.after.map((afterStartupStatusTree) =>
+    getStartupStatusTree(status, afterStartupStatusTree)
+  );
+  return afterResults.find((afterResult) => !!afterResult) ?? null;
+}
+export function isStartupStatusSameOrLaterThan(
+  status: StartupStatus,
+  laterThanStatus: StartupStatus
+) {
+  return !!getStartupStatusTree(
+    status,
+    getStartupStatusTree(laterThanStatus, startupStatusTree)!
+  );
+}
 
 export const userRoles: readonly [UserRole, ...UserRole[]] = [
   "admin",
@@ -240,7 +291,7 @@ export async function populate() {
     email: "user0@user0.com",
     password: "user0",
   });
-  await axios
+  const { id: startup0Id } = await axios
     .post("/api/startup/new", {
       name: "Startup 0",
       description: "This is startup 0",
@@ -251,6 +302,22 @@ export async function populate() {
       targetFinancing: 300,
     })
     .then(({ data }) => data);
+  for (let i = 0; i < 8; i++) {
+    await axios.post("/api/user/login", {
+      email: `expert${i}@expert${i}.com`,
+      password: `expert${i}`,
+    });
+    if (i < 6) {
+      await axios.post(`/api/startup/${startup0Id}/verification/vote`, {
+        yea: true,
+      });
+    } else {
+      await axios.post(`/api/startup/${startup0Id}/verification/vote`, {
+        yea: false,
+        nayReason: `Nay reason ${i}`,
+      });
+    }
+  }
   // await axios.post(
   //   "/admin/users/new-expert",
   //   (() => {

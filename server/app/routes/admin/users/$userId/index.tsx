@@ -27,7 +27,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   await requireCurrentAdmin(request);
   const user = await db.user.findUnique({
     where: { id: userId },
-    include: { createdBy: true, startupsCreated: true },
+    include: {
+      createdBy: true,
+      startupsCreated: { orderBy: { updatedAt: "desc" } },
+    },
   });
   if (!user) {
     throw new Response(`User with this id: ${userId} not found`, {
@@ -85,9 +88,9 @@ export default function UserIndex() {
               </CardField>
             </div>
           </div>
-          <div className="mx-4 my-8 grid grid-cols-2 gap-16">
+          <h2 className="font-bold text-lg mb-4">STARTUPS CREATED</h2>
+          <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
             <div>
-              <h2 className="font-bold text-lg mb-4">STARTUPS CREATED</h2>
               <Table
                 data={data.user.startupsCreated}
                 columns={[

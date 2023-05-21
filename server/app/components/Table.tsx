@@ -98,7 +98,7 @@ export default function Table<
             <tr
               key={row.id}
               onClick={onRowClick ? () => onRowClick({ row }) : undefined}
-              className="flex hover:bg-blue-100"
+              className={twMerge("flex", onRowClick && "hover:bg-blue-100")}
             >
               {columns.map(({ id, cell, width = defaultColumnWidth }) => {
                 return (

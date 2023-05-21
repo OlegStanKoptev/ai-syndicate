@@ -19,3 +19,4 @@ export { default as Pagination } from "./Pagination";
 export { default as Table } from "./Table";
 export type { TableColumn } from "./Table";
 export { default as DatePicker } from "./DatePicker";
+export { default as ProgressBar } from "./ProgressBar";
