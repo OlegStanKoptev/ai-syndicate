@@ -138,16 +138,8 @@ export default function Spec() {
         route="/api/user/login"
         examples={[
           {
-            name: "As user (startuper@startuper.com)",
-            body: { email: "startuper@startuper.com", password: "startuper" },
-          },
-          {
-            name: "As user (investor@investor.com)",
-            body: { email: "investor@investor.com", password: "investor" },
-          },
-          {
-            name: "As expert",
-            body: { email: "expert@expert.com", password: "expert" },
+            name: "Example",
+            body: { email: "", password: "" },
           },
         ]}
       />

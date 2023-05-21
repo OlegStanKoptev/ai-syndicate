@@ -318,6 +318,68 @@ export async function populate() {
       });
     }
   }
+  await axios.post("/api/user/login", {
+    email: "user0@user0.com",
+    password: "user0",
+  });
+  const { id: startup1Id } = await axios
+    .post("/api/startup/new", {
+      name: "Startup 1",
+      description: "This is startup 1",
+      logoFile: null,
+      specificationFile: "tz1.pdf",
+      businessPlanFile: null,
+      presentationFile: null,
+      targetFinancing: 400,
+    })
+    .then(({ data }) => data);
+  for (let i = 0; i < 5; i++) {
+    await axios.post("/api/user/login", {
+      email: `expert${i}@expert${i}.com`,
+      password: `expert${i}`,
+    });
+    if (i < 2) {
+      await axios.post(`/api/startup/${startup1Id}/verification/vote`, {
+        yea: true,
+      });
+    } else {
+      await axios.post(`/api/startup/${startup1Id}/verification/vote`, {
+        yea: false,
+        nayReason: `Nay reason ${i}`,
+      });
+    }
+  }
+  await axios.post("/api/user/login", {
+    email: "user0@user0.com",
+    password: "user0",
+  });
+  const { id: startup2Id } = await axios
+    .post("/api/startup/new", {
+      name: "Startup 1",
+      description: "This is startup 1",
+      logoFile: null,
+      specificationFile: "tz1.pdf",
+      businessPlanFile: null,
+      presentationFile: null,
+      targetFinancing: 400,
+    })
+    .then(({ data }) => data);
+  for (let i = 0; i < 9; i++) {
+    await axios.post("/api/user/login", {
+      email: `expert${i}@expert${i}.com`,
+      password: `expert${i}`,
+    });
+    if (i < 2) {
+      await axios.post(`/api/startup/${startup2Id}/verification/vote`, {
+        yea: false,
+        nayReason: `Nay reason ${i}`,
+      });
+    } else {
+      await axios.post(`/api/startup/${startup2Id}/verification/vote`, {
+        yea: true,
+      });
+    }
+  }
   // await axios.post(
   //   "/admin/users/new-expert",
   //   (() => {

@@ -110,6 +110,47 @@ export default function StartupIndex() {
           </p>
         </>
       )}
+      {data.startup.status === "verification_succeded" && (
+        <>
+          <p className="text-base mt-4">
+            <span className="font-bold">Experts decided</span> that this startup
+            is <span className="font-bold">great</span>, and it is now{" "}
+            <span className="font-bold">verified</span>!
+          </p>
+          <p className="text-base">
+            Now it is time for the{" "}
+            <Link
+              to={`/admin/users/${data.startup.startuperId}`}
+              className="text-blue-400"
+            >
+              startuper
+            </Link>{" "}
+            to submit this startup to{" "}
+            <span className="font-bold">financing</span> stage.
+          </p>
+        </>
+      )}
+      {data.startup.status === "verification_failed" && (
+        <>
+          <p className="text-base mt-4">
+            <span className="font-bold">Unfortunately, experts decided</span>{" "}
+            that this startup
+            <span className="font-bold">does not fit</span> all requirements
+          </p>
+          <p className="text-base">
+            However, the{" "}
+            <Link
+              to={`/admin/users/${data.startup.startuperId}`}
+              className="text-blue-400"
+            >
+              startuper
+            </Link>{" "}
+            can consider all the <span className="font-bold">remarks</span> of
+            the experts and try to create it again with this one as{" "}
+            <span className="font-bold">base</span>
+          </p>
+        </>
+      )}
       <div className="mx-4 mt-8 grid grid-cols-2 gap-16">
         <div>
           <CardField name="Name">{data.startup.name}</CardField>
@@ -192,6 +233,23 @@ export default function StartupIndex() {
       {isStartupStatusSameOrLaterThan(data.startup.status, "verification") && (
         <>
           <h2 className="font-bold text-lg mb-4 mt-8">VERIFICATION</h2>
+          {data.startup.status === "verification" && (
+            <p className="mb-3">Verification in progress...</p>
+          )}
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "verification_failed"
+          ) && (
+            <p className="text-red-400 font-bold mb-3">Verification failed</p>
+          )}
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "verification_succeded"
+          ) && (
+            <p className="text-green-600 font-bold mb-3">
+              Verification succeded
+            </p>
+          )}
           <div className="flex gap-4 items-center">
             <ProgressBar
               progress={
@@ -249,6 +307,7 @@ export default function StartupIndex() {
                 header: "Vote",
                 cell: ({ row }) => (row.yea ? "yea" : "nay"),
               },
+              { id: "nayReason", header: "Nay reason", width: 500 },
               {
                 id: "date",
                 header: "Date",

@@ -1,4 +1,4 @@
-import type { Startup, User } from "@prisma/client";
+import type { Startup, User, VoteNewStartup } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useCatch, useLoaderData, useNavigate } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -18,6 +18,9 @@ type LoaderData = {
   user: User & {
     createdBy: User | null;
     startupsCreated: Startup[];
+    votesNewStartup: (VoteNewStartup & {
+      startup: Startup;
+    })[];
   };
 };
 
@@ -30,6 +33,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     include: {
       createdBy: true,
       startupsCreated: { orderBy: { updatedAt: "desc" } },
+      votesNewStartup: {
+        orderBy: { updatedAt: "desc" },
+        include: { startup: true },
+      },
     },
   });
   if (!user) {
@@ -123,6 +130,41 @@ export default function UserIndex() {
             <div>
               <CardField name="Full name">{data.user.fullName}</CardField>
               <CardField name="Email">{data.user.email}</CardField>
+            </div>
+          </div>
+          <h2 className="font-bold text-lg mb-4">NEW STARTUP VOTES</h2>
+          <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
+            <div>
+              <Table
+                data={data.user.votesNewStartup}
+                columns={[
+                  { id: "id", header: "Id" },
+                  {
+                    id: "startup",
+                    header: "Startup",
+                    cell: ({ row }) => (
+                      <Link
+                        to={`/admin/startups/${row.startupId}`}
+                        className="text-blue-400"
+                      >
+                        {row.startup.name}
+                      </Link>
+                    ),
+                  },
+                  {
+                    id: "vote",
+                    header: "Vote",
+                    cell: ({ row }) => (row.yea ? "yea" : "nay"),
+                  },
+                  { id: "nayReason", header: "Nay reason", width: 500 },
+                  {
+                    id: "date",
+                    header: "Date",
+                    cell: ({ row }) =>
+                      formatDate(row.updatedAt, { time: true }),
+                  },
+                ]}
+              />
             </div>
           </div>
         </>
