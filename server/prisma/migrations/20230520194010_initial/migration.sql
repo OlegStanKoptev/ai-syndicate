@@ -2,7 +2,7 @@
 CREATE TYPE "UserRole" AS ENUM ('user', 'expert', 'admin', 'developer');
 
 -- CreateEnum
-CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded', 'developerApplication');
+CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded', 'developerApplication', 'developerVoting');
 
 -- CreateEnum
 CREATE TYPE "ApplicationNewDeveloperStatus" AS ENUM ('new', 'approved', 'declined');

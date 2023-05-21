@@ -216,6 +216,23 @@ export function scheduleStartupFinancingDeadline(id: string, deadline: Date) {
   });
 }
 
+export function scheduleStartupDeveloperApplicationDeadline(
+  id: string,
+  deadline: Date
+) {
+  scheduleOrRunJob(deadline, async () => {
+    const startup = await db.startup.findUnique({
+      where: { id: id },
+    });
+    if (startup && startup.status === "developerApplication") {
+      await db.startup.update({
+        where: { id: startup.id },
+        data: { status: "developerVoting" },
+      });
+    }
+  });
+}
+
 async function schedule() {
   const financingStartups = await db.startup.findMany({
     where: { status: "financing" },
@@ -224,6 +241,18 @@ async function schedule() {
     financingStartups.map(async (startup) => {
       invariant(startup.financingDeadline);
       scheduleStartupFinancingDeadline(startup.id, startup.financingDeadline);
+    })
+  );
+  const developerApplicationStartups = await db.startup.findMany({
+    where: { status: "developerApplication" },
+  });
+  await Promise.all(
+    developerApplicationStartups.map(async (startup) => {
+      invariant(startup.developerApplicationDeadline);
+      scheduleStartupDeveloperApplicationDeadline(
+        startup.id,
+        startup.developerApplicationDeadline
+      );
     })
   );
 }

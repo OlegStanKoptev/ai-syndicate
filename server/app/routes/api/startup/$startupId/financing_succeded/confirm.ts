@@ -2,7 +2,10 @@ import { json } from "@remix-run/node";
 import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
-import { requireCurrentApiUser } from "~/utils.server";
+import {
+  requireCurrentApiUser,
+  scheduleStartupDeveloperApplicationDeadline,
+} from "~/utils.server";
 import invariant from "tiny-invariant";
 
 const requestBodySchema = z.object({
@@ -51,5 +54,9 @@ export const action: ActionFunction = async ({ request, params }) => {
       developerApplicationDeadline: validatedData.developerApplicationDeadline,
     },
   });
+  scheduleStartupDeveloperApplicationDeadline(
+    startupId,
+    validatedData.developerApplicationDeadline
+  );
   return new Response();
 };

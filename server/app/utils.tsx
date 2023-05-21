@@ -20,6 +20,7 @@ export const startupStatuses: readonly [StartupStatus, ...StartupStatus[]] = [
   "financing_failed",
   "financing_succeded",
   "developerApplication",
+  "developerVoting",
 ];
 
 export function serialize<T = any>(data: T) {
