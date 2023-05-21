@@ -98,10 +98,6 @@ export default function Private() {
                   path: "new-developer-applications",
                   name: "New developer appplications",
                 },
-                {
-                  path: "new-expert",
-                  name: "New expert",
-                },
                 ...(process.env.NODE_ENV === "development"
                   ? [
                       {

@@ -48,7 +48,17 @@ export const action: ActionFunction = async ({ request }) => {
     );
   }
   const validatedData = validationResult.data;
-  await db.user.create({
+  const existingExpert = await db.user.findUnique({
+    where: { email: validatedData.email },
+  });
+  if (existingExpert) {
+    return new Response(
+      serialize<ActionData>({
+        errors: { email: "User with this email exists" },
+      })
+    );
+  }
+  const expert = await db.user.create({
     data: {
       role: "expert",
       email: validatedData.email,
@@ -56,7 +66,7 @@ export const action: ActionFunction = async ({ request }) => {
       fullName: validatedData.fullName,
     },
   });
-  return redirect(`/admin`);
+  return redirect(`/admin/users/${expert.id}`);
 };
 
 export const meta: MetaFunction = () => {
