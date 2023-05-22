@@ -144,8 +144,8 @@ export default function StartupIndex() {
         <>
           <p className="text-base mt-4">
             <span className="font-bold">Unfortunately, experts decided</span>{" "}
-            that this startup
-            <span className="font-bold">does not fit</span> all requirements
+            that this startup <span className="font-bold">does not fit</span>{" "}
+            all requirements
           </p>
           <p className="text-base">
             However, the{" "}
@@ -318,6 +318,82 @@ export default function StartupIndex() {
           </CardField>
         </div>
       </div>
+      {isStartupStatusSameOrLaterThan(data.startup.status, "financing") && (
+        <>
+          <h2 className="font-bold text-lg mb-4 mt-8">FINANCING</h2>
+          <p className="mb-3">
+            Started at{" "}
+            {formatDate(data.startup.verificationEndedAt!, { time: true })}
+          </p>
+          <p className="mb-3">
+            Deadline:{" "}
+            {formatDate(data.startup.financingDeadline!, { time: true })}
+          </p>
+          {data.startup.status === "financing" ? (
+            <p className="mb-3">In progress...</p>
+          ) : (
+            <p className="mb-3">
+              Ended at {formatDate(data.startup.financingEndedAt!)}
+            </p>
+          )}
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "financing_failed"
+          ) && <p className="text-red-400 font-bold mb-3">Financing failed</p>}
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "financing_succeded"
+          ) && (
+            <p className="text-green-600 font-bold mb-3">Financing succeded</p>
+          )}
+          <div className="flex gap-4 items-center">
+            <ProgressBar
+              progress={
+                (data.startup.receivedFinancing /
+                  data.startup.targetFinancing) *
+                100
+              }
+              className="w-1/2"
+            />
+            <p className="text-base">
+              Finances:{" "}
+              <span className="text-green-600 font-bold">
+                {data.startup.receivedFinancing}
+              </span>{" "}
+              / {data.startup.targetFinancing}
+            </p>
+          </div>
+          <h3 className="font-bold text-base mb-4 mt-4">Investments</h3>
+          <Table
+            data={data.startup.investments}
+            columns={[
+              { id: "id", header: "Id" },
+              {
+                id: "investor",
+                header: "Investor",
+                cell: ({ row }) => (
+                  <Link
+                    to={`/admin/users/${row.investor.id}`}
+                    className="text-blue-400"
+                  >
+                    {row.investor.fullName} ({row.investor.email})
+                  </Link>
+                ),
+                width: 300,
+              },
+              {
+                id: "amount",
+                header: "Amount",
+              },
+              {
+                id: "date",
+                header: "Date",
+                cell: ({ row }) => formatDate(row.updatedAt, { time: true }),
+              },
+            ]}
+          />
+        </>
+      )}
       {isStartupStatusSameOrLaterThan(data.startup.status, "verification") && (
         <>
           <h2 className="font-bold text-lg mb-4 mt-8">VERIFICATION</h2>
@@ -403,82 +479,6 @@ export default function StartupIndex() {
                 cell: ({ row }) => (row.yea ? "yea" : "nay"),
               },
               { id: "nayReason", header: "Nay reason", width: 500 },
-              {
-                id: "date",
-                header: "Date",
-                cell: ({ row }) => formatDate(row.updatedAt, { time: true }),
-              },
-            ]}
-          />
-        </>
-      )}
-      {isStartupStatusSameOrLaterThan(data.startup.status, "financing") && (
-        <>
-          <h2 className="font-bold text-lg mb-4 mt-8">FINANCING</h2>
-          <p className="mb-3">
-            Started at{" "}
-            {formatDate(data.startup.verificationEndedAt!, { time: true })}
-          </p>
-          <p className="mb-3">
-            Deadline:{" "}
-            {formatDate(data.startup.financingDeadline!, { time: true })}
-          </p>
-          {data.startup.status === "financing" ? (
-            <p className="mb-3">In progress...</p>
-          ) : (
-            <p className="mb-3">
-              Ended at {formatDate(data.startup.financingEndedAt!)}
-            </p>
-          )}
-          {isStartupStatusSameOrLaterThan(
-            data.startup.status,
-            "financing_failed"
-          ) && <p className="text-red-400 font-bold mb-3">Financing failed</p>}
-          {isStartupStatusSameOrLaterThan(
-            data.startup.status,
-            "financing_succeded"
-          ) && (
-            <p className="text-green-600 font-bold mb-3">Financing succeded</p>
-          )}
-          <div className="flex gap-4 items-center">
-            <ProgressBar
-              progress={
-                (data.startup.receivedFinancing /
-                  data.startup.targetFinancing) *
-                100
-              }
-              className="w-1/2"
-            />
-            <p className="text-base">
-              Finances:{" "}
-              <span className="text-green-600 font-bold">
-                {data.startup.receivedFinancing}
-              </span>{" "}
-              / {data.startup.targetFinancing}
-            </p>
-          </div>
-          <h3 className="font-bold text-base mb-4 mt-4">Investments</h3>
-          <Table
-            data={data.startup.investments}
-            columns={[
-              { id: "id", header: "Id" },
-              {
-                id: "investor",
-                header: "Investor",
-                cell: ({ row }) => (
-                  <Link
-                    to={`/admin/users/${row.investor.id}`}
-                    className="text-blue-400"
-                  >
-                    {row.investor.fullName} ({row.investor.email})
-                  </Link>
-                ),
-                width: 300,
-              },
-              {
-                id: "amount",
-                header: "Amount",
-              },
               {
                 id: "date",
                 header: "Date",
