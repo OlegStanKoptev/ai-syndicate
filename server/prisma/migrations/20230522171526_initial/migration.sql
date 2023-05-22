@@ -59,6 +59,7 @@ CREATE TABLE "Startup" (
     "presentationFile" TEXT,
     "verificationEndedAt" TIMESTAMP(3),
     "financingEndedAt" TIMESTAMP(3),
+    "developerApplicationEndedAt" TIMESTAMP(3),
     "financingDeadline" TIMESTAMP(3),
     "developerApplicationDeadline" TIMESTAMP(3),
     "developerVotingDeadline" TIMESTAMP(3),
@@ -159,7 +160,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "VoteNewStartup_startupId_expertId_key" ON "VoteNewStartup"("startupId", "expertId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ApplicationNewDeveloper_approvedOrDeclinedById_key" ON "ApplicationNewDeveloper"("approvedOrDeclinedById");
+CREATE UNIQUE INDEX "ApplicationNewDeveloper_createdDeveloperId_key" ON "ApplicationNewDeveloper"("createdDeveloperId");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

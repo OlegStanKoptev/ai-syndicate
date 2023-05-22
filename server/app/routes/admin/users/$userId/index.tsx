@@ -1,4 +1,5 @@
 import type {
+  ApplicationDeveloper,
   Deposit,
   Investment,
   Refund,
@@ -33,6 +34,9 @@ type LoaderData = {
     })[];
     deposits: Deposit[];
     refunds: Refund[];
+    applicationsDeveloper: (ApplicationDeveloper & {
+      startup: Startup;
+    })[];
   };
 };
 
@@ -43,6 +47,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const user = await db.user.findUnique({
     where: { id: userId },
     include: {
+      applicationsDeveloper: {
+        orderBy: { updatedAt: "desc" },
+        include: { startup: true },
+      },
       createdBy: true,
       startupsCreated: { orderBy: { updatedAt: "desc" } },
       votesNewStartup: {
@@ -260,48 +268,82 @@ export default function UserIndex() {
           </div>
         </>
       ) : data.user.role === "developer" ? (
-        <div className="mx-4 my-8 grid grid-cols-2 gap-16">
-          <div>
-            <CardField name="Org name">{data.user.orgName}</CardField>
-            <CardField name="Short org name">
-              {data.user.shortOrgName}
-            </CardField>
-            <CardField name="Email">{data.user.email}</CardField>
-            <CardField name="Avatar image file">
-              {data.user.avatarImageFile ? (
+        <>
+          <div className="mx-4 my-8 grid grid-cols-2 gap-16">
+            <div>
+              <CardField name="Org name">{data.user.orgName}</CardField>
+              <CardField name="Short org name">
+                {data.user.shortOrgName}
+              </CardField>
+              <CardField name="Email">{data.user.email}</CardField>
+              <CardField name="Avatar image file">
+                {data.user.avatarImageFile ? (
+                  <a
+                    href={`/files/${data.user.avatarImageFile}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-400"
+                  >
+                    {data.user.avatarImageFile}
+                  </a>
+                ) : null}
+              </CardField>
+              <CardField name="Org name">{data.user.orgName}</CardField>
+              <CardField name="Short org name">
+                {data.user.shortOrgName}
+              </CardField>
+              <CardField name="INN">{data.user.inn}</CardField>
+              <CardField name="OGRN">{data.user.ogrn}</CardField>
+              <CardField name="KPP">{data.user.kpp}</CardField>
+              <CardField name="Legal address">
+                {data.user.legalAddress}
+              </CardField>
+              <CardField name="Actual address">
+                {data.user.actualAddress}
+              </CardField>
+              <CardField name="Website">
                 <a
-                  href={`/files/${data.user.avatarImageFile}`}
+                  href={formatUrl(data.user.website!)}
                   target="_blank"
                   rel="noreferrer"
                   className="text-blue-400"
                 >
-                  {data.user.avatarImageFile}
+                  {data.user.website}
                 </a>
-              ) : null}
-            </CardField>
-            <CardField name="Org name">{data.user.orgName}</CardField>
-            <CardField name="Short org name">
-              {data.user.shortOrgName}
-            </CardField>
-            <CardField name="INN">{data.user.inn}</CardField>
-            <CardField name="OGRN">{data.user.ogrn}</CardField>
-            <CardField name="KPP">{data.user.kpp}</CardField>
-            <CardField name="Legal address">{data.user.legalAddress}</CardField>
-            <CardField name="Actual address">
-              {data.user.actualAddress}
-            </CardField>
-            <CardField name="Website">
-              <a
-                href={formatUrl(data.user.website!)}
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-400"
-              >
-                {data.user.website}
-              </a>
-            </CardField>
+              </CardField>
+            </div>
           </div>
-        </div>
+          <h2 className="font-bold text-lg mb-4">STARTUP APPLICATIONS</h2>
+          <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
+            <div>
+              <Table
+                data={data.user.applicationsDeveloper}
+                columns={[
+                  { id: "id", header: "Id" },
+                  {
+                    id: "startup",
+                    header: "Startup",
+                    cell: ({ row }) => (
+                      <Link
+                        to={`/admin/startups/${row.startupId}`}
+                        className="text-blue-400"
+                      >
+                        {row.startup.name}
+                      </Link>
+                    ),
+                  },
+                  { id: "message", header: "Message", width: 500 },
+                  {
+                    id: "date",
+                    header: "Date",
+                    cell: ({ row }) =>
+                      formatDate(row.updatedAt, { time: true }),
+                  },
+                ]}
+              />
+            </div>
+          </div>
+        </>
       ) : null}
     </div>
   );

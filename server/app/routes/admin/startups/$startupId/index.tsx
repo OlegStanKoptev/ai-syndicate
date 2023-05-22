@@ -1,4 +1,10 @@
-import type { Investment, Startup, User, VoteNewStartup } from "@prisma/client";
+import type {
+  ApplicationDeveloper,
+  Investment,
+  Startup,
+  User,
+  VoteNewStartup,
+} from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -38,6 +44,10 @@ type LoaderData = {
     investments: (Investment & {
       investor: User;
     })[];
+    applicationsDeveloper: (ApplicationDeveloper & {
+      developer: User;
+    })[];
+    applicationsDeveloperCount: number;
   };
 };
 
@@ -57,7 +67,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         orderBy: { updatedAt: "desc" },
         include: { investor: true },
       },
+      applicationsDeveloper: {
+        orderBy: { updatedAt: "desc" },
+        include: { developer: true },
+      },
     },
+  });
+  const applicationsDeveloperCount = await db.applicationDeveloper.count({
+    where: { startupId },
   });
   if (!startup) {
     throw new Response(`Startup with this id: ${startupId} not found`, {
@@ -71,6 +88,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         yeasTotal: await getNewStartupYeasTotal(startupId),
         naysTotal: await getNewStartupNaysTotal(startupId),
         receivedFinancing: await getStartupTotalFinancing(startupId),
+        applicationsDeveloperCount,
       },
     })
   );
@@ -239,6 +257,27 @@ export default function StartupIndex() {
           </p>
         </>
       )}
+      {data.startup.status === "developerApplication" && (
+        <>
+          <p className="text-base mt-4">
+            This stage is for <span className="font-bold">hiring</span> the most
+            fitting <span className="font-bold">developer team</span>.
+          </p>
+          <p className="text-base">
+            Right now there are{" "}
+            <span className="font-bold">
+              {data.startup.applicationsDeveloperCount}
+            </span>{" "}
+            applications from different developers
+          </p>
+          <p>
+            Developer application deadline:{" "}
+            {formatDate(data.startup.developerApplicationDeadline!, {
+              time: true,
+            })}
+          </p>
+        </>
+      )}
       <div className="mx-4 mt-8 grid grid-cols-2 gap-16">
         <div>
           <CardField name="Name">{data.startup.name}</CardField>
@@ -318,6 +357,65 @@ export default function StartupIndex() {
           </CardField>
         </div>
       </div>
+      {isStartupStatusSameOrLaterThan(
+        data.startup.status,
+        "developerApplication"
+      ) && (
+        <>
+          <h2 className="font-bold text-lg mb-4 mt-8">DEVELOPER APPLICATION</h2>
+          <p className="mb-3">
+            Started at{" "}
+            {formatDate(data.startup.financingEndedAt!, { time: true })}
+          </p>
+          <p className="mb-3">
+            Deadline:{" "}
+            {formatDate(data.startup.developerApplicationDeadline!, {
+              time: true,
+            })}
+          </p>
+          {data.startup.status === "developerApplication" ? (
+            <p className="mb-3">In progress...</p>
+          ) : (
+            <p className="mb-3">
+              Ended at {formatDate(data.startup.developerApplicationEndedAt!)}
+            </p>
+          )}
+          <p className="mb-3">
+            <span className="font-bold">
+              {data.startup.applicationsDeveloperCount}
+            </span>{" "}
+            total
+          </p>
+          <h3 className="font-bold text-base mb-4 mt-4">
+            Developer applications
+          </h3>
+          <Table
+            data={data.startup.applicationsDeveloper}
+            columns={[
+              { id: "id", header: "Id" },
+              {
+                id: "developer",
+                header: "Developer",
+                cell: ({ row }) => (
+                  <Link
+                    to={`/admin/users/${row.developer.id}`}
+                    className="text-blue-400"
+                  >
+                    {row.developer.fullName} ({row.developer.email})
+                  </Link>
+                ),
+                width: 300,
+              },
+              { id: "message", header: "Message", width: 400 },
+              {
+                id: "date",
+                header: "Date",
+                cell: ({ row }) => formatDate(row.updatedAt, { time: true }),
+              },
+            ]}
+          />
+        </>
+      )}
       {isStartupStatusSameOrLaterThan(data.startup.status, "financing") && (
         <>
           <h2 className="font-bold text-lg mb-4 mt-8">FINANCING</h2>

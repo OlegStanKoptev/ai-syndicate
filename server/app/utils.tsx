@@ -120,8 +120,8 @@ export function serialize<T = any>(data: T) {
 export function deserialize<T = any>(data: string): T;
 export function deserialize<T = any>(data: string | undefined): T | undefined;
 export function deserialize<T = any>(data: string | undefined) {
-  if (data === undefined || data === "") {
-    return undefined;
+  if (data === undefined || data === "" || data === null) {
+    return data;
   }
   return superjson.parse<T>(data);
 }
@@ -326,6 +326,64 @@ export async function populate() {
         )
     );
   };
+  const createDevelopers = async ({
+    createCount,
+    declineCount,
+    ignoreCount,
+  }: {
+    createCount: number;
+    declineCount: number;
+    ignoreCount: number;
+  }) => {
+    await Promise.all(
+      Array(createCount + declineCount + ignoreCount)
+        .fill(null)
+        .map(async (_, i) => {
+          const j = i % 10;
+          const { id: applicationId } = await axios
+            .post("/api/user/developer/apply", {
+              email: `developer${i}@developer${i}.com`,
+              password: `developer${i}`,
+              phone: null,
+              avatarImageFile: null,
+              orgName: `AO Developer ${i}`,
+              shortOrgName: `Good Devs ${i}`,
+              inn: `${j}${j}${j}${j}${j}${j}${j}${j}${j}${j}`,
+              ogrn: `${j}${j}${j}${j}${j}${j}${j}${j}${j}${j}${j}${j}${j}`,
+              kpp: `${j}${j}${j}${j}${j}${j}${j}${j}${j}`,
+              legalAddress: `Address ${i}`,
+              actualAddress: `Address ${i}`,
+              website: `developer${i}-site.com`,
+            })
+            .then(({ data }) => data);
+          if (i < createCount) {
+            await axios.post(
+              `/admin/applications-new-developer/${applicationId}?index`,
+              (() => {
+                const formData = new FormData();
+                formData.set("_action", "approve");
+                return formData;
+              })(),
+              {
+                headers: { "Content-Type": "multipart/form-data" },
+              }
+            );
+          } else if (i < createCount + declineCount) {
+            await axios.post(
+              `/admin/applications-new-developer/${applicationId}/decline`,
+              (() => {
+                const formData = new FormData();
+                formData.set("declineReason", `Decline reason ${i}`);
+                return formData;
+              })(),
+              {
+                headers: { "Content-Type": "multipart/form-data" },
+              }
+            );
+          }
+        })
+    );
+  };
   const loginUser = async ({ userNumber }: { userNumber: number }) => {
     await axios.post("/api/user/login", {
       email: `user${userNumber}@user${userNumber}.com`,
@@ -361,6 +419,16 @@ export async function populate() {
     await axios.post("/api/user/login", {
       email: `expert${expertNumber}@expert${expertNumber}.com`,
       password: `expert${expertNumber}`,
+    });
+  };
+  const loginDeveloper = async ({
+    developerNumber,
+  }: {
+    developerNumber: number;
+  }) => {
+    await axios.post("/api/user/login", {
+      email: `developer${developerNumber}@developer${developerNumber}.com`,
+      password: `developer${developerNumber}`,
     });
   };
   const voteForStartup = async ({
@@ -545,12 +613,49 @@ export async function populate() {
       throw new Error(`Unexpected outcome: ${outcome}`);
     }
   };
-
+  const confirmFinancingOfStartup = async ({
+    userNumber,
+    startupNumber,
+    daysToDeveloperApplicationDeadline,
+  }: {
+    userNumber: number;
+    startupNumber: number;
+    daysToDeveloperApplicationDeadline?: number;
+  }) => {
+    await loginUser({ userNumber });
+    await axios.post(
+      `/api/startup/${startupIdsByNumbers[startupNumber]}/financing_succeded/confirm`,
+      {
+        developerApplicationDeadline: dateFns.addDays(
+          await newClientDate(),
+          daysToDeveloperApplicationDeadline ?? 14
+        ),
+      }
+    );
+  };
+  const applyAsDevelopers = async ({
+    count,
+    startupNumber,
+  }: {
+    count: number;
+    startupNumber: number;
+  }) => {
+    for (let i = 0; i < count; i++) {
+      await loginDeveloper({ developerNumber: i });
+      await axios.post(
+        `/api/startup/${startupIdsByNumbers[startupNumber]}/developer-application/new`,
+        {
+          message: `I will do it well ${i}`,
+        }
+      );
+    }
+  };
   await createExperts({
     count:
       startupVerificationYeaThreshold + startupVerificationNayThreshold - 1,
   });
   await createUsers({ count: 10 });
+  await createDevelopers({ createCount: 10, declineCount: 4, ignoreCount: 2 });
   await createStartup({ userNumber: 0, startupNumber: 0 });
   await voteForStartup({ startupNumber: 0, outcome: "unfinished" });
   await createStartup({ userNumber: 0, startupNumber: 1 });
@@ -581,49 +686,20 @@ export async function populate() {
     daysToFinancingDeadline: 100,
   });
   await investInStartup({ startupNumber: 5, outcome: "success" });
-
-  // await axios.post("/api/user/login", {
-  //   email: "startuper@startuper.com",
-  //   password: "startuper",
-  // });
-  // await axios.post(`/api/startup/${startupId}/financing_succeded/confirm`, {
-  //   developerApplicationDeadline: "2023-05-27T07:04:15.641Z",
-  // });
-  // const { id: applicationId } = await axios
-  //   .post("/api/user/developer/apply", {
-  //     email: "developer@developer.com",
-  //     password: "developer",
-  //     phone: null,
-  //     avatarImageFile: null,
-  //     orgName: "AO Good Developers",
-  //     shortOrgName: "Good Devs",
-  //     inn: "5734241100",
-  //     ogrn: "9027539198166",
-  //     kpp: "271601001",
-  //     legalAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
-  //     actualAddress: "г. Москва, ул. Малая Бронная, д. 11, корпус 1",
-  //     website: "developers-228.com",
-  //   })
-  //   .then(({ data }) => data);
-  // await axios.post(
-  //   "/admin/application-new-developers",
-  //   (() => {
-  //     const formData = new FormData();
-  //     formData.set("_action", "approve");
-  //     formData.set("applicationId", applicationId);
-  //     return formData;
-  //   })(),
-  //   {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   }
-  // );
-  // await axios.post("/api/user/login", {
-  //   email: "developer@developer.com",
-  //   password: "developer",
-  // });
-  // await axios.post(`/api/startup/${startupId}/developer-application/new`, {
-  //   message: "I will do it well",
-  // });
+  await createStartup({ userNumber: 0, startupNumber: 6 });
+  await voteForStartup({ startupNumber: 6, outcome: "success" });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 6,
+    daysToFinancingDeadline: 100,
+  });
+  await investInStartup({ startupNumber: 6, outcome: "success" });
+  await confirmFinancingOfStartup({
+    userNumber: 0,
+    startupNumber: 6,
+    daysToDeveloperApplicationDeadline: 100,
+  });
+  await applyAsDevelopers({ count: 4, startupNumber: 6 });
   // await axios.post("/api/user/login", {
   //   email: "startuper@startuper.com",
   //   password: "startuper",

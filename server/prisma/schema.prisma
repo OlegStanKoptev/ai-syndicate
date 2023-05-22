@@ -52,7 +52,7 @@ model User {
   creatorOfExperts                           User[]                    @relation(name: "AdminExpertCreation")
   createdBy                                  User?                     @relation(name: "AdminExpertCreation", fields: [createdById], references: [id])
   approvedOrDeclinedApplicationsNewDeveloper ApplicationNewDeveloper[]
-  createdFromApplication                     ApplicationNewDeveloper?  @relation(name: "a")
+  createdFromApplication                     ApplicationNewDeveloper?  @relation(name: "DeveloperAndDeveloperApplication")
   deposits                                   Deposit[]
   refunds                                    Refund[]
 }
@@ -83,8 +83,9 @@ model Startup {
   businessPlanFile  String?
   presentationFile  String?
 
-  verificationEndedAt DateTime?
-  financingEndedAt    DateTime?
+  verificationEndedAt         DateTime?
+  financingEndedAt            DateTime?
+  developerApplicationEndedAt DateTime?
 
   financingDeadline            DateTime?
   developerApplicationDeadline DateTime?
@@ -157,9 +158,9 @@ model ApplicationNewDeveloper {
 
   status                 ApplicationNewDeveloperStatus
   declineReason          String?
-  approvedOrDeclinedById String?                       @unique
+  approvedOrDeclinedById String?
   approvedOrDeclinedAt   DateTime?
-  createdDeveloperId     String?
+  createdDeveloperId     String?                       @unique
 
   email           String
   passwordHash    String
@@ -174,8 +175,8 @@ model ApplicationNewDeveloper {
   website         String
   phone           String?
 
-  approvedOrDeclinedBy User? @relation(name: "a", fields: [approvedOrDeclinedById], references: [id])
-  createdDeveloper     User? @relation(fields: [createdDeveloperId], references: [id])
+  approvedOrDeclinedBy User? @relation(fields: [approvedOrDeclinedById], references: [id])
+  createdDeveloper     User? @relation(name: "DeveloperAndDeveloperApplication", fields: [createdDeveloperId], references: [id])
 }
 
 enum ApplicationDeveloperStatus {

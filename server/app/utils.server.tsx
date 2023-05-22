@@ -241,7 +241,11 @@ export function scheduleStartupDeveloperApplicationDeadline(
     if (startup && startup.status === "developerApplication") {
       await db.startup.update({
         where: { id: startup.id },
-        data: { status: "developerVoting", updatedAt: await newServerDate() },
+        data: {
+          status: "developerVoting",
+          developerApplicationEndedAt: deadline,
+          updatedAt: await newServerDate(),
+        },
       });
     }
   });
