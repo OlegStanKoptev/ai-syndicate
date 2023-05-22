@@ -54,9 +54,9 @@ export default function Private() {
             <h1 className="mx-2 whitespace-nowrap text-base font-bold">
               AI Syndicate | Admin
             </h1>
-            (<Clock additionalSeconds={data.additionalSeconds} />)
           </div>
         </NavLink>
+        <Clock additionalSeconds={data.additionalSeconds} />
         <div className="ml-auto flex items-center gap-4">
           {data.admin ? (
             <>
