@@ -265,121 +265,178 @@ export function prepareTable<T extends string, U extends T>({
   return { columns, sortKeys, prepareColumn };
 }
 
+function getRandomInt(from: number, to: number) {
+  return from + Math.floor(Math.random() * to);
+}
+
 export async function populate() {
-  for (let i = 0; i < 15; i++) {
-    await axios.post(
-      "/admin/users/new-expert",
-      (() => {
-        const formData = new FormData();
-        formData.set("email", `expert${i}@expert${i}.com`);
-        formData.set("password", `expert${i}`);
-        formData.set("fullName", `Expert ${i}`);
-        return formData;
-      })(),
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
+  const createExperts = async ({ count }: { count: number }) => {
+    await Promise.all(
+      Array(count)
+        .fill(null)
+        .map((_, i) =>
+          axios.post(
+            "/admin/users/new-expert",
+            (() => {
+              const formData = new FormData();
+              formData.set("email", `expert${i}@expert${i}.com`);
+              formData.set("password", `expert${i}`);
+              formData.set("fullName", `Expert ${i}`);
+              return formData;
+            })(),
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          )
+        )
     );
-  }
-  await axios.post("/api/user/join", {
-    email: "user0@user0.com",
-    password: "user0",
-    fullName: "User 0",
-    avatarImageFile: null,
-  });
-  await axios.post("/api/user/login", {
-    email: "user0@user0.com",
-    password: "user0",
-  });
-  const { id: startup0Id } = await axios
-    .post("/api/startup/new", {
-      name: "Startup 0",
-      description: "This is startup 0",
-      logoFile: null,
-      specificationFile: "tz1.pdf",
-      businessPlanFile: null,
-      presentationFile: null,
-      targetFinancing: 300,
-    })
-    .then(({ data }) => data);
-  for (let i = 0; i < 8; i++) {
-    await axios.post("/api/user/login", {
-      email: `expert${i}@expert${i}.com`,
-      password: `expert${i}`,
+  };
+  const createUser = async ({ userNumber }: { userNumber: number }) => {
+    await axios.post("/api/user/join", {
+      email: `user${userNumber}@user${userNumber}.com`,
+      password: `user${userNumber}`,
+      fullName: `User ${userNumber}`,
+      avatarImageFile: null,
     });
-    if (i < 6) {
-      await axios.post(`/api/startup/${startup0Id}/verification/vote`, {
-        yea: true,
-      });
-    } else {
-      await axios.post(`/api/startup/${startup0Id}/verification/vote`, {
-        yea: false,
-        nayReason: `Nay reason ${i}`,
-      });
-    }
-  }
-  await axios.post("/api/user/login", {
-    email: "user0@user0.com",
-    password: "user0",
-  });
-  const { id: startup1Id } = await axios
-    .post("/api/startup/new", {
-      name: "Startup 1",
-      description: "This is startup 1",
-      logoFile: null,
-      specificationFile: "tz1.pdf",
-      businessPlanFile: null,
-      presentationFile: null,
-      targetFinancing: 400,
-    })
-    .then(({ data }) => data);
-  for (let i = 0; i < 5; i++) {
+  };
+  const loginUser = async ({ userNumber }: { userNumber: number }) => {
     await axios.post("/api/user/login", {
-      email: `expert${i}@expert${i}.com`,
-      password: `expert${i}`,
+      email: `user${userNumber}@user${userNumber}.com`,
+      password: `user${userNumber}`,
     });
-    if (i < 2) {
-      await axios.post(`/api/startup/${startup1Id}/verification/vote`, {
-        yea: true,
-      });
-    } else {
-      await axios.post(`/api/startup/${startup1Id}/verification/vote`, {
-        yea: false,
-        nayReason: `Nay reason ${i}`,
-      });
-    }
-  }
-  await axios.post("/api/user/login", {
-    email: "user0@user0.com",
-    password: "user0",
-  });
-  const { id: startup2Id } = await axios
-    .post("/api/startup/new", {
-      name: "Startup 1",
-      description: "This is startup 1",
-      logoFile: null,
-      specificationFile: "tz1.pdf",
-      businessPlanFile: null,
-      presentationFile: null,
-      targetFinancing: 400,
-    })
-    .then(({ data }) => data);
-  for (let i = 0; i < 9; i++) {
+  };
+  const startupIdsByNumbers: { [key: number]: string } = {};
+  const createStartup = async ({
+    startupNumber,
+    targetFinancing,
+  }: {
+    startupNumber: number;
+    targetFinancing?: number;
+  }) => {
+    const { id } = await axios
+      .post("/api/startup/new", {
+        name: `Startup ${startupNumber}`,
+        description: `This is startup ${startupNumber}`,
+        logoFile: null,
+        specificationFile: "tz1.pdf",
+        businessPlanFile: null,
+        presentationFile: null,
+        targetFinancing: targetFinancing ?? getRandomInt(100, 700),
+      })
+      .then(({ data }) => data);
+    startupIdsByNumbers[startupNumber] = id;
+    return id;
+  };
+  const loginExpert = async ({ expertNumber }: { expertNumber: number }) => {
     await axios.post("/api/user/login", {
-      email: `expert${i}@expert${i}.com`,
-      password: `expert${i}`,
+      email: `expert${expertNumber}@expert${expertNumber}.com`,
+      password: `expert${expertNumber}`,
     });
-    if (i < 2) {
-      await axios.post(`/api/startup/${startup2Id}/verification/vote`, {
-        yea: false,
-        nayReason: `Nay reason ${i}`,
-      });
+  };
+  const voteForStartup = async ({
+    startupNumber,
+    outcome = "accept",
+  }: {
+    startupNumber: number;
+    outcome: "accept" | "decline" | "unfinished";
+  }) => {
+    if (outcome === "accept") {
+      for (
+        let i = 0;
+        i <
+        startupVerificationYeaThreshold + startupVerificationNayThreshold - 1;
+        i++
+      ) {
+        await loginExpert({ expertNumber: i });
+        if (i < startupVerificationNayThreshold - 1) {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/verification/vote`,
+            {
+              yea: false,
+              nayReason: `Nay reason ${i}`,
+            }
+          );
+        } else {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/verification/vote`,
+            {
+              yea: true,
+            }
+          );
+        }
+      }
+    } else if (outcome === "decline") {
+      for (
+        let i = 0;
+        i <
+        startupVerificationYeaThreshold + startupVerificationNayThreshold - 1;
+        i++
+      ) {
+        await loginExpert({ expertNumber: i });
+        if (i < startupVerificationYeaThreshold - 1) {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/verification/vote`,
+            {
+              yea: true,
+            }
+          );
+        } else {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/verification/vote`,
+            {
+              yea: false,
+              nayReason: `Nay reason ${i}`,
+            }
+          );
+        }
+      }
+    } else if (outcome === "unfinished") {
+      for (
+        let i = 0;
+        i <
+        startupVerificationYeaThreshold +
+          startupVerificationNayThreshold -
+          1 -
+          1;
+        i++
+      ) {
+        await loginExpert({ expertNumber: i });
+        if (i < startupVerificationYeaThreshold - 1) {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/verification/vote`,
+            {
+              yea: true,
+            }
+          );
+        } else {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/verification/vote`,
+            {
+              yea: false,
+              nayReason: `Nay reason ${i}`,
+            }
+          );
+        }
+      }
     } else {
-      await axios.post(`/api/startup/${startup2Id}/verification/vote`, {
-        yea: true,
-      });
+      throw new Error(`Unexpected outcome : ${outcome}`);
     }
-  }
+  };
+  await createExperts({
+    count:
+      startupVerificationYeaThreshold + startupVerificationNayThreshold - 1,
+  });
+  await createUser({ userNumber: 0 });
+  await loginUser({ userNumber: 0 });
+  await createStartup({ startupNumber: 0 });
+  await voteForStartup({ startupNumber: 0, outcome: "unfinished" });
+  await loginUser({ userNumber: 0 });
+  await createStartup({ startupNumber: 1 });
+  await voteForStartup({ startupNumber: 1, outcome: "decline" });
+  await loginUser({ userNumber: 0 });
+  await createStartup({ startupNumber: 2 });
+  await voteForStartup({ startupNumber: 2, outcome: "accept" });
+
   // await axios.post(
   //   "/admin/users/new-expert",
   //   (() => {

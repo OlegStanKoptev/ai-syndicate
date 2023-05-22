@@ -21,7 +21,7 @@ export default function HomePage() {
         <span className="font-bold">Welcome</span> to AI Syndicate{" "}
         <span className="font-bold">Admin Panel</span>!
       </h1>
-      <p className="mt-5 text-lg mb-3">Here you can administrate the system</p>
+      <p className="mt-5 text-lg mb-3">Here you can administrate the system.</p>
       {data.admin ? (
         <p className="text-base">
           See the{" "}
