@@ -198,7 +198,7 @@ export function scheduleStartupFinancingDeadline(id: string, deadline: Date) {
     if (startup && startup.status === "financing") {
       await db.startup.update({
         where: { id: startup.id },
-        data: { status: "financing_failed" },
+        data: { status: "financing_failed", financingEndedAt: new Date() },
       });
       const investments = await db.investment.findMany({
         where: { startupId: startup.id },

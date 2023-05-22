@@ -9,6 +9,7 @@ import type { FieldValues, Path, UseFormSetFocus } from "react-hook-form";
 import { useSpinDelay } from "~/components";
 import superjson from "superjson";
 import axios from "axios";
+import * as dateFns from "date-fns";
 
 export const startupVerificationYeaThreshold = 7;
 export const startupVerificationNayThreshold = 3;
@@ -291,13 +292,19 @@ export async function populate() {
         )
     );
   };
-  const createUser = async ({ userNumber }: { userNumber: number }) => {
-    await axios.post("/api/user/join", {
-      email: `user${userNumber}@user${userNumber}.com`,
-      password: `user${userNumber}`,
-      fullName: `User ${userNumber}`,
-      avatarImageFile: null,
-    });
+  const createUsers = async ({ count }: { count: number }) => {
+    await Promise.all(
+      Array(count)
+        .fill(null)
+        .map((_, i) =>
+          axios.post("/api/user/join", {
+            email: `user${i}@user${i}.com`,
+            password: `user${i}`,
+            fullName: `User ${i}`,
+            avatarImageFile: null,
+          })
+        )
+    );
   };
   const loginUser = async ({ userNumber }: { userNumber: number }) => {
     await axios.post("/api/user/login", {
@@ -307,12 +314,15 @@ export async function populate() {
   };
   const startupIdsByNumbers: { [key: number]: string } = {};
   const createStartup = async ({
+    userNumber,
     startupNumber,
     targetFinancing,
   }: {
+    userNumber: number;
     startupNumber: number;
     targetFinancing?: number;
   }) => {
+    await loginUser({ userNumber });
     const { id } = await axios
       .post("/api/startup/new", {
         name: `Startup ${startupNumber}`,
@@ -335,12 +345,12 @@ export async function populate() {
   };
   const voteForStartup = async ({
     startupNumber,
-    outcome = "accept",
+    outcome = "success",
   }: {
     startupNumber: number;
-    outcome: "accept" | "decline" | "unfinished";
+    outcome: "success" | "fail" | "unfinished";
   }) => {
-    if (outcome === "accept") {
+    if (outcome === "success") {
       for (
         let i = 0;
         i <
@@ -365,7 +375,7 @@ export async function populate() {
           );
         }
       }
-    } else if (outcome === "decline") {
+    } else if (outcome === "fail") {
       for (
         let i = 0;
         i <
@@ -422,62 +432,103 @@ export async function populate() {
       throw new Error(`Unexpected outcome : ${outcome}`);
     }
   };
+  const confirmVerificationOfStartup = async ({
+    userNumber,
+    startupNumber,
+    financingDeadline = dateFns.addDays(new Date(), 14),
+  }: {
+    userNumber: number;
+    startupNumber: number;
+    financingDeadline?: Date | string;
+  }) => {
+    await loginUser({ userNumber });
+    await axios.post(
+      `/api/startup/${startupIdsByNumbers[startupNumber]}/verification_succeded/confirm`,
+      {
+        financingDeadline,
+      }
+    );
+  };
+  const getStartupInfo = async ({
+    startupNumber,
+  }: {
+    startupNumber: number;
+  }) => {
+    return axios
+      .get(`/api/startup/${startupIdsByNumbers[startupNumber]}`)
+      .then(({ data }) => data);
+  };
+  const deposit = async ({
+    userNumber,
+    amount = 1000,
+  }: {
+    userNumber: number;
+    amount?: number;
+  }) => {
+    await loginUser({ userNumber });
+    await axios.post("/api/user/deposit", { amount });
+  };
+  const investInStartup = async ({
+    startupNumber,
+    outcome,
+  }: {
+    startupNumber: number;
+    outcome: "success" | "fail" | "unfinished";
+  }) => {
+    const { targetFinancing } = await getStartupInfo({ startupNumber });
+    const part1 = Math.floor(targetFinancing / 2);
+    const part2 = Math.floor((targetFinancing - part1) / 2);
+    const part3 = targetFinancing - part1 - part2;
+    await loginUser({ userNumber: 5 });
+    await deposit({ userNumber: 5, amount: part1 });
+    await axios.post(
+      `/api/startup/${startupIdsByNumbers[startupNumber]}/financing/invest`,
+      {
+        amount: part1,
+      }
+    );
+    await loginUser({ userNumber: 6 });
+    await deposit({ userNumber: 6, amount: part2 });
+    await axios.post(
+      `/api/startup/${startupIdsByNumbers[startupNumber]}/financing/invest`,
+      {
+        amount: part2,
+      }
+    );
+    if (outcome === "success") {
+      await loginUser({ userNumber: 7 });
+      await deposit({ userNumber: 7, amount: part3 });
+      await axios.post(
+        `/api/startup/${startupIdsByNumbers[startupNumber]}/financing/invest`,
+        {
+          amount: part3,
+        }
+      );
+    } else if (outcome === "fail") {
+      // TODO
+    } else if (outcome === "unfinished") {
+      return;
+    } else {
+      throw new Error(`Unexpected outcome: ${outcome}`);
+    }
+  };
+
   await createExperts({
     count:
       startupVerificationYeaThreshold + startupVerificationNayThreshold - 1,
   });
-  await createUser({ userNumber: 0 });
-  await loginUser({ userNumber: 0 });
-  await createStartup({ startupNumber: 0 });
+  await createUsers({ count: 10 });
+  await createStartup({ userNumber: 0, startupNumber: 0 });
   await voteForStartup({ startupNumber: 0, outcome: "unfinished" });
-  await loginUser({ userNumber: 0 });
-  await createStartup({ startupNumber: 1 });
-  await voteForStartup({ startupNumber: 1, outcome: "decline" });
-  await loginUser({ userNumber: 0 });
-  await createStartup({ startupNumber: 2 });
-  await voteForStartup({ startupNumber: 2, outcome: "accept" });
+  await createStartup({ userNumber: 0, startupNumber: 1 });
+  await voteForStartup({ startupNumber: 1, outcome: "fail" });
+  await createStartup({ userNumber: 0, startupNumber: 2 });
+  await voteForStartup({ startupNumber: 2, outcome: "success" });
+  await createStartup({ userNumber: 0, startupNumber: 3 });
+  await voteForStartup({ startupNumber: 3, outcome: "success" });
+  await confirmVerificationOfStartup({ userNumber: 0, startupNumber: 3 });
+  await investInStartup({ startupNumber: 3, outcome: "unfinished" });
 
-  // await axios.post(
-  //   "/admin/users/new-expert",
-  //   (() => {
-  //     const formData = new FormData();
-  //     formData.set("email", "expert@expert.com");
-  //     formData.set("password", "expert");
-  //     formData.set("fullName", "Expert Expertov");
-  //     return formData;
-  //   })(),
-  //   {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   }
-  // );
-  // await axios.post("/api/user/login", {
-  //   email: "expert@expert.com",
-  //   password: "expert",
-  // });
-  // await axios.post(`/api/startup/${startupId}/verification/vote`, {
-  //   yea: true,
-  // });
-  // await axios.post("/api/user/login", {
-  //   email: "startuper@startuper.com",
-  //   password: "startuper",
-  // });
-  // await axios.post(`/api/startup/${startupId}/verification_succeded/confirm`, {
-  //   financingDeadline: "2023-05-26T07:04:15.641Z",
-  // });
-  // await axios.post("/api/user/join", {
-  //   email: "investor@investor.com",
-  //   password: "investor",
-  //   fullName: "Investor Investorov",
-  //   avatarImageFile: null,
-  // });
-  // await axios.post("/api/user/login", {
-  //   email: "investor@investor.com",
-  //   password: "investor",
-  // });
-  // await axios.post("/api/user/deposit", { amount: 1000 });
-  // await axios.post(`/api/startup/${startupId}/financing/invest`, {
-  //   amount: 300,
-  // });
   // await axios.post("/api/user/login", {
   //   email: "startuper@startuper.com",
   //   password: "startuper",

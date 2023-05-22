@@ -83,7 +83,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   if (startupTotalFinancingNow === startup.targetFinancing) {
     await db.startup.update({
       where: { id: startup.id },
-      data: { status: "financing_succeded" },
+      data: { status: "financing_succeded", financingEndedAt: new Date() },
     });
   }
   return new Response();

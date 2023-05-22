@@ -76,6 +76,9 @@ model Startup {
   businessPlanFile  String?
   presentationFile  String?
 
+  verificationEndedAt DateTime?
+  financingEndedAt    DateTime?
+
   financingDeadline            DateTime?
   developerApplicationDeadline DateTime?
   developerVotingDeadline      DateTime?

@@ -82,13 +82,16 @@ export const action: ActionFunction = async ({ request, params }) => {
   if (yeasTotal >= startupVerificationYeaThreshold) {
     await db.startup.update({
       where: { id: startupId },
-      data: { status: "verification_succeded" },
+      data: {
+        status: "verification_succeded",
+        verificationEndedAt: new Date(),
+      },
     });
   }
   if (naysTotal >= startupVerificationNayThreshold) {
     await db.startup.update({
       where: { id: startupId },
-      data: { status: "verification_failed" },
+      data: { status: "verification_failed", verificationEndedAt: new Date() },
     });
   }
   return new Response();

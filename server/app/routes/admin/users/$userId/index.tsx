@@ -1,4 +1,4 @@
-import type { Startup, User, VoteNewStartup } from "@prisma/client";
+import type { Investment, Startup, User, VoteNewStartup } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useCatch, useLoaderData, useNavigate } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -21,6 +21,9 @@ type LoaderData = {
     votesNewStartup: (VoteNewStartup & {
       startup: Startup;
     })[];
+    investments: (Investment & {
+      startup: Startup;
+    })[];
   };
 };
 
@@ -34,6 +37,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       createdBy: true,
       startupsCreated: { orderBy: { updatedAt: "desc" } },
       votesNewStartup: {
+        orderBy: { updatedAt: "desc" },
+        include: { startup: true },
+      },
+      investments: {
         orderBy: { updatedAt: "desc" },
         include: { startup: true },
       },
@@ -108,8 +115,44 @@ export default function UserIndex() {
                     header: "Status",
                     cell: ({ row }) => startupStatusNames[row.status],
                   },
+                  {
+                    id: "date",
+                    header: "Date",
+                    cell: ({ row }) =>
+                      formatDate(row.createdAt, { time: true }),
+                  },
                 ]}
                 onRowClick={({ row }) => navigate(`/admin/startups/${row.id}`)}
+              />
+            </div>
+          </div>
+          <h2 className="font-bold text-lg mb-4 mt-8">INVESTMENTS</h2>
+          <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
+            <div>
+              <Table
+                data={data.user.investments}
+                columns={[
+                  { id: "id", header: "Id" },
+                  {
+                    id: "startup",
+                    header: "Startup",
+                    cell: ({ row }) => (
+                      <Link
+                        to={`/admin/startups/${row.startup.id}`}
+                        className="text-blue-400"
+                      >
+                        {row.startup.name}
+                      </Link>
+                    ),
+                  },
+                  { id: "amount", header: "Amount" },
+                  {
+                    id: "date",
+                    header: "Date",
+                    cell: ({ row }) =>
+                      formatDate(row.createdAt, { time: true }),
+                  },
+                ]}
               />
             </div>
           </div>

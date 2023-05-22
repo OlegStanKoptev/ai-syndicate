@@ -49,6 +49,7 @@ CREATE TABLE "Startup" (
     "specificationFile" TEXT NOT NULL,
     "businessPlanFile" TEXT,
     "presentationFile" TEXT,
+    "verificationEndedAt" TIMESTAMP(3),
     "financingDeadline" TIMESTAMP(3),
     "developerApplicationDeadline" TIMESTAMP(3),
     "developerVotingDeadline" TIMESTAMP(3),

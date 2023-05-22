@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge";
 
 export default function ProgressBar({
   progress,
-  label = `${progress}%`,
+  label = `${Math.trunc(progress)}%`,
   className,
   barClassName,
   labelClassName,

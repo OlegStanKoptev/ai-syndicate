@@ -1,4 +1,4 @@
-import type { Startup, User, VoteNewStartup } from "@prisma/client";
+import type { Investment, Startup, User, VoteNewStartup } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -22,6 +22,7 @@ import {
 import {
   getNewStartupNaysTotal,
   getNewStartupYeasTotal,
+  getStartupTotalFinancing,
   requireCurrentAdmin,
 } from "~/utils.server";
 
@@ -33,6 +34,10 @@ type LoaderData = {
     })[];
     yeasTotal: number;
     naysTotal: number;
+    receivedFinancing: number;
+    investments: (Investment & {
+      investor: User;
+    })[];
   };
 };
 
@@ -48,6 +53,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         orderBy: { updatedAt: "desc" },
         include: { expert: true },
       },
+      investments: {
+        orderBy: { updatedAt: "desc" },
+        include: { investor: true },
+      },
     },
   });
   if (!startup) {
@@ -61,6 +70,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         ...startup,
         yeasTotal: await getNewStartupYeasTotal(startupId),
         naysTotal: await getNewStartupNaysTotal(startupId),
+        receivedFinancing: await getStartupTotalFinancing(startupId),
       },
     })
   );
@@ -151,6 +161,46 @@ export default function StartupIndex() {
           </p>
         </>
       )}
+      {data.startup.status === "financing" && (
+        <>
+          <p className="text-base mt-4">
+            It is time for <span className="font-bold">investors</span> to{" "}
+            <span className="font-bold">fund</span> the startup.
+          </p>
+          <p className="text-base">
+            Note that <span className="font-bold">total</span> amount of
+            investments <span className="font-bold">cannot exeed</span> the{" "}
+            <span className="font-bold">target</span> financing amount of the
+            startup
+          </p>
+          <p className="text-base mt-4">
+            Currently,{" "}
+            <span className="text-green-600 font-bold">
+              {Math.trunc(
+                (data.startup.receivedFinancing /
+                  data.startup.targetFinancing) *
+                  100
+              )}
+              %
+            </span>{" "}
+            of target financing is gathered (
+            <span className="text-green-600 font-bold">
+              {data.startup.receivedFinancing}
+            </span>{" "}
+            out of {data.startup.targetFinancing})
+          </p>
+          <p className="text-base mt-4">
+            The financing stage will end as soon as{" "}
+            <span className="font-bold">target</span> financing is{" "}
+            <span className="font-bold">received</span> or{" "}
+            <span className="font-bold">time runs out</span>
+          </p>
+          <p>
+            Financing deadline:{" "}
+            {formatDate(data.startup.financingDeadline!, { time: true })}
+          </p>
+        </>
+      )}
       <div className="mx-4 mt-8 grid grid-cols-2 gap-16">
         <div>
           <CardField name="Name">{data.startup.name}</CardField>
@@ -233,8 +283,15 @@ export default function StartupIndex() {
       {isStartupStatusSameOrLaterThan(data.startup.status, "verification") && (
         <>
           <h2 className="font-bold text-lg mb-4 mt-8">VERIFICATION</h2>
-          {data.startup.status === "verification" && (
-            <p className="mb-3">Verification in progress...</p>
+          <p className="mb-3">
+            Started at {formatDate(data.startup.createdAt, { time: true })}
+          </p>
+          {data.startup.status === "verification" ? (
+            <p className="mb-3">In progress...</p>
+          ) : (
+            <p className="mb-3">
+              Ended at {formatDate(data.startup.verificationEndedAt!)}
+            </p>
           )}
           {isStartupStatusSameOrLaterThan(
             data.startup.status,
@@ -308,6 +365,82 @@ export default function StartupIndex() {
                 cell: ({ row }) => (row.yea ? "yea" : "nay"),
               },
               { id: "nayReason", header: "Nay reason", width: 500 },
+              {
+                id: "date",
+                header: "Date",
+                cell: ({ row }) => formatDate(row.updatedAt, { time: true }),
+              },
+            ]}
+          />
+        </>
+      )}
+      {isStartupStatusSameOrLaterThan(data.startup.status, "financing") && (
+        <>
+          <h2 className="font-bold text-lg mb-4 mt-8">FINANCING</h2>
+          <p className="mb-3">
+            Started at{" "}
+            {formatDate(data.startup.verificationEndedAt!, { time: true })}
+          </p>
+          <p className="mb-3">
+            Deadline:{" "}
+            {formatDate(data.startup.financingDeadline!, { time: true })}
+          </p>
+          {data.startup.status === "financing" ? (
+            <p className="mb-3">In progress...</p>
+          ) : (
+            <p className="mb-3">
+              Ended at {formatDate(data.startup.financingEndedAt!)}
+            </p>
+          )}
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "financing_failed"
+          ) && <p className="text-red-400 font-bold mb-3">Financing failed</p>}
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "financing_succeded"
+          ) && (
+            <p className="text-green-600 font-bold mb-3">Financing succeded</p>
+          )}
+          <div className="flex gap-4 items-center">
+            <ProgressBar
+              progress={
+                (data.startup.receivedFinancing /
+                  data.startup.targetFinancing) *
+                100
+              }
+              className="w-1/2"
+            />
+            <p className="text-base">
+              Finances:{" "}
+              <span className="text-green-600 font-bold">
+                {data.startup.receivedFinancing}
+              </span>{" "}
+              / {data.startup.targetFinancing}
+            </p>
+          </div>
+          <h3 className="font-bold text-base mb-4 mt-4">Investments</h3>
+          <Table
+            data={data.startup.investments}
+            columns={[
+              { id: "id", header: "Id" },
+              {
+                id: "investor",
+                header: "Investor",
+                cell: ({ row }) => (
+                  <Link
+                    to={`/admin/users/${row.investor.id}`}
+                    className="text-blue-400"
+                  >
+                    {row.investor.fullName} ({row.investor.email})
+                  </Link>
+                ),
+                width: 300,
+              },
+              {
+                id: "amount",
+                header: "Amount",
+              },
               {
                 id: "date",
                 header: "Date",
