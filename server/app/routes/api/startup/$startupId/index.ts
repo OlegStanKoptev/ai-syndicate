@@ -162,6 +162,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         return null;
       }
       return {
+        developerApplicationDeadline: startup.developerApplicationDeadline,
         applications: await db.applicationDeveloper.findMany({
           where: { startupId },
           select: {

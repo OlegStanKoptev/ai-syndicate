@@ -650,6 +650,25 @@ export async function populate() {
       );
     }
   };
+  const waitForDeveloperApplicationDeadline = async ({
+    startupNumber,
+  }: {
+    startupNumber: number;
+  }) => {
+    const {
+      developerApplication: { developerApplicationDeadline },
+    }: { developerApplication: { developerApplicationDeadline: string } } =
+      await getStartupInfo({
+        startupNumber,
+      });
+    const daysToWait =
+      1 +
+      dateFns.differenceInDays(
+        new Date(developerApplicationDeadline),
+        await newClientDate()
+      );
+    await waitDays(daysToWait);
+  };
   await createExperts({
     count:
       startupVerificationYeaThreshold + startupVerificationNayThreshold - 1,
@@ -700,6 +719,21 @@ export async function populate() {
     daysToDeveloperApplicationDeadline: 100,
   });
   await applyAsDevelopers({ count: 4, startupNumber: 6 });
+  await createStartup({ userNumber: 0, startupNumber: 7 });
+  await voteForStartup({ startupNumber: 7, outcome: "success" });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 7,
+    daysToFinancingDeadline: 80,
+  });
+  await investInStartup({ startupNumber: 7, outcome: "success" });
+  await confirmFinancingOfStartup({
+    userNumber: 0,
+    startupNumber: 7,
+    daysToDeveloperApplicationDeadline: 5,
+  });
+  await applyAsDevelopers({ count: 3, startupNumber: 7 });
+  await waitForDeveloperApplicationDeadline({ startupNumber: 7 });
   // await axios.post("/api/user/login", {
   //   email: "startuper@startuper.com",
   //   password: "startuper",
