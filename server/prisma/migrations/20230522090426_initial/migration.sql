@@ -11,6 +11,14 @@ CREATE TYPE "ApplicationNewDeveloperStatus" AS ENUM ('new', 'approved', 'decline
 CREATE TYPE "ApplicationDeveloperStatus" AS ENUM ('new');
 
 -- CreateTable
+CREATE TABLE "Config" (
+    "id" TEXT NOT NULL,
+    "additionalSeconds" INTEGER NOT NULL,
+
+    CONSTRAINT "Config_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

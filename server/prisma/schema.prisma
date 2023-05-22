@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Config {
+  id                String @id @default(cuid())
+  additionalSeconds Int
+}
+
 enum UserRole {
   user
   expert

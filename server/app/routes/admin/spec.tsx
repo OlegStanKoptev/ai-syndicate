@@ -9,13 +9,15 @@ import { Response } from "@remix-run/node";
 import {
   Form,
   Link,
+  useActionData,
   useFetcher,
   useLoaderData,
   useTransition,
 } from "@remix-run/react";
 import { useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { Button, InputWrapper, useSpinDelay } from "~/components";
+import { z } from "zod";
+import { Button, InputWrapper, TextInput, useSpinDelay } from "~/components";
 import {
   deserialize,
   populate,
@@ -24,10 +26,14 @@ import {
   useHydrated,
 } from "~/utils";
 import {
+  addSeconds,
   clearDb,
   getCurrentApiUser,
   requireCurrentAdmin,
+  validateSingleParameter,
 } from "~/utils.server";
+
+type ActionData = { addedTime?: boolean };
 
 export const action: ActionFunction = async ({ request }) => {
   await requireCurrentAdmin(request);
@@ -39,6 +45,62 @@ export const action: ActionFunction = async ({ request }) => {
   if (_action === "clear") {
     await clearDb();
     return new Response();
+  }
+  if (_action === "add-days") {
+    const amount = validateSingleParameter({
+      value: data.amount,
+      schema: z.preprocess(
+        (val) => (val ? Number(val) : null),
+        z.number().int().nonnegative()
+      ),
+      throw_: new Response("Must be a non-negative number", {
+        status: 400,
+      }),
+    });
+    await addSeconds(amount * 24 * 60 * 60);
+    return new Response(serialize<ActionData>({ addedTime: true }));
+  }
+  if (_action === "add-hours") {
+    const amount = validateSingleParameter({
+      value: data.amount,
+      schema: z.preprocess(
+        (val) => (val ? Number(val) : null),
+        z.number().int().nonnegative()
+      ),
+      throw_: new Response("Must be a non-negative number", {
+        status: 400,
+      }),
+    });
+    await addSeconds(amount * 60 * 60);
+    return new Response(serialize<ActionData>({ addedTime: true }));
+  }
+  if (_action === "add-minutes") {
+    const amount = validateSingleParameter({
+      value: data.amount,
+      schema: z.preprocess(
+        (val) => (val ? Number(val) : null),
+        z.number().int().nonnegative()
+      ),
+      throw_: new Response("Must be a non-negative number", {
+        status: 400,
+      }),
+    });
+    await addSeconds(amount * 60);
+    return new Response(serialize<ActionData>({ addedTime: true }));
+  }
+  if (_action === "add-seconds") {
+    const amount = validateSingleParameter({
+      value: data.amount,
+      schema: z.preprocess(
+        (val) => (val ? Number(val) : null),
+        z.number().int().nonnegative()
+      ),
+      throw_: new Response("Must be a non-negative number", {
+        status: 400,
+      }),
+    });
+    await addSeconds(amount);
+    return new Response(serialize<ActionData>({ addedTime: true }));
   }
   throw new Error(`Unknown action: ${_action}`);
 };
@@ -65,11 +127,16 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Spec() {
   const data = deserialize<LoaderData>(useLoaderData());
+  const actionData = deserialize<ActionData>(useActionData());
   const fetcher = useFetcher();
   const transition = useTransition();
   const isClearing = useSpinDelay(
     transition.state === "submitting" &&
       transition.submission.formData.get("_action") === "clear"
+  );
+  const isAddingDays = useSpinDelay(
+    transition.state === "submitting" &&
+      transition.submission.formData.get("_action") === "add-days"
   );
   const [isPopulatingState, setIsPopulatingState] = useState(false);
   const isPopulating = useSpinDelay(isPopulatingState);
@@ -132,6 +199,38 @@ export default function Spec() {
       ) : (
         <div>&nbsp;</div>
       )}
+      <div className="mt-4">
+        <Form method="post" replace className="flex items-center gap-4">
+          <div className="font-bold text-base">Add</div>
+          <TextInput
+            type="number"
+            name="amount"
+            defaultValue={1}
+            className="w-16"
+          />
+          <Button
+            size="sm"
+            type="submit"
+            name="_action"
+            value="add-days"
+            loading={isAddingDays}
+          >
+            Days
+          </Button>
+          <Button size="sm" type="submit" name="_action" value="add-hours">
+            Hours
+          </Button>
+          <Button size="sm" type="submit" name="_action" value="add-minutes">
+            Minutes
+          </Button>
+          <Button size="sm" type="submit" name="_action" value="add-seconds">
+            Seconds
+          </Button>
+        </Form>
+        <div className="text-green-600">
+          {actionData?.addedTime ? "Added" : <>&nbsp;</>}
+        </div>
+      </div>
       <h1 className="mt-8 font-bold text-lg">User</h1>
       <Endpoint
         method="post"

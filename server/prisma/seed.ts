@@ -11,6 +11,11 @@ async function seed() {
       fullName: "Admin Adminov",
     },
   });
+  await db.config.create({
+    data: {
+      additionalSeconds: 0,
+    },
+  });
 }
 
 seed();

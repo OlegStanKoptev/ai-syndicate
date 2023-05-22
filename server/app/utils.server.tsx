@@ -271,3 +271,12 @@ export async function clearDb() {
   execSync(`npx prisma migrate reset --force`);
   reconnectDb();
 }
+
+export async function addSeconds(seconds: number) {
+  const { id } = (await db.config.findFirst())!;
+  const { additionalSeconds } = await db.config.update({
+    where: { id },
+    data: { additionalSeconds: { increment: seconds } },
+  });
+  return additionalSeconds;
+}

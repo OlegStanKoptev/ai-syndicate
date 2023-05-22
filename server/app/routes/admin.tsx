@@ -13,18 +13,21 @@ import {
 import { useSpinDelay } from "spin-delay";
 import { twMerge } from "tailwind-merge";
 import invariant from "tiny-invariant";
-import { Button, Nav, Spinner } from "~/components";
+import { Button, Clock, Nav, Spinner } from "~/components";
+import { db } from "~/db.server";
 import logoImgUrl from "~/images/logo.svg";
 import { deserialize, serialize } from "~/utils";
 import { getCurrentAdmin } from "~/utils.server";
 
 type LoaderData = {
   admin: User | null;
+  additionalSeconds: number;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   const admin = await getCurrentAdmin(request);
-  return serialize<LoaderData>({ admin });
+  const { additionalSeconds } = (await db.config.findFirst())!;
+  return serialize<LoaderData>({ admin, additionalSeconds });
 };
 
 export default function Private() {
@@ -50,6 +53,7 @@ export default function Private() {
             <h1 className="mx-2 whitespace-nowrap text-base font-bold">
               AI Syndicate | Admin
             </h1>
+            (<Clock additionalSeconds={data.additionalSeconds} />)
           </div>
         </NavLink>
         <div className="ml-auto flex items-center gap-4">
