@@ -17,6 +17,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button, InputWrapper, TextInput, UnexpectedError } from "~/components";
 import type { FormattedZodError } from "~/utils.server";
+import { newServerDate } from "~/utils.server";
 import { formatZodError, requireCurrentAdmin } from "~/utils.server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { db } from "~/db.server";
@@ -65,6 +66,8 @@ export const action: ActionFunction = async ({ request }) => {
       passwordHash: await bycript.hash(validatedData.password, 10),
       fullName: validatedData.fullName,
       createdById: admin.id,
+      createdAt: await newServerDate(),
+      updatedAt: await newServerDate(),
     },
   });
   return redirect(`/admin/users/${expert.id}`);

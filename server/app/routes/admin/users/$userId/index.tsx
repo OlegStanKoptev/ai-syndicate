@@ -1,4 +1,11 @@
-import type { Investment, Startup, User, VoteNewStartup } from "@prisma/client";
+import type {
+  Deposit,
+  Investment,
+  Refund,
+  Startup,
+  User,
+  VoteNewStartup,
+} from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useCatch, useLoaderData, useNavigate } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -24,6 +31,8 @@ type LoaderData = {
     investments: (Investment & {
       startup: Startup;
     })[];
+    deposits: Deposit[];
+    refunds: Refund[];
   };
 };
 
@@ -44,6 +53,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         orderBy: { updatedAt: "desc" },
         include: { startup: true },
       },
+      deposits: { orderBy: { updatedAt: "desc" } },
+      refunds: { orderBy: { updatedAt: "desc" } },
     },
   });
   if (!user) {
@@ -97,6 +108,7 @@ export default function UserIndex() {
                   </a>
                 ) : null}
               </CardField>
+              <CardField name="Balance">{data.user.balance}</CardField>
               <CardField name="Registered at">
                 {formatDate(data.user.createdAt, { time: true })}
               </CardField>
@@ -145,6 +157,42 @@ export default function UserIndex() {
                       </Link>
                     ),
                   },
+                  { id: "amount", header: "Amount" },
+                  {
+                    id: "date",
+                    header: "Date",
+                    cell: ({ row }) =>
+                      formatDate(row.createdAt, { time: true }),
+                  },
+                ]}
+              />
+            </div>
+          </div>
+          <h2 className="font-bold text-lg mb-4 mt-8">DEPOSITS</h2>
+          <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
+            <div>
+              <Table
+                data={data.user.deposits}
+                columns={[
+                  { id: "id", header: "Id" },
+                  { id: "amount", header: "Amount" },
+                  {
+                    id: "date",
+                    header: "Date",
+                    cell: ({ row }) =>
+                      formatDate(row.createdAt, { time: true }),
+                  },
+                ]}
+              />
+            </div>
+          </div>
+          <h2 className="font-bold text-lg mb-4 mt-8">REFUNDS</h2>
+          <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
+            <div>
+              <Table
+                data={data.user.refunds}
+                columns={[
+                  { id: "id", header: "Id" },
                   { id: "amount", header: "Amount" },
                   {
                     id: "date",

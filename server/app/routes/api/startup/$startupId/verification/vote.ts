@@ -5,6 +5,7 @@ import { db } from "~/db.server";
 import {
   getNewStartupNaysTotal,
   getNewStartupYeasTotal,
+  newServerDate,
   requireCurrentApiUser,
 } from "~/utils.server";
 import invariant from "tiny-invariant";
@@ -65,6 +66,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       data: {
         yea: validatedData.yea,
         nayReason: validatedData.nayReason ?? null,
+        updatedAt: await newServerDate(),
       },
     });
   } else {
@@ -74,6 +76,8 @@ export const action: ActionFunction = async ({ request, params }) => {
         expertId: user.id,
         yea: validatedData.yea,
         nayReason: validatedData.nayReason,
+        createdAt: await newServerDate(),
+        updatedAt: await newServerDate(),
       },
     });
   }
@@ -84,14 +88,19 @@ export const action: ActionFunction = async ({ request, params }) => {
       where: { id: startupId },
       data: {
         status: "verification_succeded",
-        verificationEndedAt: new Date(),
+        verificationEndedAt: await newServerDate(),
+        updatedAt: await newServerDate(),
       },
     });
   }
   if (naysTotal >= startupVerificationNayThreshold) {
     await db.startup.update({
       where: { id: startupId },
-      data: { status: "verification_failed", verificationEndedAt: new Date() },
+      data: {
+        status: "verification_failed",
+        verificationEndedAt: await newServerDate(),
+        updatedAt: await newServerDate(),
+      },
     });
   }
   return new Response();

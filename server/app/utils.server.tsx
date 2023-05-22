@@ -4,7 +4,7 @@ import type { ZodEffects, ZodError, ZodSchema } from "zod";
 import { z } from "zod";
 import { db, reconnectDb } from "./db.server";
 import { orderByValues } from "./utils";
-import { scheduleJob } from "node-schedule";
+import { scheduleJob, gracefulShutdown as cancelAllJobs } from "node-schedule";
 import * as dateFns from "date-fns";
 import { execSync } from "child_process";
 
@@ -183,7 +183,7 @@ export async function getNewStartupNaysTotal(id: string) {
 }
 
 export async function scheduleOrRunJob(date: Date, handle: () => any) {
-  if (dateFns.isFuture(date)) {
+  if (dateFns.isAfter(date, await newServerDate())) {
     scheduleJob(date, handle);
   } else {
     handle();
@@ -198,19 +198,33 @@ export function scheduleStartupFinancingDeadline(id: string, deadline: Date) {
     if (startup && startup.status === "financing") {
       await db.startup.update({
         where: { id: startup.id },
-        data: { status: "financing_failed", financingEndedAt: new Date() },
+        data: {
+          status: "financing_failed",
+          financingEndedAt: deadline,
+          updatedAt: await newServerDate(),
+        },
       });
       const investments = await db.investment.findMany({
         where: { startupId: startup.id },
       });
       await Promise.all(
-        investments.map(
-          async (investment) =>
-            await db.user.update({
-              where: { id: investment.investorId },
-              data: { balance: { increment: investment.amount } },
-            })
-        )
+        investments.map(async (investment) => {
+          await db.user.update({
+            where: { id: investment.investorId },
+            data: {
+              balance: { increment: investment.amount },
+              updatedAt: await newServerDate(),
+            },
+          });
+          await db.refund.create({
+            data: {
+              amount: investment.amount,
+              investorId: investment.investorId,
+              createdAt: await newServerDate(),
+              updatedAt: await newServerDate(),
+            },
+          });
+        })
       );
     }
   });
@@ -227,7 +241,7 @@ export function scheduleStartupDeveloperApplicationDeadline(
     if (startup && startup.status === "developerApplication") {
       await db.startup.update({
         where: { id: startup.id },
-        data: { status: "developerVoting" },
+        data: { status: "developerVoting", updatedAt: await newServerDate() },
       });
     }
   });
@@ -276,7 +290,21 @@ export async function addSeconds(seconds: number) {
   const { id } = (await db.config.findFirst())!;
   const { additionalSeconds } = await db.config.update({
     where: { id },
-    data: { additionalSeconds: { increment: seconds } },
+    data: {
+      additionalSeconds: { increment: seconds },
+    },
   });
+  await cancelAllJobs();
+  await schedule();
   return additionalSeconds;
+}
+
+export async function getAdditionalSeconds() {
+  const { additionalSeconds } = (await db.config.findFirst())!;
+  return additionalSeconds;
+}
+
+export async function newServerDate(date?: Date) {
+  const additionalSeconds = await getAdditionalSeconds();
+  return dateFns.addSeconds(date ?? new Date(), additionalSeconds);
 }

@@ -2,7 +2,7 @@ import { json } from "@remix-run/node";
 import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
-import { requireCurrentApiUser } from "~/utils.server";
+import { newServerDate, requireCurrentApiUser } from "~/utils.server";
 import invariant from "tiny-invariant";
 
 const requestBodySchema = z.object({
@@ -29,7 +29,18 @@ export const action: ActionFunction = async ({ request }) => {
   invariant(typeof user.balance === "number");
   const investor = await db.user.update({
     where: { id: user.id },
-    data: { balance: user.balance + validatedData.amount },
+    data: {
+      balance: user.balance + validatedData.amount,
+      updatedAt: await newServerDate(),
+    },
+  });
+  await db.deposit.create({
+    data: {
+      amount: validatedData.amount,
+      investorId: investor.id,
+      createdAt: await newServerDate(),
+      updatedAt: await newServerDate(),
+    },
   });
   invariant(typeof investor.balance === "number");
   return json({ balance: investor.balance });

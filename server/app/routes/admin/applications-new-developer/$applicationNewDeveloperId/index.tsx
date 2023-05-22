@@ -21,7 +21,7 @@ import {
   applicationNewDeveloperStatusNames,
   formatDate,
 } from "~/utils";
-import { requireCurrentAdmin } from "~/utils.server";
+import { newServerDate, requireCurrentAdmin } from "~/utils.server";
 
 export const action: ActionFunction = async ({ request, params }) => {
   const { applicationNewDeveloperId } = params;
@@ -62,7 +62,8 @@ export const action: ActionFunction = async ({ request, params }) => {
       data: {
         status: "approved",
         approvedOrDeclinedById: admin.id,
-        approvedOrDeclinedAt: new Date(),
+        approvedOrDeclinedAt: await newServerDate(),
+        updatedAt: await newServerDate(),
       },
     });
     const newDeveloper = await db.user.create({
@@ -80,12 +81,15 @@ export const action: ActionFunction = async ({ request, params }) => {
         legalAddress: applicationNewDeveloper.legalAddress,
         actualAddress: applicationNewDeveloper.actualAddress,
         website: applicationNewDeveloper.website,
+        createdAt: await newServerDate(),
+        updatedAt: await newServerDate(),
       },
     });
     await db.applicationNewDeveloper.update({
       where: { id: applicationNewDeveloper.id },
       data: {
         createdDeveloperId: newDeveloper.id,
+        updatedAt: await newServerDate(),
       },
     });
     return new Response();

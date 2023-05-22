@@ -20,6 +20,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button, InputWrapper, Textarea, UnexpectedError } from "~/components";
 import type { FormattedZodError } from "~/utils.server";
+import { newServerDate } from "~/utils.server";
 import { formatZodError, requireCurrentAdmin } from "~/utils.server";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { db } from "~/db.server";
@@ -76,7 +77,8 @@ export const action: ActionFunction = async ({ request, params }) => {
       status: "declined",
       declineReason: validatedData.declineReason,
       approvedOrDeclinedById: admin.id,
-      approvedOrDeclinedAt: new Date(),
+      approvedOrDeclinedAt: await newServerDate(),
+      updatedAt: await newServerDate(),
     },
   });
   return redirect(

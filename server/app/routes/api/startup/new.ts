@@ -2,7 +2,7 @@ import { json } from "@remix-run/node";
 import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
-import { requireCurrentApiUser } from "~/utils.server";
+import { newServerDate, requireCurrentApiUser } from "~/utils.server";
 
 const requestBodySchema = z.object({
   name: z.string().min(1),
@@ -42,6 +42,8 @@ export const action: ActionFunction = async ({ request }) => {
       businessPlanFile: validatedData.businessPlanFile,
       presentationFile: validatedData.presentationFile,
       targetFinancing: validatedData.targetFinancing,
+      createdAt: await newServerDate(),
+      updatedAt: await newServerDate(),
     },
   });
   return json({ id: startup.id });

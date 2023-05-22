@@ -2,7 +2,7 @@ import { json } from "@remix-run/node";
 import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
-import { requireCurrentApiUser } from "~/utils.server";
+import { newServerDate, requireCurrentApiUser } from "~/utils.server";
 import invariant from "tiny-invariant";
 
 const requestBodySchema = z.object({
@@ -50,6 +50,8 @@ export const action: ActionFunction = async ({ request, params }) => {
       developerId: user.id,
       status: "new",
       message: validatedData.message,
+      createdAt: await newServerDate(),
+      updatedAt: await newServerDate(),
     },
   });
   return new Response();

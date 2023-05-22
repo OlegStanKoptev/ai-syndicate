@@ -201,6 +201,44 @@ export default function StartupIndex() {
           </p>
         </>
       )}
+      {data.startup.status === "financing_failed" && (
+        <>
+          <p className="text-base mt-4">
+            Sadly, the startup <span className="font-bold">failed</span> to
+            attract enough <span className="font-bold">investment</span>. But
+            the investors got their refunds.
+          </p>
+          <p className="text-base">
+            The{" "}
+            <Link
+              to={`/admin/users/${data.startup.startuperId}`}
+              className="text-blue-400"
+            >
+              startuper
+            </Link>{" "}
+            can <span className="font-bold">try again</span> and create a new
+            startup with this one as <span className="font-bold">base</span>, or
+            they could do so <span className="font-bold">from scratch</span>
+          </p>
+        </>
+      )}
+      {data.startup.status === "financing_succeded" && (
+        <>
+          <p className="text-base mt-4">The startup got its financing!</p>
+          <p className="text-base">
+            Now the{" "}
+            <Link
+              to={`/admin/users/${data.startup.startuperId}`}
+              className="text-blue-400"
+            >
+              startuper
+            </Link>{" "}
+            must <span className="font-bold">confirm transition</span> to
+            developer <span className="font-bold">hiring</span> stage and
+            specify the <span className="font-bold">deadline</span> for that
+          </p>
+        </>
+      )}
       <div className="mx-4 mt-8 grid grid-cols-2 gap-16">
         <div>
           <CardField name="Name">{data.startup.name}</CardField>

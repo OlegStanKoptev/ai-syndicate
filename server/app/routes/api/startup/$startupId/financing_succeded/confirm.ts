@@ -3,6 +3,7 @@ import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
 import {
+  newServerDate,
   requireCurrentApiUser,
   scheduleStartupDeveloperApplicationDeadline,
 } from "~/utils.server";
@@ -52,6 +53,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     data: {
       status: "developerApplication",
       developerApplicationDeadline: validatedData.developerApplicationDeadline,
+      updatedAt: await newServerDate(),
     },
   });
   scheduleStartupDeveloperApplicationDeadline(

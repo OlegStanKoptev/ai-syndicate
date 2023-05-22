@@ -18,6 +18,7 @@ import { db } from "~/db.server";
 import logoImgUrl from "~/images/logo.svg";
 import { deserialize, serialize } from "~/utils";
 import { getCurrentAdmin } from "~/utils.server";
+import * as dateFns from "date-fns";
 
 type LoaderData = {
   admin: User | null;
@@ -151,7 +152,8 @@ export default function Private() {
         <Outlet />
       </main>
       <footer className="border-t-2 bg-slate-100 p-3 text-center text-xs">
-        AI Syndicate © {new Date().getFullYear()}
+        AI Syndicate ©{" "}
+        {dateFns.addSeconds(new Date(), data.additionalSeconds).getFullYear()}
       </footer>
       {isLoadingPage && (
         <Spinner className="fixed bottom-4 right-4 h-12 w-12" />

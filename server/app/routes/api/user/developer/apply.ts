@@ -3,6 +3,7 @@ import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
 import bycript from "bcryptjs";
+import { newServerDate } from "~/utils.server";
 
 const requestBodySchema = z.object({
   email: z.string().email(),
@@ -67,6 +68,8 @@ export const action: ActionFunction = async ({ request }) => {
       legalAddress: validatedData.legalAddress,
       actualAddress: validatedData.actualAddress,
       website: validatedData.website,
+      createdAt: await newServerDate(),
+      updatedAt: await newServerDate(),
     },
   });
   return json({ id: application.id });

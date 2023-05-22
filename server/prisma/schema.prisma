@@ -53,6 +53,8 @@ model User {
   createdBy                                  User?                     @relation(name: "AdminExpertCreation", fields: [createdById], references: [id])
   approvedOrDeclinedApplicationsNewDeveloper ApplicationNewDeveloper[]
   createdFromApplication                     ApplicationNewDeveloper?  @relation(name: "a")
+  deposits                                   Deposit[]
+  refunds                                    Refund[]
 }
 
 enum StartupStatus {
@@ -110,6 +112,16 @@ model VoteNewStartup {
   @@unique([startupId, expertId])
 }
 
+model Deposit {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  amount     Int
+  investorId String
+
+  investor User @relation(fields: [investorId], references: [id])
+}
+
 model Investment {
   id         String   @id @default(cuid())
   createdAt  DateTime @default(now())
@@ -120,6 +132,16 @@ model Investment {
 
   investor User    @relation(fields: [investorId], references: [id])
   startup  Startup @relation(fields: [startupId], references: [id])
+}
+
+model Refund {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  amount     Int
+  investorId String
+
+  investor User @relation(fields: [investorId], references: [id])
 }
 
 enum ApplicationNewDeveloperStatus {

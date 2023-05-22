@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "~/db.server";
 import {
   getStartupTotalFinancing,
+  newServerDate,
   requireCurrentApiUser,
 } from "~/utils.server";
 import invariant from "tiny-invariant";
@@ -73,17 +74,26 @@ export const action: ActionFunction = async ({ request, params }) => {
       amount: validatedData.amount,
       investorId: user.id,
       startupId: startup.id,
+      createdAt: await newServerDate(),
+      updatedAt: await newServerDate(),
     },
   });
   await db.user.update({
     where: { id: user.id },
-    data: { balance: user.balance - validatedData.amount },
+    data: {
+      balance: user.balance - validatedData.amount,
+      updatedAt: await newServerDate(),
+    },
   });
   const startupTotalFinancingNow = await getStartupTotalFinancing(startupId);
   if (startupTotalFinancingNow === startup.targetFinancing) {
     await db.startup.update({
       where: { id: startup.id },
-      data: { status: "financing_succeded", financingEndedAt: new Date() },
+      data: {
+        status: "financing_succeded",
+        financingEndedAt: await newServerDate(),
+        updatedAt: await newServerDate(),
+      },
     });
   }
   return new Response();

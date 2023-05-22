@@ -421,6 +421,13 @@ export default function Spec() {
         ]}
         className="mt-4"
       />
+      <h1 className="mt-14 font-bold text-lg">Config</h1>
+      <Endpoint
+        method="get"
+        route="/api/config/additional-seconds"
+        examples={[{ name: "Example" }]}
+        className="mt-4"
+      />
       <h1 className="mt-14 font-bold text-lg">Files</h1>
       <Endpoint
         method="post"

@@ -120,7 +120,7 @@ export function serialize<T = any>(data: T) {
 export function deserialize<T = any>(data: string): T;
 export function deserialize<T = any>(data: string | undefined): T | undefined;
 export function deserialize<T = any>(data: string | undefined) {
-  if (data === undefined) {
+  if (data === undefined || data === "") {
     return undefined;
   }
   return superjson.parse<T>(data);
@@ -271,6 +271,26 @@ function getRandomInt(from: number, to: number) {
 }
 
 export async function populate() {
+  const newClientDate = async (date?: Date) => {
+    const additionalSeconds: number = await axios
+      .get("/api/config/additional-seconds")
+      .then(({ data }) => data);
+    return dateFns.addSeconds(date ?? new Date(), additionalSeconds);
+  };
+  const waitDays = async (days: number) => {
+    await axios.post(
+      "/admin/spec",
+      (() => {
+        const formData = new FormData();
+        formData.set("_action", "add-days");
+        formData.set("amount", String(days));
+        return formData;
+      })(),
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+  };
   const createExperts = async ({ count }: { count: number }) => {
     await Promise.all(
       Array(count)
@@ -435,17 +455,20 @@ export async function populate() {
   const confirmVerificationOfStartup = async ({
     userNumber,
     startupNumber,
-    financingDeadline = dateFns.addDays(new Date(), 14),
+    daysToFinancingDeadline,
   }: {
     userNumber: number;
     startupNumber: number;
-    financingDeadline?: Date | string;
+    daysToFinancingDeadline?: number;
   }) => {
     await loginUser({ userNumber });
     await axios.post(
       `/api/startup/${startupIdsByNumbers[startupNumber]}/verification_succeded/confirm`,
       {
-        financingDeadline,
+        financingDeadline: dateFns.addDays(
+          await newClientDate(),
+          daysToFinancingDeadline ?? 14
+        ),
       }
     );
   };
@@ -475,7 +498,11 @@ export async function populate() {
     startupNumber: number;
     outcome: "success" | "fail" | "unfinished";
   }) => {
-    const { targetFinancing } = await getStartupInfo({ startupNumber });
+    const {
+      targetFinancing,
+      financing: { financingDeadline },
+    }: { targetFinancing: number; financing: { financingDeadline: string } } =
+      await getStartupInfo({ startupNumber });
     const part1 = Math.floor(targetFinancing / 2);
     const part2 = Math.floor((targetFinancing - part1) / 2);
     const part3 = targetFinancing - part1 - part2;
@@ -505,7 +532,13 @@ export async function populate() {
         }
       );
     } else if (outcome === "fail") {
-      // TODO
+      const daysToWait =
+        1 +
+        dateFns.differenceInDays(
+          new Date(financingDeadline),
+          await newClientDate()
+        );
+      await waitDays(daysToWait);
     } else if (outcome === "unfinished") {
       return;
     } else {
@@ -526,8 +559,28 @@ export async function populate() {
   await voteForStartup({ startupNumber: 2, outcome: "success" });
   await createStartup({ userNumber: 0, startupNumber: 3 });
   await voteForStartup({ startupNumber: 3, outcome: "success" });
-  await confirmVerificationOfStartup({ userNumber: 0, startupNumber: 3 });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 3,
+    daysToFinancingDeadline: 150,
+  });
   await investInStartup({ startupNumber: 3, outcome: "unfinished" });
+  await createStartup({ userNumber: 0, startupNumber: 4 });
+  await voteForStartup({ startupNumber: 4, outcome: "success" });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 4,
+    daysToFinancingDeadline: 4,
+  });
+  await investInStartup({ startupNumber: 4, outcome: "fail" });
+  await createStartup({ userNumber: 0, startupNumber: 5 });
+  await voteForStartup({ startupNumber: 5, outcome: "success" });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 5,
+    daysToFinancingDeadline: 100,
+  });
+  await investInStartup({ startupNumber: 5, outcome: "success" });
 
   // await axios.post("/api/user/login", {
   //   email: "startuper@startuper.com",

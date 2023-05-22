@@ -3,6 +3,7 @@ import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
 import bycript from "bcryptjs";
+import { newServerDate } from "~/utils.server";
 
 const requestBodySchema = z.object({
   email: z.string().email(),
@@ -40,6 +41,8 @@ export const action: ActionFunction = async ({ request }) => {
       fullName: validatedData.fullName,
       avatarImageFile: validatedData.avatarImageFile,
       balance: 0,
+      createdAt: await newServerDate(),
+      updatedAt: await newServerDate(),
     },
   });
   return json({ id: user.id });
