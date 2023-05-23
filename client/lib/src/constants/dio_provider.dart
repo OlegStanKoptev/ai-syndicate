@@ -7,5 +7,5 @@ part 'dio_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 Dio dio(DioRef ref) => Dio()
-  ..options.baseUrl = 'https://olegk.space/'
+  ..options.baseUrl = 'https://feldspar.space'
   ..interceptors.add(CookieManager(PersistCookieJar()));

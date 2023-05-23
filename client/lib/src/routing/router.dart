@@ -1,5 +1,6 @@
-import 'package:client/src/features/authentication/presentation/auth_screen.dart';
-import 'package:client/src/features/authentication/presentation/login_screen.dart';
+import 'package:client/src/features/authentication/presentation/screens/auth_screen/auth_screen.dart';
+import 'package:client/src/features/authentication/presentation/screens/login_screen.dart';
+import 'package:client/src/features/authentication/presentation/screens/register_screen/register_screen.dart';
 import 'package:client/src/features/startups/presentation/startups_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -17,8 +18,8 @@ final _routes = [
     builder: (context, state) => const StartupsScreen(),
     routes: [
       GoRoute(
-        name: 'auth',
-        path: 'auth',
+        name: 'profile',
+        path: 'profile',
         builder: (context, state) => const AuthScreen(),
         routes: [
           GoRoute(
@@ -29,7 +30,7 @@ final _routes = [
           GoRoute(
             name: 'register',
             path: 'register',
-            builder: (context, state) => const LoginScreen(),
+            builder: (context, state) => const RegisterScreen(),
           ),
         ],
       ),
