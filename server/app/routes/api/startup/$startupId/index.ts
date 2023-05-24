@@ -175,5 +175,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         }),
       };
     })(),
+    developerVoting: await (async () => {
+      if (!(startup.status === "developerVoting")) {
+        return null;
+      }
+      return {
+        developerVotingDeadline: startup.developerVotingDeadline,
+      };
+    })(),
   };
 };

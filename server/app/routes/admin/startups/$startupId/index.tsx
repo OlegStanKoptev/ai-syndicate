@@ -55,6 +55,7 @@ type LoaderData = {
     maxApprovalApplicationsDeveloper: (ApplicationDeveloper & {
       developer: User;
     })[];
+    developer: User | null;
   };
 };
 
@@ -78,6 +79,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         orderBy: { updatedAt: "desc" },
         include: { developer: true },
       },
+      developer: true,
     },
   });
   const maxApprovalData = await getStartupLeadingApplicationsDeveloper(
@@ -369,6 +371,24 @@ export default function StartupIndex() {
           </p>
         </>
       )}
+      {data.startup.status === "development" && (
+        <>
+          <p className="text-base mt-4">
+            The startup is in development. In the end, the{" "}
+            <Link
+              to={`/admin/users/${data.startup.developerId!}`}
+              className="text-blue-400"
+            >
+              developer
+            </Link>{" "}
+            will file a report that will be checked by experts.
+          </p>
+          <p>
+            Development deadline:{" "}
+            {formatDate(data.startup.developmentDeadline!, { time: true })}
+          </p>
+        </>
+      )}
       <div className="mx-4 mt-8 grid grid-cols-2 gap-16">
         <div>
           <CardField name="Name">{data.startup.name}</CardField>
@@ -437,6 +457,20 @@ export default function StartupIndex() {
               {data.startup.startuper.fullName} ({data.startup.startuper.email})
             </Link>
           </CardField>
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "development"
+          ) && (
+            <CardField name="Developer">
+              <Link
+                className="text-blue-400"
+                to={`/admin/users/${data.startup.developer!.id}`}
+              >
+                {data.startup.developer!.fullName} (
+                {data.startup.developer!.email})
+              </Link>
+            </CardField>
+          )}
         </div>
         <div />
         <div>
@@ -448,6 +482,49 @@ export default function StartupIndex() {
           </CardField>
         </div>
       </div>
+      {isStartupStatusSameOrLaterThan(data.startup.status, "development") && (
+        <>
+          <div id="developer-application" className="relative bottom-5" />
+          <h2 className="font-bold text-lg mb-4 mt-8">DEVELOPMENT</h2>
+          <p className="mb-3">
+            Started at{" "}
+            {formatDate(data.startup.developerVotingEndedAt!, {
+              time: true,
+            })}
+          </p>
+          <p className="mb-3">
+            Deadline:{" "}
+            {formatDate(data.startup.developmentDeadline!, {
+              time: true,
+            })}
+          </p>
+          {data.startup.status === "development" ? (
+            <p className="mb-3">In progress...</p>
+          ) : (
+            <p className="mb-3">
+              Ended at {formatDate(data.startup.developmentEndedAt!)}
+            </p>
+          )}
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "development_succeded"
+          ) && (
+            <p className="text-green-600 font-bold mb-3">
+              Development succeded
+            </p>
+          )}
+          <p>
+            Developer:{" "}
+            <Link
+              to={`/admin/users/${data.startup.developerId}`}
+              className="text-blue-400"
+            >
+              {data.startup.developer!.shortOrgName} (
+              {data.startup.developer!.email})
+            </Link>
+          </p>
+        </>
+      )}
       {isStartupStatusSameOrLaterThan(
         data.startup.status,
         "developerVoting"

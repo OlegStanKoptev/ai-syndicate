@@ -32,6 +32,8 @@ export const startupStatuses: readonly [StartupStatus, ...StartupStatus[]] = [
   "developerVoting",
   "developerVoting_succeded",
   "development",
+  "development_succeded",
+  "finished",
 ];
 export const startupStatusNames: { [K in StartupStatus]: string } = {
   verification: "Verification",
@@ -45,6 +47,8 @@ export const startupStatusNames: { [K in StartupStatus]: string } = {
   developerVoting: "Developer voting",
   developerVoting_succeded: "Developer voting succeded",
   development: "Development",
+  development_succeded: "Development succeded",
+  finished: "Finished",
 };
 type StartupStatusTree = { status: StartupStatus; after?: StartupStatusTree[] };
 const startupStatusTree: StartupStatusTree = {
@@ -72,7 +76,17 @@ const startupStatusTree: StartupStatusTree = {
                           after: [
                             {
                               status: "developerVoting_succeded",
-                              after: [{ status: "development" }],
+                              after: [
+                                {
+                                  status: "development",
+                                  after: [
+                                    {
+                                      status: "development_succeded",
+                                      after: [{ status: "finished" }],
+                                    },
+                                  ],
+                                },
+                              ],
                             },
                           ],
                         },
@@ -743,6 +757,51 @@ export async function populate() {
       }
     }
   };
+  const waitForDeveloperVotingDeadline = async ({
+    startupNumber,
+  }: {
+    startupNumber: number;
+  }) => {
+    const {
+      developerVoting: { developerVotingDeadline },
+    }: { developerVoting: { developerVotingDeadline: string } } =
+      await getStartupInfo({
+        startupNumber,
+      });
+    const daysToWait =
+      1 +
+      dateFns.differenceInDays(
+        new Date(developerVotingDeadline),
+        await newClientDate()
+      );
+    await waitDays(daysToWait);
+  };
+  const confirmDeveloperVotingOfStartup = async ({
+    userNumber,
+    startupNumber,
+    daysToDevelopmentDeadline,
+  }: {
+    userNumber: number;
+    startupNumber: number;
+    daysToDevelopmentDeadline?: number;
+  }) => {
+    await loginUser({ userNumber });
+    const { ids } = await axios
+      .get(
+        `/api/startup/${startupIdsByNumbers[startupNumber]}/developer-voting_succeded/leaders`
+      )
+      .then(({ data }) => data);
+    await axios.post(
+      `/api/startup/${startupIdsByNumbers[startupNumber]}/developer-voting_succeded/confirm`,
+      {
+        developmentDeadline: dateFns.addDays(
+          await newClientDate(),
+          daysToDevelopmentDeadline ?? 14
+        ),
+        applicationDeveloperId: ids[0],
+      }
+    );
+  };
   await createExperts({
     count:
       startupVerificationYeaThreshold + startupVerificationNayThreshold - 1,
@@ -826,7 +885,56 @@ export async function populate() {
   await confirmDeveloperApplicationOfStartup({
     userNumber: 0,
     startupNumber: 8,
-    daysToDeveloperVotingDeadline: 5,
+    daysToDeveloperVotingDeadline: 75,
   });
   await voteForDevelopers({ startupNumber: 8 });
+  await createStartup({ userNumber: 0, startupNumber: 9 });
+  await voteForStartup({ startupNumber: 9, outcome: "success" });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 9,
+    daysToFinancingDeadline: 90,
+  });
+  await investInStartup({ startupNumber: 9, outcome: "success" });
+  await confirmFinancingOfStartup({
+    userNumber: 0,
+    startupNumber: 9,
+    daysToDeveloperApplicationDeadline: 5,
+  });
+  await applyAsDevelopers({ count: 3, startupNumber: 9 });
+  await waitForDeveloperApplicationDeadline({ startupNumber: 9 });
+  await confirmDeveloperApplicationOfStartup({
+    userNumber: 0,
+    startupNumber: 9,
+    daysToDeveloperVotingDeadline: 5,
+  });
+  await voteForDevelopers({ startupNumber: 9 });
+  await waitForDeveloperVotingDeadline({ startupNumber: 9 });
+  await createStartup({ userNumber: 0, startupNumber: 10 });
+  await voteForStartup({ startupNumber: 10, outcome: "success" });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 10,
+    daysToFinancingDeadline: 100,
+  });
+  await investInStartup({ startupNumber: 10, outcome: "success" });
+  await confirmFinancingOfStartup({
+    userNumber: 0,
+    startupNumber: 10,
+    daysToDeveloperApplicationDeadline: 5,
+  });
+  await applyAsDevelopers({ count: 3, startupNumber: 10 });
+  await waitForDeveloperApplicationDeadline({ startupNumber: 10 });
+  await confirmDeveloperApplicationOfStartup({
+    userNumber: 0,
+    startupNumber: 10,
+    daysToDeveloperVotingDeadline: 5,
+  });
+  await voteForDevelopers({ startupNumber: 10 });
+  await waitForDeveloperVotingDeadline({ startupNumber: 10 });
+  await confirmDeveloperVotingOfStartup({
+    userNumber: 0,
+    startupNumber: 10,
+    daysToDevelopmentDeadline: 6,
+  });
 }

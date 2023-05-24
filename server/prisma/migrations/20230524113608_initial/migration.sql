@@ -2,7 +2,7 @@
 CREATE TYPE "UserRole" AS ENUM ('user', 'expert', 'admin', 'developer');
 
 -- CreateEnum
-CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded', 'developerApplication', 'developerApplication_succeded', 'developerVoting', 'developerVoting_succeded');
+CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded', 'developerApplication', 'developerApplication_succeded', 'developerVoting', 'developerVoting_succeded', 'development', 'development_succeded', 'finished');
 
 -- CreateEnum
 CREATE TYPE "ApplicationNewDeveloperStatus" AS ENUM ('new', 'approved', 'declined');
@@ -54,13 +54,17 @@ CREATE TABLE "Startup" (
     "specificationFile" TEXT NOT NULL,
     "businessPlanFile" TEXT,
     "presentationFile" TEXT,
+    "developerId" TEXT,
+    "reportFile" TEXT,
     "verificationEndedAt" TIMESTAMP(3),
     "financingEndedAt" TIMESTAMP(3),
     "developerApplicationEndedAt" TIMESTAMP(3),
     "developerVotingEndedAt" TIMESTAMP(3),
+    "developmentEndedAt" TIMESTAMP(3),
     "financingDeadline" TIMESTAMP(3),
     "developerApplicationDeadline" TIMESTAMP(3),
     "developerVotingDeadline" TIMESTAMP(3),
+    "developmentDeadline" TIMESTAMP(3),
 
     CONSTRAINT "Startup_pkey" PRIMARY KEY ("id")
 );
@@ -178,6 +182,9 @@ ALTER TABLE "User" ADD CONSTRAINT "User_createdById_fkey" FOREIGN KEY ("createdB
 
 -- AddForeignKey
 ALTER TABLE "Startup" ADD CONSTRAINT "Startup_startuperId_fkey" FOREIGN KEY ("startuperId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Startup" ADD CONSTRAINT "Startup_developerId_fkey" FOREIGN KEY ("developerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "VoteNewStartup" ADD CONSTRAINT "VoteNewStartup_startupId_fkey" FOREIGN KEY ("startupId") REFERENCES "Startup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

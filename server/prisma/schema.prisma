@@ -56,6 +56,7 @@ model User {
   deposits                                   Deposit[]
   refunds                                    Refund[]
   votesDeveloperApplication                  VoteDeveloperApplication[]
+  startupsDeveloping                         Startup[]                  @relation(name: "StartupDeveloper")
 }
 
 enum StartupStatus {
@@ -70,6 +71,8 @@ enum StartupStatus {
   developerVoting
   developerVoting_succeded
   development
+  development_succeded
+  finished
 }
 
 model Startup {
@@ -87,19 +90,25 @@ model Startup {
   businessPlanFile  String?
   presentationFile  String?
 
+  developerId String?
+  reportFile  String?
+
   verificationEndedAt         DateTime?
   financingEndedAt            DateTime?
   developerApplicationEndedAt DateTime?
   developerVotingEndedAt      DateTime?
+  developmentEndedAt          DateTime?
 
   financingDeadline            DateTime?
   developerApplicationDeadline DateTime?
   developerVotingDeadline      DateTime?
+  developmentDeadline          DateTime?
 
   startuper             User                   @relation(fields: [startuperId], references: [id])
   investments           Investment[]
   votesNewStartup       VoteNewStartup[]
   applicationsDeveloper ApplicationDeveloper[]
+  developer             User?                  @relation(name: "StartupDeveloper", fields: [developerId], references: [id])
 }
 
 model VoteNewStartup {
