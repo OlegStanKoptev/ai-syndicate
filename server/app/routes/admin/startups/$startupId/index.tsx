@@ -17,6 +17,7 @@ import {
   UnexpectedError,
 } from "~/components";
 import { db } from "~/db.server";
+import { MdEdit } from "react-icons/md";
 import {
   deserialize,
   formatDate,
@@ -158,6 +159,12 @@ export default function StartupIndex() {
           Startup <span className="font-bold">{data.startup.name}</span> (
           {startupStatusNames[data.startup.status]})
         </h1>
+        <Link to="edit">
+          <MdEdit
+            title="Edit"
+            className="h-7 w-7 rounded-full bg-blue-400 fill-white p-1 hover:bg-blue-500"
+          />
+        </Link>
       </div>
       {data.startup.status === "verification" && (
         <>
