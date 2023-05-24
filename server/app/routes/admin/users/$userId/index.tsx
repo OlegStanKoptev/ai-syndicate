@@ -1,11 +1,14 @@
 import type {
   ApplicationDeveloper,
   Deposit,
+  Income,
   Investment,
   Refund,
+  Report,
   Startup,
   User,
   VoteNewStartup,
+  VoteReport,
 } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useCatch, useLoaderData, useNavigate } from "@remix-run/react";
@@ -34,8 +37,14 @@ type LoaderData = {
     })[];
     deposits: Deposit[];
     refunds: Refund[];
+    incomes: Income[];
     applicationsDeveloper: (ApplicationDeveloper & {
       startup: Startup;
+    })[];
+    votesReport: (VoteReport & {
+      report: Report & {
+        startup: Startup;
+      };
     })[];
   };
 };
@@ -47,6 +56,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const user = await db.user.findUnique({
     where: { id: userId },
     include: {
+      votesReport: {
+        orderBy: { updatedAt: "desc" },
+        include: { report: { include: { startup: true } } },
+      },
       applicationsDeveloper: {
         orderBy: { updatedAt: "desc" },
         include: { startup: true },
@@ -63,6 +76,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       },
       deposits: { orderBy: { updatedAt: "desc" } },
       refunds: { orderBy: { updatedAt: "desc" } },
+      incomes: { orderBy: { updatedAt: "desc" } },
     },
   });
   if (!user) {
@@ -266,6 +280,54 @@ export default function UserIndex() {
               />
             </div>
           </div>
+          <h2 className="font-bold text-lg mb-4 mt-12">REPORT VOTES</h2>
+          <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
+            <div>
+              <Table
+                data={data.user.votesReport}
+                columns={[
+                  { id: "id", header: "Id" },
+                  {
+                    id: "startup",
+                    header: "Startup",
+                    cell: ({ row }) => (
+                      <Link
+                        to={`/admin/startups/${row.report.startupId}`}
+                        className="text-blue-400"
+                      >
+                        {row.report.startup.name}
+                      </Link>
+                    ),
+                  },
+                  {
+                    id: "report",
+                    header: "Report",
+                    cell: ({ row }) => (
+                      <Link
+                        to={`/admin/startups/${row.report.startupId}/report/${row.report.id}`}
+                        className="text-blue-400"
+                      >
+                        Report{" "}
+                        {formatDate(row.report.createdAt, { time: false })}
+                      </Link>
+                    ),
+                  },
+                  {
+                    id: "vote",
+                    header: "Vote",
+                    cell: ({ row }) => (row.yea ? "yea" : "nay"),
+                  },
+                  { id: "nayReason", header: "Nay reason", width: 500 },
+                  {
+                    id: "date",
+                    header: "Date",
+                    cell: ({ row }) =>
+                      formatDate(row.updatedAt, { time: true }),
+                  },
+                ]}
+              />
+            </div>
+          </div>
         </>
       ) : data.user.role === "developer" ? (
         <>
@@ -311,6 +373,7 @@ export default function UserIndex() {
                   {data.user.website}
                 </a>
               </CardField>
+              <CardField name="Balance">{data.user.balance}</CardField>
             </div>
           </div>
           <h2 className="font-bold text-lg mb-4">STARTUP APPLICATIONS</h2>
@@ -338,6 +401,24 @@ export default function UserIndex() {
                     header: "Date",
                     cell: ({ row }) =>
                       formatDate(row.updatedAt, { time: true }),
+                  },
+                ]}
+              />
+            </div>
+          </div>
+          <h2 className="font-bold text-lg mb-4 mt-8">INCOME</h2>
+          <div className="mx-4 mt-4 grid grid-cols-2 gap-16">
+            <div>
+              <Table
+                data={data.user.incomes}
+                columns={[
+                  { id: "id", header: "Id" },
+                  { id: "amount", header: "Amount" },
+                  {
+                    id: "date",
+                    header: "Date",
+                    cell: ({ row }) =>
+                      formatDate(row.createdAt, { time: true }),
                   },
                 ]}
               />

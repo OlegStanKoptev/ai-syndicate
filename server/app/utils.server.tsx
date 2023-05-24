@@ -195,6 +195,20 @@ export async function getNewStartupNaysTotal(id: string) {
   return naysTotal;
 }
 
+export async function getReportYeasTotal(id: string) {
+  const yeasTotal = await db.voteReport.count({
+    where: { reportId: id, yea: true },
+  });
+  return yeasTotal;
+}
+
+export async function getReportNaysTotal(id: string) {
+  const naysTotal = await db.voteReport.count({
+    where: { reportId: id, yea: false },
+  });
+  return naysTotal;
+}
+
 export async function scheduleOrRunJob(date: Date, handle: () => any) {
   if (dateFns.isAfter(date, await newServerDate())) {
     scheduleJob(date, handle);

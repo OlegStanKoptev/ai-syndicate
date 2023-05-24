@@ -155,7 +155,6 @@ export default function ApplicationDeveloperIndex() {
               {data.applicationDeveloper.developer.email})
             </Link>
           </CardField>
-          <CardField name="Voting score">?</CardField>
         </div>
       </div>
       <h3 className="font-bold text-base mb-4 mt-4">Votes</h3>

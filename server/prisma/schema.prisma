@@ -57,6 +57,8 @@ model User {
   refunds                                    Refund[]
   votesDeveloperApplication                  VoteDeveloperApplication[]
   startupsDeveloping                         Startup[]                  @relation(name: "StartupDeveloper")
+  votesReport                                VoteReport[]
+  incomes                                    Income[]
 }
 
 enum StartupStatus {
@@ -90,14 +92,15 @@ model Startup {
   businessPlanFile  String?
   presentationFile  String?
 
-  developerId String?
-  reportFile  String?
+  developerId     String?
+  currentReportId String?
 
   verificationEndedAt         DateTime?
   financingEndedAt            DateTime?
   developerApplicationEndedAt DateTime?
   developerVotingEndedAt      DateTime?
   developmentEndedAt          DateTime?
+  finishedAt                  DateTime?
 
   financingDeadline            DateTime?
   developerApplicationDeadline DateTime?
@@ -109,6 +112,8 @@ model Startup {
   votesNewStartup       VoteNewStartup[]
   applicationsDeveloper ApplicationDeveloper[]
   developer             User?                  @relation(name: "StartupDeveloper", fields: [developerId], references: [id])
+  reports               Report[]
+  currentReport         Report?                @relation(name: "StartupCurrentReport", fields: [currentReportId], references: [id])
 }
 
 model VoteNewStartup {
@@ -157,6 +162,16 @@ model Refund {
   investorId String
 
   investor User @relation(fields: [investorId], references: [id])
+}
+
+model Income {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  amount      Int
+  developerId String
+
+  developer User @relation(fields: [developerId], references: [id])
 }
 
 enum ApplicationNewDeveloperStatus {
@@ -219,4 +234,33 @@ model VoteDeveloperApplication {
   voter                User                 @relation(fields: [voterId], references: [id])
 
   @@unique([applicationDeveloperId, voterId])
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  startupId  String
+  reportFile String
+
+  startup  Startup      @relation(fields: [startupId], references: [id])
+  startups Startup[]    @relation(name: "StartupCurrentReport")
+  votes    VoteReport[]
+}
+
+model VoteReport {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expertId  String
+  reportId  String
+  yea       Boolean
+  nayReason String?
+
+  expert User   @relation(fields: [expertId], references: [id])
+  report Report @relation(fields: [reportId], references: [id])
+
+  @@unique([reportId, expertId])
 }

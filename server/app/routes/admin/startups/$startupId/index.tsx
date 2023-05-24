@@ -1,6 +1,7 @@
 import type {
   ApplicationDeveloper,
   Investment,
+  Report,
   Startup,
   User,
   VoteNewStartup,
@@ -20,6 +21,7 @@ import {
   deserialize,
   formatDate,
   isStartupStatusSameOrLaterThan,
+  reportVerificationYeaThreshold,
   serialize,
   startupStatusNames,
   startupVerificationNayThreshold,
@@ -29,10 +31,14 @@ import {
   getApplicationDeveloperApproval,
   getNewStartupNaysTotal,
   getNewStartupYeasTotal,
+  getReportNaysTotal,
+  getReportYeasTotal,
   getStartupLeadingApplicationsDeveloper,
   getStartupTotalFinancing,
+  newServerDate,
   requireCurrentAdmin,
 } from "~/utils.server";
+import * as dateFns from "date-fns";
 
 type LoaderData = {
   startup: Startup & {
@@ -56,6 +62,8 @@ type LoaderData = {
       developer: User;
     })[];
     developer: User | null;
+    reports: (Report & { yeas: number; nays: number })[];
+    isDevelopmentLate: boolean;
   };
 };
 
@@ -66,6 +74,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const startup = await db.startup.findUnique({
     where: { id: startupId },
     include: {
+      reports: { orderBy: { updatedAt: "desc" } },
       startuper: true,
       votesNewStartup: {
         orderBy: { updatedAt: "desc" },
@@ -111,12 +120,22 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             ),
           }))
         ),
+        reports: await Promise.all(
+          startup.reports.map(async (report) => ({
+            ...report,
+            yeas: await getReportYeasTotal(report.id),
+            nays: await getReportNaysTotal(report.id),
+          }))
+        ),
         yeasTotal: await getNewStartupYeasTotal(startupId),
         naysTotal: await getNewStartupNaysTotal(startupId),
         receivedFinancing: await getStartupTotalFinancing(startupId),
         applicationsDeveloperCount,
         maxApproval,
         maxApprovalApplicationsDeveloper,
+        isDevelopmentLate:
+          startup.status === "development" &&
+          dateFns.isAfter(await newServerDate(), startup.developmentDeadline!),
       },
     })
   );
@@ -383,9 +402,32 @@ export default function StartupIndex() {
             </Link>{" "}
             will file a report that will be checked by experts.
           </p>
+          <p className="text-base">
+            7 'yeas' make the startup pass the development stage, but 3 'nays'
+            mean that the developer needs to improve their work and file a new
+            report.
+          </p>
           <p>
             Development deadline:{" "}
             {formatDate(data.startup.developmentDeadline!, { time: true })}
+          </p>
+        </>
+      )}
+      {data.startup.status === "development_succeded" && (
+        <>
+          <p className="text-base mt-4">
+            This is the last step! The startuper only needs to confirm that the
+            project is finished.
+          </p>
+        </>
+      )}
+      {data.startup.status === "finished" && (
+        <>
+          <p className="text-base mt-4">
+            The startup is <span className="text-green-600">finished</span>!
+          </p>
+          <p>
+            Finish date: {formatDate(data.startup.finishedAt!, { time: true })}
           </p>
         </>
       )}
@@ -505,6 +547,9 @@ export default function StartupIndex() {
               Ended at {formatDate(data.startup.developmentEndedAt!)}
             </p>
           )}
+          {data.startup.isDevelopmentLate && (
+            <p className="text-red-400 mb-3 font-bold">Deadline overdue</p>
+          )}
           {isStartupStatusSameOrLaterThan(
             data.startup.status,
             "development_succeded"
@@ -523,6 +568,46 @@ export default function StartupIndex() {
               {data.startup.developer!.email})
             </Link>
           </p>
+          <h3 className="font-bold text-base mb-4 mt-4">Reports</h3>
+          <Table
+            data={data.startup.reports}
+            columns={[
+              { id: "id", header: "Id" },
+              {
+                id: "result",
+                header: "Result",
+                cell: ({ row }) =>
+                  row.yeas === reportVerificationYeaThreshold ? (
+                    <span className="font-bold text-green-600">Success</span>
+                  ) : row.nays === startupVerificationNayThreshold ? (
+                    <span className="font-bold text-red-400">Fail</span>
+                  ) : (
+                    "Voting in progress..."
+                  ),
+                width: 200,
+              },
+              {
+                id: "yeas",
+                header: "Yeas",
+                cell: ({ row }) => (
+                  <span className="font-bold text-green-600">{row.yeas}</span>
+                ),
+              },
+              {
+                id: "nays",
+                header: "Nays",
+                cell: ({ row }) => (
+                  <span className="font-bold text-red-400">{row.nays}</span>
+                ),
+              },
+              {
+                id: "date",
+                header: "Date",
+                cell: ({ row }) => formatDate(row.updatedAt, { time: true }),
+              },
+            ]}
+            onRowClick={({ row }) => navigate(`report/${row.id}`)}
+          />
         </>
       )}
       {isStartupStatusSameOrLaterThan(

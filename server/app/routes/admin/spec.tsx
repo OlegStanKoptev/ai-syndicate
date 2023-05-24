@@ -458,6 +458,72 @@ export default function Spec() {
         ]}
         className="mt-4"
       />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/developer-voting_succeded/confirm"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+            body: {
+              developmentDeadline: "2023-05-27T07:04:15.641Z",
+              applicationDeveloperId: "",
+            },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="get"
+        route="/api/startup/{startupId}/developer-voting_succeded/leaders"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/development/report"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+            body: { reportFile: "" },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/development/vote"
+        examples={[
+          {
+            name: "Yea",
+            path: { startupId: "" },
+            body: { yea: true },
+          },
+          {
+            name: "Nay",
+            path: { startupId: "" },
+            body: { yea: false, nayReason: "Bad idea" },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/development_succeded/confirm"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+          },
+        ]}
+        className="mt-4"
+      />
       <h1 className="mt-14 font-bold text-lg">Config</h1>
       <Endpoint
         method="get"

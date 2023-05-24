@@ -55,12 +55,13 @@ CREATE TABLE "Startup" (
     "businessPlanFile" TEXT,
     "presentationFile" TEXT,
     "developerId" TEXT,
-    "reportFile" TEXT,
+    "currentReportId" TEXT,
     "verificationEndedAt" TIMESTAMP(3),
     "financingEndedAt" TIMESTAMP(3),
     "developerApplicationEndedAt" TIMESTAMP(3),
     "developerVotingEndedAt" TIMESTAMP(3),
     "developmentEndedAt" TIMESTAMP(3),
+    "finishedAt" TIMESTAMP(3),
     "financingDeadline" TIMESTAMP(3),
     "developerApplicationDeadline" TIMESTAMP(3),
     "developerVotingDeadline" TIMESTAMP(3),
@@ -117,6 +118,17 @@ CREATE TABLE "Refund" (
 );
 
 -- CreateTable
+CREATE TABLE "Income" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "developerId" TEXT NOT NULL,
+
+    CONSTRAINT "Income_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "ApplicationNewDeveloper" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -165,6 +177,30 @@ CREATE TABLE "VoteDeveloperApplication" (
     CONSTRAINT "VoteDeveloperApplication_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Report" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "startupId" TEXT NOT NULL,
+    "reportFile" TEXT NOT NULL,
+
+    CONSTRAINT "Report_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "VoteReport" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "expertId" TEXT NOT NULL,
+    "reportId" TEXT NOT NULL,
+    "yea" BOOLEAN NOT NULL,
+    "nayReason" TEXT,
+
+    CONSTRAINT "VoteReport_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -177,6 +213,9 @@ CREATE UNIQUE INDEX "ApplicationNewDeveloper_createdDeveloperId_key" ON "Applica
 -- CreateIndex
 CREATE UNIQUE INDEX "VoteDeveloperApplication_applicationDeveloperId_voterId_key" ON "VoteDeveloperApplication"("applicationDeveloperId", "voterId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "VoteReport_reportId_expertId_key" ON "VoteReport"("reportId", "expertId");
+
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -185,6 +224,9 @@ ALTER TABLE "Startup" ADD CONSTRAINT "Startup_startuperId_fkey" FOREIGN KEY ("st
 
 -- AddForeignKey
 ALTER TABLE "Startup" ADD CONSTRAINT "Startup_developerId_fkey" FOREIGN KEY ("developerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Startup" ADD CONSTRAINT "Startup_currentReportId_fkey" FOREIGN KEY ("currentReportId") REFERENCES "Report"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "VoteNewStartup" ADD CONSTRAINT "VoteNewStartup_startupId_fkey" FOREIGN KEY ("startupId") REFERENCES "Startup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -205,6 +247,9 @@ ALTER TABLE "Investment" ADD CONSTRAINT "Investment_startupId_fkey" FOREIGN KEY 
 ALTER TABLE "Refund" ADD CONSTRAINT "Refund_investorId_fkey" FOREIGN KEY ("investorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Income" ADD CONSTRAINT "Income_developerId_fkey" FOREIGN KEY ("developerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "ApplicationNewDeveloper" ADD CONSTRAINT "ApplicationNewDeveloper_approvedOrDeclinedById_fkey" FOREIGN KEY ("approvedOrDeclinedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -221,3 +266,12 @@ ALTER TABLE "VoteDeveloperApplication" ADD CONSTRAINT "VoteDeveloperApplication_
 
 -- AddForeignKey
 ALTER TABLE "VoteDeveloperApplication" ADD CONSTRAINT "VoteDeveloperApplication_voterId_fkey" FOREIGN KEY ("voterId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Report" ADD CONSTRAINT "Report_startupId_fkey" FOREIGN KEY ("startupId") REFERENCES "Startup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "VoteReport" ADD CONSTRAINT "VoteReport_expertId_fkey" FOREIGN KEY ("expertId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "VoteReport" ADD CONSTRAINT "VoteReport_reportId_fkey" FOREIGN KEY ("reportId") REFERENCES "Report"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

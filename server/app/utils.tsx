@@ -15,6 +15,9 @@ import * as dateFns from "date-fns";
 export const startupVerificationYeaThreshold = 7;
 export const startupVerificationNayThreshold = 3;
 
+export const reportVerificationYeaThreshold = 7;
+export const reportVerificationNayThreshold = 3;
+
 export const startuperWeight = 0.15;
 
 export const orderByValues = ["desc", "asc"] as const;
@@ -802,6 +805,114 @@ export async function populate() {
       }
     );
   };
+  const fileReport = async ({ startupNumber }: { startupNumber: number }) => {
+    await loginDeveloper({ developerNumber: 0 });
+    await axios.post(
+      `/api/startup/${startupIdsByNumbers[startupNumber]}/development/report`,
+      { reportFile: "reportFile1.pdf" }
+    );
+  };
+  const voteForReport = async ({
+    startupNumber,
+    outcome = "success",
+  }: {
+    startupNumber: number;
+    outcome: "success" | "fail" | "unfinished";
+  }) => {
+    if (outcome === "success") {
+      for (
+        let i = 0;
+        i <
+        startupVerificationYeaThreshold + startupVerificationNayThreshold - 1;
+        i++
+      ) {
+        await loginExpert({ expertNumber: i });
+        if (i < startupVerificationNayThreshold - 1) {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/development/vote`,
+            {
+              yea: false,
+              nayReason: `Nay reason ${i}`,
+            }
+          );
+        } else {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/development/vote`,
+            {
+              yea: true,
+            }
+          );
+        }
+      }
+    } else if (outcome === "fail") {
+      for (
+        let i = 0;
+        i <
+        startupVerificationYeaThreshold + startupVerificationNayThreshold - 1;
+        i++
+      ) {
+        await loginExpert({ expertNumber: i });
+        if (i < startupVerificationYeaThreshold - 1) {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/development/vote`,
+            {
+              yea: true,
+            }
+          );
+        } else {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/development/vote`,
+            {
+              yea: false,
+              nayReason: `Nay reason ${i}`,
+            }
+          );
+        }
+      }
+    } else if (outcome === "unfinished") {
+      for (
+        let i = 0;
+        i <
+        startupVerificationYeaThreshold +
+          startupVerificationNayThreshold -
+          1 -
+          1;
+        i++
+      ) {
+        await loginExpert({ expertNumber: i });
+        if (i < startupVerificationYeaThreshold - 1) {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/development/vote`,
+            {
+              yea: true,
+            }
+          );
+        } else {
+          await axios.post(
+            `/api/startup/${startupIdsByNumbers[startupNumber]}/development/vote`,
+            {
+              yea: false,
+              nayReason: `Nay reason ${i}`,
+            }
+          );
+        }
+      }
+    } else {
+      throw new Error(`Unexpected outcome : ${outcome}`);
+    }
+  };
+  const confirmDevelopmentOfStartup = async ({
+    userNumber,
+    startupNumber,
+  }: {
+    userNumber: number;
+    startupNumber: number;
+  }) => {
+    await loginUser({ userNumber });
+    await axios.post(
+      `/api/startup/${startupIdsByNumbers[startupNumber]}/development_succeded/confirm`
+    );
+  };
   await createExperts({
     count:
       startupVerificationYeaThreshold + startupVerificationNayThreshold - 1,
@@ -936,5 +1047,75 @@ export async function populate() {
     userNumber: 0,
     startupNumber: 10,
     daysToDevelopmentDeadline: 6,
+  });
+  await fileReport({ startupNumber: 10 });
+  await voteForReport({ startupNumber: 10, outcome: "fail" });
+  await fileReport({ startupNumber: 10 });
+  await voteForReport({ startupNumber: 10, outcome: "unfinished" });
+  await createStartup({ userNumber: 0, startupNumber: 11 });
+  await voteForStartup({ startupNumber: 11, outcome: "success" });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 11,
+    daysToFinancingDeadline: 110,
+  });
+  await investInStartup({ startupNumber: 11, outcome: "success" });
+  await confirmFinancingOfStartup({
+    userNumber: 0,
+    startupNumber: 11,
+    daysToDeveloperApplicationDeadline: 5,
+  });
+  await applyAsDevelopers({ count: 3, startupNumber: 11 });
+  await waitForDeveloperApplicationDeadline({ startupNumber: 11 });
+  await confirmDeveloperApplicationOfStartup({
+    userNumber: 0,
+    startupNumber: 11,
+    daysToDeveloperVotingDeadline: 5,
+  });
+  await voteForDevelopers({ startupNumber: 11 });
+  await waitForDeveloperVotingDeadline({ startupNumber: 11 });
+  await confirmDeveloperVotingOfStartup({
+    userNumber: 0,
+    startupNumber: 11,
+    daysToDevelopmentDeadline: 6,
+  });
+  await fileReport({ startupNumber: 11 });
+  await voteForReport({ startupNumber: 11, outcome: "fail" });
+  await fileReport({ startupNumber: 11 });
+  await voteForReport({ startupNumber: 11, outcome: "success" });
+  await createStartup({ userNumber: 0, startupNumber: 12 });
+  await voteForStartup({ startupNumber: 12, outcome: "success" });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 12,
+    daysToFinancingDeadline: 120,
+  });
+  await investInStartup({ startupNumber: 12, outcome: "success" });
+  await confirmFinancingOfStartup({
+    userNumber: 0,
+    startupNumber: 12,
+    daysToDeveloperApplicationDeadline: 5,
+  });
+  await applyAsDevelopers({ count: 3, startupNumber: 12 });
+  await waitForDeveloperApplicationDeadline({ startupNumber: 12 });
+  await confirmDeveloperApplicationOfStartup({
+    userNumber: 0,
+    startupNumber: 12,
+    daysToDeveloperVotingDeadline: 5,
+  });
+  await voteForDevelopers({ startupNumber: 12 });
+  await waitForDeveloperVotingDeadline({ startupNumber: 12 });
+  await confirmDeveloperVotingOfStartup({
+    userNumber: 0,
+    startupNumber: 12,
+    daysToDevelopmentDeadline: 6,
+  });
+  await fileReport({ startupNumber: 12 });
+  await voteForReport({ startupNumber: 12, outcome: "fail" });
+  await fileReport({ startupNumber: 12 });
+  await voteForReport({ startupNumber: 12, outcome: "success" });
+  await confirmDevelopmentOfStartup({
+    userNumber: 0,
+    startupNumber: 12,
   });
 }

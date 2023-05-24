@@ -81,6 +81,7 @@ export const action: ActionFunction = async ({ request, params }) => {
         legalAddress: applicationNewDeveloper.legalAddress,
         actualAddress: applicationNewDeveloper.actualAddress,
         website: applicationNewDeveloper.website,
+        balance: 0,
         createdAt: await newServerDate(),
         updatedAt: await newServerDate(),
       },
