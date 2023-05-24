@@ -3,7 +3,7 @@ import invariant from "tiny-invariant";
 import type { ZodEffects, ZodError, ZodSchema } from "zod";
 import { z } from "zod";
 import { db, reconnectDb } from "./db.server";
-import { orderByValues } from "./utils";
+import { orderByValues, startuperWeight } from "./utils";
 import { scheduleJob, gracefulShutdown as cancelAllJobs } from "node-schedule";
 import * as dateFns from "date-fns";
 import { execSync } from "child_process";
@@ -242,8 +242,29 @@ export function scheduleStartupDeveloperApplicationDeadline(
       await db.startup.update({
         where: { id: startup.id },
         data: {
-          status: "developerVoting",
+          status: "developerApplication_succeded",
           developerApplicationEndedAt: deadline,
+          updatedAt: await newServerDate(),
+        },
+      });
+    }
+  });
+}
+
+export function scheduleStartupDeveloperVotingDeadline(
+  id: string,
+  deadline: Date
+) {
+  scheduleOrRunJob(deadline, async () => {
+    const startup = await db.startup.findUnique({
+      where: { id: id },
+    });
+    if (startup && startup.status === "developerVoting") {
+      await db.startup.update({
+        where: { id: startup.id },
+        data: {
+          status: "developerVoting_succeded",
+          developerVotingEndedAt: deadline,
           updatedAt: await newServerDate(),
         },
       });
@@ -270,6 +291,18 @@ async function schedule() {
       scheduleStartupDeveloperApplicationDeadline(
         startup.id,
         startup.developerApplicationDeadline
+      );
+    })
+  );
+  const developerVotingStartups = await db.startup.findMany({
+    where: { status: "developerVoting" },
+  });
+  await Promise.all(
+    developerVotingStartups.map(async (startup) => {
+      invariant(startup.developerVotingDeadline);
+      scheduleStartupDeveloperVotingDeadline(
+        startup.id,
+        startup.developerVotingDeadline
       );
     })
   );
@@ -311,4 +344,76 @@ export async function getAdditionalSeconds() {
 export async function newServerDate(date?: Date) {
   const additionalSeconds = await getAdditionalSeconds();
   return dateFns.addSeconds(date ?? new Date(), additionalSeconds);
+}
+
+export async function getInvestorTotalFundingOfStartup({
+  investorId,
+  startupId,
+}: {
+  investorId: string;
+  startupId: string;
+}) {
+  const { _sum } = await db.investment.aggregate({
+    where: { investorId, startupId },
+    _sum: { amount: true },
+  });
+  return _sum.amount ?? 0;
+}
+
+export async function getVoterWeight({
+  voterId,
+  startupId,
+}: {
+  voterId: string;
+  startupId: string;
+}) {
+  const startup = await db.startup.findUnique({ where: { id: startupId } });
+  invariant(startup);
+  if (startup.startuperId === voterId) {
+    return startuperWeight;
+  }
+  const investments = await getInvestorTotalFundingOfStartup({
+    investorId: voterId,
+    startupId,
+  });
+  const totalInvestments = await getStartupTotalFinancing(startupId);
+  return (1 - startuperWeight) * (investments / totalInvestments);
+}
+
+export async function getApplicationDeveloperApproval(id: string) {
+  const applicationDeveloper = await db.applicationDeveloper.findUnique({
+    where: { id },
+  });
+  invariant(applicationDeveloper);
+  const votes = await db.voteDeveloperApplication.findMany({
+    where: { applicationDeveloperId: id },
+  });
+  const weights = await Promise.all(
+    votes.map((vote) =>
+      getVoterWeight({
+        voterId: vote.voterId,
+        startupId: applicationDeveloper.startupId,
+      })
+    )
+  );
+  return weights.reduce((sum, weight) => sum + weight, 0);
+}
+
+export async function getStartupLeadingApplicationsDeveloper(id: string) {
+  const applicationsDeveloper = await db.applicationDeveloper.findMany({
+    where: { startupId: id },
+  });
+  const approvals = await Promise.all(
+    applicationsDeveloper.map(async ({ id }) => ({
+      id,
+      approval: Math.trunc((await getApplicationDeveloperApproval(id)) * 100),
+    }))
+  );
+  const maxApproval = Math.max(...approvals.map(({ approval }) => approval));
+  return {
+    maxApproval,
+    ids: approvals
+      .filter((approval) => approval.approval === maxApproval)
+      .map(({ id }) => id),
+  };
 }

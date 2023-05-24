@@ -2,11 +2,18 @@ import { json } from "@remix-run/node";
 import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
-import { newServerDate, requireCurrentApiUser } from "~/utils.server";
+import {
+  newServerDate,
+  requireCurrentApiUser,
+  scheduleStartupDeveloperVotingDeadline,
+} from "~/utils.server";
 import invariant from "tiny-invariant";
 
 const requestBodySchema = z.object({
-  message: z.string().min(1),
+  developerVotingDeadline: z.preprocess(
+    (val) => (typeof val == "string" ? new Date(val) : undefined),
+    z.date()
+  ),
 });
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -19,11 +26,11 @@ export const action: ActionFunction = async ({ request, params }) => {
       { status: 404 }
     );
   }
-  if (startupData.status !== "developerApplication") {
+  if (startupData.status !== "developerApplication_succeded") {
     return json(
       {
         message:
-          "You do this for startups that are in 'developerApplication' status",
+          "You can only do this for startups that are in 'developerApplication_succeded' status",
       },
       { status: 409 }
     );
@@ -38,20 +45,20 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
   const validatedData = dataValidationResult.data;
   const user = await requireCurrentApiUser(request);
-  if (user.role !== "developer") {
-    return json(
-      { message: "Must be an 'developer' to do this" },
-      { status: 403 }
-    );
+  if (user.id !== startupData.startuperId) {
+    return json({ message: "Must be the startup owner" }, { status: 403 });
   }
-  await db.applicationDeveloper.create({
+  await db.startup.update({
+    where: { id: startupId },
     data: {
-      startupId,
-      developerId: user.id,
-      message: validatedData.message,
-      createdAt: await newServerDate(),
+      status: "developerVoting",
+      developerVotingDeadline: validatedData.developerVotingDeadline,
       updatedAt: await newServerDate(),
     },
   });
+  scheduleStartupDeveloperVotingDeadline(
+    startupId,
+    validatedData.developerVotingDeadline
+  );
   return new Response();
 };

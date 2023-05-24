@@ -421,6 +421,43 @@ export default function Spec() {
         ]}
         className="mt-4"
       />
+      <Endpoint
+        method="get"
+        route="/api/startup/{startupId}/developer-application/list"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/developer-application_succeded/confirm"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+            body: {
+              developerVotingDeadline: "2023-05-27T07:04:15.641Z",
+            },
+          },
+        ]}
+        className="mt-4"
+      />
+      <Endpoint
+        method="post"
+        route="/api/startup/{startupId}/developer-voting/vote"
+        examples={[
+          {
+            name: "Example",
+            path: { startupId: "" },
+            body: { applicationDeveloperId: "" },
+          },
+        ]}
+        className="mt-4"
+      />
       <h1 className="mt-14 font-bold text-lg">Config</h1>
       <Endpoint
         method="get"

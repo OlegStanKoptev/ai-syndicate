@@ -49,12 +49,13 @@ model User {
   votesNewStartup                            VoteNewStartup[]
   investments                                Investment[]
   applicationsDeveloper                      ApplicationDeveloper[]
-  creatorOfExperts                           User[]                    @relation(name: "AdminExpertCreation")
-  createdBy                                  User?                     @relation(name: "AdminExpertCreation", fields: [createdById], references: [id])
+  creatorOfExperts                           User[]                     @relation(name: "AdminExpertCreation")
+  createdBy                                  User?                      @relation(name: "AdminExpertCreation", fields: [createdById], references: [id])
   approvedOrDeclinedApplicationsNewDeveloper ApplicationNewDeveloper[]
-  createdFromApplication                     ApplicationNewDeveloper?  @relation(name: "DeveloperAndDeveloperApplication")
+  createdFromApplication                     ApplicationNewDeveloper?   @relation(name: "DeveloperAndDeveloperApplication")
   deposits                                   Deposit[]
   refunds                                    Refund[]
+  votesDeveloperApplication                  VoteDeveloperApplication[]
 }
 
 enum StartupStatus {
@@ -65,7 +66,10 @@ enum StartupStatus {
   financing_failed
   financing_succeded
   developerApplication
+  developerApplication_succeded
   developerVoting
+  developerVoting_succeded
+  development
 }
 
 model Startup {
@@ -86,6 +90,7 @@ model Startup {
   verificationEndedAt         DateTime?
   financingEndedAt            DateTime?
   developerApplicationEndedAt DateTime?
+  developerVotingEndedAt      DateTime?
 
   financingDeadline            DateTime?
   developerApplicationDeadline DateTime?
@@ -179,10 +184,6 @@ model ApplicationNewDeveloper {
   createdDeveloper     User? @relation(name: "DeveloperAndDeveloperApplication", fields: [createdDeveloperId], references: [id])
 }
 
-enum ApplicationDeveloperStatus {
-  new
-}
-
 model ApplicationDeveloper {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -190,9 +191,23 @@ model ApplicationDeveloper {
 
   startupId   String
   developerId String
-  status      ApplicationDeveloperStatus
   message     String
 
-  startup   Startup @relation(fields: [startupId], references: [id])
-  developer User    @relation(fields: [developerId], references: [id])
+  startup   Startup                    @relation(fields: [startupId], references: [id])
+  developer User                       @relation(fields: [developerId], references: [id])
+  votes     VoteDeveloperApplication[]
+}
+
+model VoteDeveloperApplication {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applicationDeveloperId String
+  voterId                String
+
+  applicationDeveloper ApplicationDeveloper @relation(fields: [applicationDeveloperId], references: [id])
+  voter                User                 @relation(fields: [voterId], references: [id])
+
+  @@unique([applicationDeveloperId, voterId])
 }

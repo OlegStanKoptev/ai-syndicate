@@ -1,4 +1,5 @@
 import type {
+  ApplicationDeveloper,
   ApplicationNewDeveloperStatus,
   StartupStatus,
   UserRole,
@@ -14,6 +15,8 @@ import * as dateFns from "date-fns";
 export const startupVerificationYeaThreshold = 7;
 export const startupVerificationNayThreshold = 3;
 
+export const startuperWeight = 0.15;
+
 export const orderByValues = ["desc", "asc"] as const;
 export type OrderBy = (typeof orderByValues)[number];
 
@@ -25,7 +28,9 @@ export const startupStatuses: readonly [StartupStatus, ...StartupStatus[]] = [
   "financing_failed",
   "financing_succeded",
   "developerApplication",
+  "developerApplication_succeded",
   "developerVoting",
+  "developerVoting_succeded",
 ];
 export const startupStatusNames: { [K in StartupStatus]: string } = {
   verification: "Verification",
@@ -35,7 +40,9 @@ export const startupStatusNames: { [K in StartupStatus]: string } = {
   financing_failed: "Financing failed",
   financing_succeded: "Financing succeded",
   developerApplication: "Developer application",
+  developerApplication_succeded: "Developer application success",
   developerVoting: "Developer voting",
+  developerVoting_succeded: "Developer voting succeded",
 };
 type StartupStatusTree = { status: StartupStatus; after?: StartupStatusTree[] };
 const startupStatusTree: StartupStatusTree = {
@@ -54,7 +61,17 @@ const startupStatusTree: StartupStatusTree = {
               after: [
                 {
                   status: "developerApplication",
-                  after: [{ status: "developerVoting" }],
+                  after: [
+                    {
+                      status: "developerApplication_succeded",
+                      after: [
+                        {
+                          status: "developerVoting",
+                          after: [{ status: "developerVoting_succeded" }],
+                        },
+                      ],
+                    },
+                  ],
                 },
               ],
             },
@@ -669,6 +686,56 @@ export async function populate() {
       );
     await waitDays(daysToWait);
   };
+  const confirmDeveloperApplicationOfStartup = async ({
+    userNumber,
+    startupNumber,
+    daysToDeveloperVotingDeadline,
+  }: {
+    userNumber: number;
+    startupNumber: number;
+    daysToDeveloperVotingDeadline?: number;
+  }) => {
+    await loginUser({ userNumber });
+    await axios.post(
+      `/api/startup/${startupIdsByNumbers[startupNumber]}/developer-application_succeded/confirm`,
+      {
+        developerVotingDeadline: dateFns.addDays(
+          await newClientDate(),
+          daysToDeveloperVotingDeadline ?? 14
+        ),
+      }
+    );
+  };
+  const voteForDevelopers = async ({
+    startupNumber,
+  }: {
+    startupNumber: number;
+  }) => {
+    const applicationsDeveloper: ApplicationDeveloper[] = await axios
+      .get(
+        `/api/startup/${startupIdsByNumbers[startupNumber]}/developer-application/list`
+      )
+      .then(({ data }) => data);
+    for (let i = 0; i < applicationsDeveloper.length; i++) {
+      if (i >= 3) {
+        return;
+      }
+      if (i === 1) {
+        await loginUser({ userNumber: 0 });
+        await axios.post(
+          `/api/startup/${startupIdsByNumbers[startupNumber]}/developer-voting/vote`,
+          { applicationDeveloperId: applicationsDeveloper[i].id }
+        );
+      }
+      for (let j = 5; j < 8 - i; j++) {
+        await loginUser({ userNumber: j });
+        await axios.post(
+          `/api/startup/${startupIdsByNumbers[startupNumber]}/developer-voting/vote`,
+          { applicationDeveloperId: applicationsDeveloper[i].id }
+        );
+      }
+    }
+  };
   await createExperts({
     count:
       startupVerificationYeaThreshold + startupVerificationNayThreshold - 1,
@@ -734,6 +801,27 @@ export async function populate() {
   });
   await applyAsDevelopers({ count: 3, startupNumber: 7 });
   await waitForDeveloperApplicationDeadline({ startupNumber: 7 });
+  await createStartup({ userNumber: 0, startupNumber: 8 });
+  await voteForStartup({ startupNumber: 8, outcome: "success" });
+  await confirmVerificationOfStartup({
+    userNumber: 0,
+    startupNumber: 8,
+    daysToFinancingDeadline: 80,
+  });
+  await investInStartup({ startupNumber: 8, outcome: "success" });
+  await confirmFinancingOfStartup({
+    userNumber: 0,
+    startupNumber: 8,
+    daysToDeveloperApplicationDeadline: 5,
+  });
+  await applyAsDevelopers({ count: 3, startupNumber: 8 });
+  await waitForDeveloperApplicationDeadline({ startupNumber: 8 });
+  await confirmDeveloperApplicationOfStartup({
+    userNumber: 0,
+    startupNumber: 8,
+    daysToDeveloperVotingDeadline: 5,
+  });
+  await voteForDevelopers({ startupNumber: 8 });
   // await axios.post("/api/user/login", {
   //   email: "startuper@startuper.com",
   //   password: "startuper",

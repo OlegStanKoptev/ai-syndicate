@@ -6,7 +6,7 @@ import type {
   VoteNewStartup,
 } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
-import { Link, useCatch, useLoaderData } from "@remix-run/react";
+import { Link, useCatch, useLoaderData, useNavigate } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import {
   CardField,
@@ -26,8 +26,10 @@ import {
   startupVerificationYeaThreshold,
 } from "~/utils";
 import {
+  getApplicationDeveloperApproval,
   getNewStartupNaysTotal,
   getNewStartupYeasTotal,
+  getStartupLeadingApplicationsDeveloper,
   getStartupTotalFinancing,
   requireCurrentAdmin,
 } from "~/utils.server";
@@ -46,8 +48,13 @@ type LoaderData = {
     })[];
     applicationsDeveloper: (ApplicationDeveloper & {
       developer: User;
+      approval: number;
     })[];
     applicationsDeveloperCount: number;
+    maxApproval: number;
+    maxApprovalApplicationsDeveloper: (ApplicationDeveloper & {
+      developer: User;
+    })[];
   };
 };
 
@@ -73,6 +80,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       },
     },
   });
+  const maxApprovalData = await getStartupLeadingApplicationsDeveloper(
+    startupId
+  );
+  const { maxApproval } = maxApprovalData;
+  const maxApprovalApplicationsDeveloper =
+    await db.applicationDeveloper.findMany({
+      where: { id: { in: maxApprovalData.ids } },
+      include: { developer: true },
+    });
   const applicationsDeveloperCount = await db.applicationDeveloper.count({
     where: { startupId },
   });
@@ -85,10 +101,20 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     serialize<LoaderData>({
       startup: {
         ...startup,
+        applicationsDeveloper: await Promise.all(
+          startup.applicationsDeveloper.map(async (applicationDeveloper) => ({
+            ...applicationDeveloper,
+            approval: await getApplicationDeveloperApproval(
+              applicationDeveloper.id
+            ),
+          }))
+        ),
         yeasTotal: await getNewStartupYeasTotal(startupId),
         naysTotal: await getNewStartupNaysTotal(startupId),
         receivedFinancing: await getStartupTotalFinancing(startupId),
         applicationsDeveloperCount,
+        maxApproval,
+        maxApprovalApplicationsDeveloper,
       },
     })
   );
@@ -103,6 +129,7 @@ export const meta: MetaFunction = (args) => {
 
 export default function StartupIndex() {
   const data = deserialize<LoaderData>(useLoaderData());
+  const navigate = useNavigate();
   return (
     <div className="m-4">
       <div className="flex items-center gap-4">
@@ -278,6 +305,70 @@ export default function StartupIndex() {
           </p>
         </>
       )}
+      {data.startup.status === "developerApplication_succeded" && (
+        <>
+          <p className="text-base mt-4">
+            Developer applications have been received!
+          </p>
+          <p className="text-base">
+            Now the{" "}
+            <Link
+              to={`/admin/users/${data.startup.startuperId}`}
+              className="text-blue-400"
+            >
+              startuper
+            </Link>{" "}
+            should <span className="font-bold">confirm</span> that it is time to{" "}
+            <span className="font-bold">vote</span> on which one of these{" "}
+            <Link to="#developer-application" className="text-blue-400">
+              developers
+            </Link>{" "}
+            will suit us <span className="font-bold">best</span>
+          </p>
+          <p className="text-base">
+            He must also specify developer voting{" "}
+            <span className="font-bold">deadline</span>.
+          </p>
+        </>
+      )}
+      {data.startup.status === "developerVoting" && (
+        <>
+          <p className="text-base mt-4"></p>
+          <p className="text-base">
+            Now startuper and investors can vote on which developers they deem
+            appropriate for the goals of this project
+          </p>
+          <p>
+            Developer voting deadline:{" "}
+            {formatDate(data.startup.developerVotingDeadline!, {
+              time: true,
+            })}
+          </p>
+        </>
+      )}
+      {data.startup.status === "developerVoting_succeded" && (
+        <>
+          <p className="text-base mt-4">
+            The startuper must <span className="font-bold">choose</span> one of
+            the developers that won and move the project on to the stage of
+            development
+          </p>
+          <p>
+            Leaders ({data.startup.maxApproval}%):{" "}
+            {data.startup.maxApprovalApplicationsDeveloper.map(
+              (applicationDeveloper) => (
+                <Link
+                  to={`/admin/users/${applicationDeveloper.developerId}`}
+                  key={applicationDeveloper.id}
+                  className="text-blue-400 ml-3"
+                >
+                  {applicationDeveloper.developer.email}
+                </Link>
+              )
+            )}
+          </p>
+        </>
+      )}
       <div className="mx-4 mt-8 grid grid-cols-2 gap-16">
         <div>
           <CardField name="Name">{data.startup.name}</CardField>
@@ -359,9 +450,91 @@ export default function StartupIndex() {
       </div>
       {isStartupStatusSameOrLaterThan(
         data.startup.status,
+        "developerVoting"
+      ) && (
+        <>
+          <div id="developer-application" className="relative bottom-5" />
+          <h2 className="font-bold text-lg mb-4 mt-8">DEVELOPER VOTING</h2>
+          <p className="mb-3">
+            Started at{" "}
+            {formatDate(data.startup.developerApplicationEndedAt!, {
+              time: true,
+            })}
+          </p>
+          <p className="mb-3">
+            Deadline:{" "}
+            {formatDate(data.startup.developerVotingDeadline!, {
+              time: true,
+            })}
+          </p>
+          {data.startup.status === "developerVoting" ? (
+            <p className="mb-3">In progress...</p>
+          ) : (
+            <p className="mb-3">
+              Ended at {formatDate(data.startup.developerVotingEndedAt!)}
+            </p>
+          )}
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "developerVoting_succeded"
+          ) && (
+            <p className="text-green-600 font-bold mb-3">
+              Developer voting succeded
+            </p>
+          )}
+          <p>
+            Leaders ({data.startup.maxApproval}%):{" "}
+            {data.startup.maxApprovalApplicationsDeveloper.map(
+              (applicationDeveloper) => (
+                <Link
+                  to={`/admin/users/${applicationDeveloper.developerId}`}
+                  key={applicationDeveloper.id}
+                  className="text-blue-400 ml-3"
+                >
+                  {applicationDeveloper.developer.email}
+                </Link>
+              )
+            )}
+          </p>
+          <h3 className="font-bold text-base mb-4 mt-4">
+            Developer application approval
+          </h3>
+          <Table
+            data={data.startup.applicationsDeveloper}
+            columns={[
+              { id: "id", header: "Id" },
+              {
+                id: "developer",
+                header: "Developer",
+                cell: ({ row }) => (
+                  <Link
+                    to={`/admin/users/${row.developer.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-blue-400"
+                  >
+                    {row.developer.fullName} ({row.developer.email})
+                  </Link>
+                ),
+                width: 300,
+              },
+              {
+                id: "approval",
+                header: "Approval",
+                cell: ({ row }) => `${Math.trunc(row.approval * 100)}%`,
+              },
+            ]}
+            onRowClick={({ row }) =>
+              navigate(`application-developer/${row.id}`)
+            }
+          />
+        </>
+      )}
+      {isStartupStatusSameOrLaterThan(
+        data.startup.status,
         "developerApplication"
       ) && (
         <>
+          <div id="developer-application" className="relative bottom-5" />
           <h2 className="font-bold text-lg mb-4 mt-8">DEVELOPER APPLICATION</h2>
           <p className="mb-3">
             Started at{" "}
@@ -378,6 +551,14 @@ export default function StartupIndex() {
           ) : (
             <p className="mb-3">
               Ended at {formatDate(data.startup.developerApplicationEndedAt!)}
+            </p>
+          )}
+          {isStartupStatusSameOrLaterThan(
+            data.startup.status,
+            "developerApplication_succeded"
+          ) && (
+            <p className="text-green-600 font-bold mb-3">
+              Developer application succeded
             </p>
           )}
           <p className="mb-3">
@@ -399,6 +580,7 @@ export default function StartupIndex() {
                 cell: ({ row }) => (
                   <Link
                     to={`/admin/users/${row.developer.id}`}
+                    onClick={(e) => e.stopPropagation()}
                     className="text-blue-400"
                   >
                     {row.developer.fullName} ({row.developer.email})
@@ -413,6 +595,9 @@ export default function StartupIndex() {
                 cell: ({ row }) => formatDate(row.updatedAt, { time: true }),
               },
             ]}
+            onRowClick={({ row }) =>
+              navigate(`application-developer/${row.id}`)
+            }
           />
         </>
       )}

@@ -2,13 +2,10 @@
 CREATE TYPE "UserRole" AS ENUM ('user', 'expert', 'admin', 'developer');
 
 -- CreateEnum
-CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded', 'developerApplication', 'developerVoting');
+CREATE TYPE "StartupStatus" AS ENUM ('verification', 'verification_failed', 'verification_succeded', 'financing', 'financing_failed', 'financing_succeded', 'developerApplication', 'developerApplication_succeded', 'developerVoting', 'developerVoting_succeded');
 
 -- CreateEnum
 CREATE TYPE "ApplicationNewDeveloperStatus" AS ENUM ('new', 'approved', 'declined');
-
--- CreateEnum
-CREATE TYPE "ApplicationDeveloperStatus" AS ENUM ('new');
 
 -- CreateTable
 CREATE TABLE "Config" (
@@ -60,6 +57,7 @@ CREATE TABLE "Startup" (
     "verificationEndedAt" TIMESTAMP(3),
     "financingEndedAt" TIMESTAMP(3),
     "developerApplicationEndedAt" TIMESTAMP(3),
+    "developerVotingEndedAt" TIMESTAMP(3),
     "financingDeadline" TIMESTAMP(3),
     "developerApplicationDeadline" TIMESTAMP(3),
     "developerVotingDeadline" TIMESTAMP(3),
@@ -147,10 +145,20 @@ CREATE TABLE "ApplicationDeveloper" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "startupId" TEXT NOT NULL,
     "developerId" TEXT NOT NULL,
-    "status" "ApplicationDeveloperStatus" NOT NULL,
     "message" TEXT NOT NULL,
 
     CONSTRAINT "ApplicationDeveloper_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "VoteDeveloperApplication" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "applicationDeveloperId" TEXT NOT NULL,
+    "voterId" TEXT NOT NULL,
+
+    CONSTRAINT "VoteDeveloperApplication_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -161,6 +169,9 @@ CREATE UNIQUE INDEX "VoteNewStartup_startupId_expertId_key" ON "VoteNewStartup"(
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ApplicationNewDeveloper_createdDeveloperId_key" ON "ApplicationNewDeveloper"("createdDeveloperId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "VoteDeveloperApplication_applicationDeveloperId_voterId_key" ON "VoteDeveloperApplication"("applicationDeveloperId", "voterId");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -197,3 +208,9 @@ ALTER TABLE "ApplicationDeveloper" ADD CONSTRAINT "ApplicationDeveloper_startupI
 
 -- AddForeignKey
 ALTER TABLE "ApplicationDeveloper" ADD CONSTRAINT "ApplicationDeveloper_developerId_fkey" FOREIGN KEY ("developerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "VoteDeveloperApplication" ADD CONSTRAINT "VoteDeveloperApplication_applicationDeveloperId_fkey" FOREIGN KEY ("applicationDeveloperId") REFERENCES "ApplicationDeveloper"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "VoteDeveloperApplication" ADD CONSTRAINT "VoteDeveloperApplication_voterId_fkey" FOREIGN KEY ("voterId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

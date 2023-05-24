@@ -168,7 +168,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           select: {
             id: true,
             message: true,
-            status: true,
             developer: {
               select: { id: true, shortOrgName: true, email: true },
             },
