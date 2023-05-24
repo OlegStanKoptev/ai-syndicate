@@ -3,6 +3,8 @@ import type { ActionFunction } from "react-router";
 import { z } from "zod";
 import { db } from "~/db.server";
 import {
+  emailFrom,
+  emailTransporter,
   getNewStartupNaysTotal,
   getNewStartupYeasTotal,
   newServerDate,
@@ -22,7 +24,10 @@ const requestBodySchema = z.object({
 export const action: ActionFunction = async ({ request, params }) => {
   const { startupId } = params;
   invariant(typeof startupId === "string");
-  const startupData = await db.startup.findUnique({ where: { id: startupId } });
+  const startupData = await db.startup.findUnique({
+    where: { id: startupId },
+    include: { startuper: true },
+  });
   if (!startupData) {
     return json(
       { message: `Startup with this id not found: ${startupId}` },
@@ -94,6 +99,10 @@ export const action: ActionFunction = async ({ request, params }) => {
     });
   }
   if (naysTotal >= startupVerificationNayThreshold) {
+    const nayVotes = await db.voteNewStartup.findMany({
+      where: { startupId, yea: false },
+      include: { expert: true },
+    });
     await db.startup.update({
       where: { id: startupId },
       data: {
@@ -101,6 +110,16 @@ export const action: ActionFunction = async ({ request, params }) => {
         verificationEndedAt: await newServerDate(),
         updatedAt: await newServerDate(),
       },
+    });
+    emailTransporter.sendMail({
+      from: emailFrom,
+      to: startupData.startuper.email,
+      subject: "Your startup was rejected",
+      html: nayVotes
+        .map(
+          (nayVote) => `<p>${nayVote.expert.fullName}: ${nayVote.nayReason}</p>`
+        )
+        .join("\n"),
     });
   }
   return new Response();

@@ -19,6 +19,8 @@ jobs:
           touch server/.env
           echo SESSION_SECRET=${{ secrets.SESSION_SECRET }} >> server/.env
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> server/.env
+          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> server/.env
+          echo MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} >> server/.env
           cat server/.env
 
       - name: Remove containers

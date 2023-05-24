@@ -31,6 +31,7 @@ export const startupStatuses: readonly [StartupStatus, ...StartupStatus[]] = [
   "developerApplication_succeded",
   "developerVoting",
   "developerVoting_succeded",
+  "development",
 ];
 export const startupStatusNames: { [K in StartupStatus]: string } = {
   verification: "Verification",
@@ -43,6 +44,7 @@ export const startupStatusNames: { [K in StartupStatus]: string } = {
   developerApplication_succeded: "Developer application success",
   developerVoting: "Developer voting",
   developerVoting_succeded: "Developer voting succeded",
+  development: "Development",
 };
 type StartupStatusTree = { status: StartupStatus; after?: StartupStatusTree[] };
 const startupStatusTree: StartupStatusTree = {
@@ -67,7 +69,12 @@ const startupStatusTree: StartupStatusTree = {
                       after: [
                         {
                           status: "developerVoting",
-                          after: [{ status: "developerVoting_succeded" }],
+                          after: [
+                            {
+                              status: "developerVoting_succeded",
+                              after: [{ status: "development" }],
+                            },
+                          ],
                         },
                       ],
                     },
@@ -317,7 +324,7 @@ export async function populate() {
             "/admin/users/new-expert",
             (() => {
               const formData = new FormData();
-              formData.set("email", `expert${i}@expert${i}.com`);
+              formData.set("email", `expert${i}-ais@mail.ru`);
               formData.set("password", `expert${i}`);
               formData.set("fullName", `Expert ${i}`);
               return formData;
@@ -333,14 +340,14 @@ export async function populate() {
     await Promise.all(
       Array(count)
         .fill(null)
-        .map((_, i) =>
-          axios.post("/api/user/join", {
-            email: `user${i}@user${i}.com`,
+        .map((_, i) => {
+          return axios.post("/api/user/join", {
+            email: `user${i}-ais@mail.ru`,
             password: `user${i}`,
             fullName: `User ${i}`,
             avatarImageFile: null,
-          })
-        )
+          });
+        })
     );
   };
   const createDevelopers = async ({
@@ -359,7 +366,7 @@ export async function populate() {
           const j = i % 10;
           const { id: applicationId } = await axios
             .post("/api/user/developer/apply", {
-              email: `developer${i}@developer${i}.com`,
+              email: `developer${i}-ais@mail.ru`,
               password: `developer${i}`,
               phone: null,
               avatarImageFile: null,
@@ -403,7 +410,7 @@ export async function populate() {
   };
   const loginUser = async ({ userNumber }: { userNumber: number }) => {
     await axios.post("/api/user/login", {
-      email: `user${userNumber}@user${userNumber}.com`,
+      email: `user${userNumber}-ais@mail.ru`,
       password: `user${userNumber}`,
     });
   };
@@ -434,7 +441,7 @@ export async function populate() {
   };
   const loginExpert = async ({ expertNumber }: { expertNumber: number }) => {
     await axios.post("/api/user/login", {
-      email: `expert${expertNumber}@expert${expertNumber}.com`,
+      email: `expert${expertNumber}-ais@mail.ru`,
       password: `expert${expertNumber}`,
     });
   };
@@ -444,7 +451,7 @@ export async function populate() {
     developerNumber: number;
   }) => {
     await axios.post("/api/user/login", {
-      email: `developer${developerNumber}@developer${developerNumber}.com`,
+      email: `developer${developerNumber}-ais@mail.ru`,
       password: `developer${developerNumber}`,
     });
   };
@@ -822,8 +829,4 @@ export async function populate() {
     daysToDeveloperVotingDeadline: 5,
   });
   await voteForDevelopers({ startupNumber: 8 });
-  // await axios.post("/api/user/login", {
-  //   email: "startuper@startuper.com",
-  //   password: "startuper",
-  // });
 }

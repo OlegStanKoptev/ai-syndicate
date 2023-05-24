@@ -7,6 +7,7 @@ import { orderByValues, startuperWeight } from "./utils";
 import { scheduleJob, gracefulShutdown as cancelAllJobs } from "node-schedule";
 import * as dateFns from "date-fns";
 import { execSync } from "child_process";
+import nodemailer from "nodemailer";
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 const sessionStorage = createCookieSessionStorage({
@@ -26,6 +27,18 @@ export function getSession(request: Request) {
 }
 export const commitSession = sessionStorage.commitSession;
 export const destroySession = sessionStorage.destroySession;
+
+invariant(process.env.MAIL_PASSWORD, "MAIL_PASSWORD must be set");
+export const emailTransporter = nodemailer.createTransport({
+  host: "smtp.mail.ru",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "ai-syndicate@mail.ru",
+    pass: process.env.MAIL_PASSWORD,
+  },
+});
+export const emailFrom = '"AI Syndicate" <ai-syndicate@mail.ru>';
 
 export async function getCurrentAdmin(request: Request) {
   const session = await getSession(request);
