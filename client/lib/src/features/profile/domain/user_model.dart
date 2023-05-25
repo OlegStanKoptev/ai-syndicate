@@ -15,7 +15,7 @@ sealed class UserModel with _$UserModel {
     required String email,
     required String fullName,
     required String phone,
-    required String avatarImageFile,
+    String? avatarImageFile,
     required String orgName,
     required String shortOrgName,
     required String inn,
@@ -34,8 +34,8 @@ sealed class UserModel with _$UserModel {
     required String id,
     required String email,
     required String fullName,
-    required String avatarImageFile,
-    required int balance,
+    String? avatarImageFile,
+    int? balance,
   }) = User;
 
   factory UserModel.fromJson(Map<String, Object?> json) =>

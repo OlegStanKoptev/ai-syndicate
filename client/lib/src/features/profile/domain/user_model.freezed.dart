@@ -44,7 +44,7 @@ mixin _$UserModel {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -56,7 +56,7 @@ mixin _$UserModel {
         developer,
     required TResult Function(String id, String email, String fullName) expert,
     required TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)
+            String? avatarImageFile, int? balance)
         user,
   }) =>
       throw _privateConstructorUsedError;
@@ -68,7 +68,7 @@ mixin _$UserModel {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -80,7 +80,7 @@ mixin _$UserModel {
         developer,
     TResult? Function(String id, String email, String fullName)? expert,
     TResult? Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
   }) =>
       throw _privateConstructorUsedError;
@@ -92,7 +92,7 @@ mixin _$UserModel {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -104,7 +104,7 @@ mixin _$UserModel {
         developer,
     TResult Function(String id, String email, String fullName)? expert,
     TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
     required TResult orElse(),
   }) =>
@@ -278,7 +278,7 @@ class _$Admin implements Admin {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -290,7 +290,7 @@ class _$Admin implements Admin {
         developer,
     required TResult Function(String id, String email, String fullName) expert,
     required TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)
+            String? avatarImageFile, int? balance)
         user,
   }) {
     return admin(id, email, fullName);
@@ -305,7 +305,7 @@ class _$Admin implements Admin {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -317,7 +317,7 @@ class _$Admin implements Admin {
         developer,
     TResult? Function(String id, String email, String fullName)? expert,
     TResult? Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
   }) {
     return admin?.call(id, email, fullName);
@@ -332,7 +332,7 @@ class _$Admin implements Admin {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -344,7 +344,7 @@ class _$Admin implements Admin {
         developer,
     TResult Function(String id, String email, String fullName)? expert,
     TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
     required TResult orElse(),
   }) {
@@ -430,7 +430,7 @@ abstract class _$$DeveloperCopyWith<$Res> implements $UserModelCopyWith<$Res> {
       String email,
       String fullName,
       String phone,
-      String avatarImageFile,
+      String? avatarImageFile,
       String orgName,
       String shortOrgName,
       String inn,
@@ -456,7 +456,7 @@ class __$$DeveloperCopyWithImpl<$Res>
     Object? email = null,
     Object? fullName = null,
     Object? phone = null,
-    Object? avatarImageFile = null,
+    Object? avatarImageFile = freezed,
     Object? orgName = null,
     Object? shortOrgName = null,
     Object? inn = null,
@@ -483,10 +483,10 @@ class __$$DeveloperCopyWithImpl<$Res>
           ? _value.phone
           : phone // ignore: cast_nullable_to_non_nullable
               as String,
-      avatarImageFile: null == avatarImageFile
+      avatarImageFile: freezed == avatarImageFile
           ? _value.avatarImageFile
           : avatarImageFile // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       orgName: null == orgName
           ? _value.orgName
           : orgName // ignore: cast_nullable_to_non_nullable
@@ -531,7 +531,7 @@ class _$Developer implements Developer {
       required this.email,
       required this.fullName,
       required this.phone,
-      required this.avatarImageFile,
+      this.avatarImageFile,
       required this.orgName,
       required this.shortOrgName,
       required this.inn,
@@ -555,7 +555,7 @@ class _$Developer implements Developer {
   @override
   final String phone;
   @override
-  final String avatarImageFile;
+  final String? avatarImageFile;
   @override
   final String orgName;
   @override
@@ -639,7 +639,7 @@ class _$Developer implements Developer {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -651,7 +651,7 @@ class _$Developer implements Developer {
         developer,
     required TResult Function(String id, String email, String fullName) expert,
     required TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)
+            String? avatarImageFile, int? balance)
         user,
   }) {
     return developer(id, email, fullName, phone, avatarImageFile, orgName,
@@ -667,7 +667,7 @@ class _$Developer implements Developer {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -679,7 +679,7 @@ class _$Developer implements Developer {
         developer,
     TResult? Function(String id, String email, String fullName)? expert,
     TResult? Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
   }) {
     return developer?.call(id, email, fullName, phone, avatarImageFile, orgName,
@@ -695,7 +695,7 @@ class _$Developer implements Developer {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -707,7 +707,7 @@ class _$Developer implements Developer {
         developer,
     TResult Function(String id, String email, String fullName)? expert,
     TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
     required TResult orElse(),
   }) {
@@ -769,7 +769,7 @@ abstract class Developer implements UserModel {
       required final String email,
       required final String fullName,
       required final String phone,
-      required final String avatarImageFile,
+      final String? avatarImageFile,
       required final String orgName,
       required final String shortOrgName,
       required final String inn,
@@ -788,7 +788,7 @@ abstract class Developer implements UserModel {
   @override
   String get fullName;
   String get phone;
-  String get avatarImageFile;
+  String? get avatarImageFile;
   String get orgName;
   String get shortOrgName;
   String get inn;
@@ -901,7 +901,7 @@ class _$Expert implements Expert {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -913,7 +913,7 @@ class _$Expert implements Expert {
         developer,
     required TResult Function(String id, String email, String fullName) expert,
     required TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)
+            String? avatarImageFile, int? balance)
         user,
   }) {
     return expert(id, email, fullName);
@@ -928,7 +928,7 @@ class _$Expert implements Expert {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -940,7 +940,7 @@ class _$Expert implements Expert {
         developer,
     TResult? Function(String id, String email, String fullName)? expert,
     TResult? Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
   }) {
     return expert?.call(id, email, fullName);
@@ -955,7 +955,7 @@ class _$Expert implements Expert {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -967,7 +967,7 @@ class _$Expert implements Expert {
         developer,
     TResult Function(String id, String email, String fullName)? expert,
     TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
     required TResult orElse(),
   }) {
@@ -1052,8 +1052,8 @@ abstract class _$$UserCopyWith<$Res> implements $UserModelCopyWith<$Res> {
       {String id,
       String email,
       String fullName,
-      String avatarImageFile,
-      int balance});
+      String? avatarImageFile,
+      int? balance});
 }
 
 /// @nodoc
@@ -1068,8 +1068,8 @@ class __$$UserCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res, _$User>
     Object? id = null,
     Object? email = null,
     Object? fullName = null,
-    Object? avatarImageFile = null,
-    Object? balance = null,
+    Object? avatarImageFile = freezed,
+    Object? balance = freezed,
   }) {
     return _then(_$User(
       id: null == id
@@ -1084,14 +1084,14 @@ class __$$UserCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res, _$User>
           ? _value.fullName
           : fullName // ignore: cast_nullable_to_non_nullable
               as String,
-      avatarImageFile: null == avatarImageFile
+      avatarImageFile: freezed == avatarImageFile
           ? _value.avatarImageFile
           : avatarImageFile // ignore: cast_nullable_to_non_nullable
-              as String,
-      balance: null == balance
+              as String?,
+      balance: freezed == balance
           ? _value.balance
           : balance // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }
@@ -1103,8 +1103,8 @@ class _$User implements User {
       {required this.id,
       required this.email,
       required this.fullName,
-      required this.avatarImageFile,
-      required this.balance,
+      this.avatarImageFile,
+      this.balance,
       final String? $type})
       : $type = $type ?? 'user';
 
@@ -1117,9 +1117,9 @@ class _$User implements User {
   @override
   final String fullName;
   @override
-  final String avatarImageFile;
+  final String? avatarImageFile;
   @override
-  final int balance;
+  final int? balance;
 
   @JsonKey(name: 'role')
   final String $type;
@@ -1163,7 +1163,7 @@ class _$User implements User {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -1175,7 +1175,7 @@ class _$User implements User {
         developer,
     required TResult Function(String id, String email, String fullName) expert,
     required TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)
+            String? avatarImageFile, int? balance)
         user,
   }) {
     return user(id, email, fullName, avatarImageFile, balance);
@@ -1190,7 +1190,7 @@ class _$User implements User {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -1202,7 +1202,7 @@ class _$User implements User {
         developer,
     TResult? Function(String id, String email, String fullName)? expert,
     TResult? Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
   }) {
     return user?.call(id, email, fullName, avatarImageFile, balance);
@@ -1217,7 +1217,7 @@ class _$User implements User {
             String email,
             String fullName,
             String phone,
-            String avatarImageFile,
+            String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
@@ -1229,7 +1229,7 @@ class _$User implements User {
         developer,
     TResult Function(String id, String email, String fullName)? expert,
     TResult Function(String id, String email, String fullName,
-            String avatarImageFile, int balance)?
+            String? avatarImageFile, int? balance)?
         user,
     required TResult orElse(),
   }) {
@@ -1289,8 +1289,8 @@ abstract class User implements UserModel {
       {required final String id,
       required final String email,
       required final String fullName,
-      required final String avatarImageFile,
-      required final int balance}) = _$User;
+      final String? avatarImageFile,
+      final int? balance}) = _$User;
 
   factory User.fromJson(Map<String, dynamic> json) = _$User.fromJson;
 
@@ -1300,8 +1300,8 @@ abstract class User implements UserModel {
   String get email;
   @override
   String get fullName;
-  String get avatarImageFile;
-  int get balance;
+  String? get avatarImageFile;
+  int? get balance;
   @override
   @JsonKey(ignore: true)
   _$$UserCopyWith<_$User> get copyWith => throw _privateConstructorUsedError;

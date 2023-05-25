@@ -25,7 +25,7 @@ _$Developer _$$DeveloperFromJson(Map<String, dynamic> json) => _$Developer(
       email: json['email'] as String,
       fullName: json['fullName'] as String,
       phone: json['phone'] as String,
-      avatarImageFile: json['avatarImageFile'] as String,
+      avatarImageFile: json['avatarImageFile'] as String?,
       orgName: json['orgName'] as String,
       shortOrgName: json['shortOrgName'] as String,
       inn: json['inn'] as String,
@@ -73,8 +73,8 @@ _$User _$$UserFromJson(Map<String, dynamic> json) => _$User(
       id: json['id'] as String,
       email: json['email'] as String,
       fullName: json['fullName'] as String,
-      avatarImageFile: json['avatarImageFile'] as String,
-      balance: json['balance'] as int,
+      avatarImageFile: json['avatarImageFile'] as String?,
+      balance: json['balance'] as int?,
       $type: json['role'] as String?,
     );
 

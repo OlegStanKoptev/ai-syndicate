@@ -24,7 +24,7 @@ jobs:
           cat server/.env
 
       - name: Remove containers
-        run: docker compose rm -f
+        run: docker image prune -af && docker compose rm -f
 
       - name: Build and run the Docker image
         run: docker compose up -d --build

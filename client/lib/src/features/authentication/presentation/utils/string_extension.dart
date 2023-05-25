@@ -1,6 +1,6 @@
 extension StringExtension on String {
   bool get isValidEmail {
-    final emailRegExp = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+    final emailRegExp = RegExp(r"^[a-zA-Z0-9\-.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
     return emailRegExp.hasMatch(this);
   }
 
@@ -11,7 +11,7 @@ extension StringExtension on String {
   }
 
   bool get isValidPassword {
-    final passwordRegExp = RegExp(r'^[\w\W]{8,}$');
+    final passwordRegExp = RegExp(r'^[\w\W]{2,}$');
     return passwordRegExp.hasMatch(this);
   }
 

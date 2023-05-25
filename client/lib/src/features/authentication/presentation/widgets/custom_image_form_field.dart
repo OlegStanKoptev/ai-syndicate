@@ -9,10 +9,12 @@ class CustomImageFormField extends HookWidget {
     super.key,
     required this.controller,
     required this.validator,
+    this.hintText,
   });
 
   final FileController? controller;
   final String? Function(File?) validator;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +47,16 @@ class CustomImageFormField extends HookWidget {
                   color: const Color(0xff707070)
                       .withOpacity(touched.value ? 0.2 : 0.1),
                 ),
-                child: const Column(
-                  children: [Icon(Icons.upload_file), Text('Upload Image')],
+                child: Column(
+                  children: [
+                    const Icon(Icons.upload_file),
+                    Text(
+                      hintText ?? 'Upload Image',
+                      style: TextStyle(
+                        color: pickedFile.value != null ? Colors.green : null,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
