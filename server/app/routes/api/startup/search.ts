@@ -48,7 +48,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     where,
     skip: size * page,
     take: size,
-    select: { id: true, name: true, description: true, logoFile: true },
   });
   return json({
     size,
