@@ -224,7 +224,7 @@ class __$$AdminCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res, _$Admin>
 /// @nodoc
 @JsonSerializable()
 class _$Admin implements Admin {
-  _$Admin(
+  const _$Admin(
       {required this.id,
       required this.email,
       required this.fullName,
@@ -400,7 +400,7 @@ class _$Admin implements Admin {
 }
 
 abstract class Admin implements UserModel {
-  factory Admin(
+  const factory Admin(
       {required final String id,
       required final String email,
       required final String fullName}) = _$Admin;
@@ -526,7 +526,7 @@ class __$$DeveloperCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$Developer implements Developer {
-  _$Developer(
+  const _$Developer(
       {required this.id,
       required this.email,
       required this.fullName,
@@ -764,7 +764,7 @@ class _$Developer implements Developer {
 }
 
 abstract class Developer implements UserModel {
-  factory Developer(
+  const factory Developer(
       {required final String id,
       required final String email,
       required final String fullName,
@@ -846,7 +846,7 @@ class __$$ExpertCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$Expert implements Expert {
-  _$Expert(
+  const _$Expert(
       {required this.id,
       required this.email,
       required this.fullName,
@@ -1023,7 +1023,7 @@ class _$Expert implements Expert {
 }
 
 abstract class Expert implements UserModel {
-  factory Expert(
+  const factory Expert(
       {required final String id,
       required final String email,
       required final String fullName}) = _$Expert;
@@ -1099,7 +1099,7 @@ class __$$UserCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res, _$User>
 /// @nodoc
 @JsonSerializable()
 class _$User implements User {
-  _$User(
+  const _$User(
       {required this.id,
       required this.email,
       required this.fullName,
@@ -1285,7 +1285,7 @@ class _$User implements User {
 }
 
 abstract class User implements UserModel {
-  factory User(
+  const factory User(
       {required final String id,
       required final String email,
       required final String fullName,

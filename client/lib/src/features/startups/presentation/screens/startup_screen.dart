@@ -1,5 +1,9 @@
 import 'package:client/src/features/startups/application/startup_service.dart';
 import 'package:client/src/features/startups/presentation/widgets/startup_description.dart';
+import 'package:client/src/features/startups/presentation/widgets/startup_developer.dart';
+import 'package:client/src/features/startups/presentation/widgets/startup_developer_application.dart';
+import 'package:client/src/features/startups/presentation/widgets/startup_development.dart';
+import 'package:client/src/features/startups/presentation/widgets/startup_financing.dart';
 import 'package:client/src/features/startups/presentation/widgets/startup_verification.dart';
 import 'package:client/src/utils/future_data_consumer.dart';
 import 'package:flutter/material.dart';
@@ -22,10 +26,17 @@ class StartupScreen extends StatelessWidget {
           child: FutureDataConsumer(
             load: () => Provider.of<StartupService>(context, listen: false)
                 .getStartup(id: startupId),
-            data: (startup) => ListView(children: [
-              StartupDescription(startup: startup),
-              StartupVerification(startup: startup)
-            ]),
+            data: (startup) => Provider.value(
+              value: startup,
+              child: ListView(children: const [
+                StartupDescription(),
+                StartupDevelopment(),
+                StartupDeveloper(),
+                StartupDeveloperApplication(),
+                StartupFinancing(),
+                StartupVerification(),
+              ]),
+            ),
           ),
         ),
       ),

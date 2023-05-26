@@ -5,12 +5,12 @@ part 'user_model.g.dart';
 
 @Freezed(unionKey: 'role')
 sealed class UserModel with _$UserModel {
-  factory UserModel.admin({
+  const factory UserModel.admin({
     required String id,
     required String email,
     required String fullName,
   }) = Admin;
-  factory UserModel.developer({
+  const factory UserModel.developer({
     required String id,
     required String email,
     required String fullName,
@@ -25,12 +25,12 @@ sealed class UserModel with _$UserModel {
     required String actualAddress,
     required String website,
   }) = Developer;
-  factory UserModel.expert({
+  const factory UserModel.expert({
     required String id,
     required String email,
     required String fullName,
   }) = Expert;
-  factory UserModel.user({
+  const factory UserModel.user({
     required String id,
     required String email,
     required String fullName,

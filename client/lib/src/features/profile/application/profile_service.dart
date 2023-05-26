@@ -4,10 +4,10 @@ import 'package:client/src/features/profile/domain/user_model.dart';
 import 'package:flutter/material.dart';
 
 class ProfileService extends ChangeNotifier {
-  User? _currentUser;
-  User? get currentUser => _currentUser;
+  UserModel? _currentUser;
+  UserModel? get currentUser => _currentUser;
 
-  void _updateUserAndNotify(User? user) {
+  void _updateUserAndNotify(UserModel? user) {
     _currentUser = user;
     notifyListeners();
   }
@@ -15,7 +15,7 @@ class ProfileService extends ChangeNotifier {
   Future updateCurrentUser() {
     return dio
         .get('/api/user/me')
-        .then((response) => User.fromJson(response.data))
+        .then((response) => UserModel.fromJson(response.data))
         .then((user) => _updateUserAndNotify(user));
   }
 
@@ -28,9 +28,8 @@ class ProfileService extends ChangeNotifier {
         .post('/api/user/deposit')
         .then((response) => DepositResponse.fromJson(response.data).balance)
         .then(
-          (balance) => _updateUserAndNotify(
-            _currentUser?.copyWith(balance: balance),
-          ),
+          // TODO: Add balance
+          (balance) => _updateUserAndNotify(_currentUser?.copyWith()),
         );
   }
 }

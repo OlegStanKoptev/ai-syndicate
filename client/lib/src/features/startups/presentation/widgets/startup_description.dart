@@ -5,11 +5,11 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class StartupDescription extends StatelessWidget {
-  final FullStartupModel startup;
-  const StartupDescription({super.key, required this.startup});
+  const StartupDescription({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final startup = Provider.of<FullStartupModel>(context);
     final logoFile = startup.logoFile;
     final textTheme = Theme.of(context).textTheme;
     return Column(
@@ -55,13 +55,6 @@ class StartupDescription extends StatelessWidget {
               Provider.of<FileService>(context, listen: false)
                   .getFileUrl(fileName: startup.specificationFile)),
         ),
-        Card(
-          child: Center(
-              child: Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Text('Invest', style: textTheme.bodyLarge),
-          )),
-        )
       ],
     );
   }
