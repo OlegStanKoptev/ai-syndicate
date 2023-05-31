@@ -1,4 +1,5 @@
 import 'package:client/src/features/profile/application/profile_service.dart';
+import 'package:client/src/features/profile/presentation/pages/expert_page.dart';
 import 'package:client/src/features/profile/presentation/pages/user_page.dart';
 import 'package:client/src/utils/error_text.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
               admin: (_) => const ErrorText(text: 'Admin not supported'),
               developer: (_) =>
                   const ErrorText(text: 'Developer not supported'),
-              expert: (_) => const ErrorText(text: 'Expert not supported'),
+              expert: (expert) => ExpertPage(expert: expert),
               user: (user) => UserPage(user: user),
             ) ??
             Container(),

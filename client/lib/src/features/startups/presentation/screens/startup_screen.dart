@@ -26,16 +26,21 @@ class StartupScreen extends StatelessWidget {
           child: FutureDataConsumer(
             load: () => Provider.of<StartupService>(context, listen: false)
                 .getStartup(id: startupId),
-            data: (startup) => Provider.value(
-              value: startup,
-              child: ListView(children: const [
-                StartupDescription(),
-                StartupDevelopment(),
-                StartupDeveloper(),
-                StartupDeveloperApplication(),
-                StartupFinancing(),
-                StartupVerification(),
-              ]),
+            data: (startup, invalidator) => MultiProvider(
+              providers: [
+                Provider.value(value: startup),
+                Provider.value(value: invalidator),
+              ],
+              child: ListView(
+                children: const [
+                  StartupDescription(),
+                  StartupDevelopment(),
+                  StartupDeveloper(),
+                  StartupDeveloperApplication(),
+                  StartupFinancing(),
+                  StartupVerification(),
+                ],
+              ),
             ),
           ),
         ),

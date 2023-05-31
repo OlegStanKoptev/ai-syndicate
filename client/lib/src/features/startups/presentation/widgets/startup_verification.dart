@@ -1,24 +1,57 @@
 import 'package:client/src/features/profile/application/profile_service.dart';
 import 'package:client/src/features/profile/domain/user_model.dart';
+import 'package:client/src/features/startups/application/startup_service.dart';
 import 'package:client/src/features/startups/domain/models/full_startup_model.dart';
+import 'package:client/src/features/startups/domain/models/verification_confirm_model.dart';
+import 'package:client/src/features/startups/domain/responses/startup_verification_response.dart';
+import 'package:client/src/routing/routes.dart';
+import 'package:client/src/utils/enum_extension.dart';
+import 'package:client/src/utils/future_data_consumer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class StartupVerification extends StatelessWidget {
   const StartupVerification({super.key});
 
+  void confirm(BuildContext context, FullStartupModel startup) async {
+    final startupService = Provider.of<StartupService>(context, listen: false);
+    final invalidator = Provider.of<DataInvalidator>(context, listen: false);
+    await startupService.confirmStartup(
+      id: startup.id,
+      confirm: VerificationConfirmModel(
+        financingDeadline: DateTime.now().add(
+          const Duration(days: 7),
+        ),
+      ),
+    );
+    invalidator.invalidate();
+  }
+
+  void action(BuildContext context, FullStartupModel startup) {
+    StartupVerificationRoute(startupId: startup.id).go(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final startup = Provider.of<FullStartupModel>(context);
-    final verificationVotes = startup.verification;
+    final verificationVotes = startup.status >= StartupStatus.verification
+        ? startup.verification ??
+            StartupVerificationResponse(yeasTotal: 5, naysTotal: 2)
+        : null;
     if (verificationVotes == null) {
       return Container();
     }
-    final verificationEnded = startup.verificationSucceded != null ||
-        startup.verificationFailed != null;
-    final verificationSuccess = startup.verificationSucceded != null &&
-        startup.verificationFailed == null;
-    final isExpert = Provider.of<ProfileService>(context).currentUser is Expert;
+
+    final currentUser = Provider.of<ProfileService>(context).currentUser;
+
+    final processOngoing = startup.status == StartupStatus.verification;
+    final processSuccess =
+        startup.status >= StartupStatus.verification_succeded;
+    final isExpert = currentUser is Expert;
+
+    final processWaitsForConfirmation =
+        startup.status == StartupStatus.verification_succeded;
+    final isStartuper = startup.startuper.id == currentUser?.id;
 
     final textTheme = Theme.of(context).textTheme;
     return Column(
@@ -36,25 +69,47 @@ class StartupVerification extends StatelessWidget {
           title: const Text('Negative votes'),
           subtitle: Text(verificationVotes.naysTotal.toString()),
         ),
-        !verificationEnded
-            ? Card(
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text('Leave a vote!', style: textTheme.bodyLarge),
-                  ),
-                ),
-              )
-            : ListTile(
-                title: Text(
-                  verificationSuccess
-                      ? 'Startup idea has been approved!'
-                      : 'Startup idea is declined',
-                  style: TextStyle(
-                    color: verificationSuccess ? Colors.green : Colors.red,
-                  ),
+        ListTile(
+          title: Text(
+            processOngoing
+                ? 'Startup is in the process of verification'
+                : processSuccess
+                    ? 'Startup idea has been approved!'
+                    : 'Startup idea is declined',
+            style: TextStyle(
+              color: processOngoing
+                  ? Colors.purple
+                  : processSuccess
+                      ? Colors.green
+                      : Colors.red,
+            ),
+          ),
+        ),
+        if (processWaitsForConfirmation && isStartuper)
+          Card(
+            child: InkWell(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child:
+                      Text('Start the financing!', style: textTheme.bodyLarge),
                 ),
               ),
+              onTap: () => confirm(context, startup),
+            ),
+          ),
+        if (processOngoing && isExpert)
+          Card(
+            child: InkWell(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text('Leave a vote!', style: textTheme.bodyLarge),
+                ),
+              ),
+              onTap: () => action(context, startup),
+            ),
+          ),
       ],
     );
   }

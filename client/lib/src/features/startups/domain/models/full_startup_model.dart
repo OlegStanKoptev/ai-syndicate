@@ -25,28 +25,21 @@ enum StartupStatus {
 }
 
 extension ParseToString on StartupStatus {
-  String get description {
-    switch (this) {
-      case StartupStatus.verification:
-      case StartupStatus.verification_failed:
-      case StartupStatus.verification_succeded:
-        return 'Verification';
-      case StartupStatus.financing:
-      case StartupStatus.financing_failed:
-      case StartupStatus.financing_succeded:
-        return 'Financing';
-      case StartupStatus.developerApplication:
-      case StartupStatus.developerApplication_succeded:
-        return 'Hiring';
-      case StartupStatus.developerVoting:
-      case StartupStatus.developerVoting_succeded:
-        return 'Preparing for development';
-      case StartupStatus.development:
-      case StartupStatus.development_succeded:
-      case StartupStatus.finished:
-        return 'Finished';
-    }
-  }
+  String get description => switch (this) {
+        StartupStatus.verification => "Verification",
+        StartupStatus.verification_failed => "Failed Verification",
+        StartupStatus.verification_succeded => "Verified",
+        StartupStatus.financing => "Financing",
+        StartupStatus.financing_failed => "Underfunded",
+        StartupStatus.financing_succeded => "Funded",
+        StartupStatus.developerApplication => "Hiring",
+        StartupStatus.developerApplication_succeded => "Finished hiring",
+        StartupStatus.developerVoting => "Choosing a developer",
+        StartupStatus.developerVoting_succeded => "Invited a developer",
+        StartupStatus.development => "In development",
+        StartupStatus.development_succeded => "Finished developing",
+        StartupStatus.finished => "Completed",
+      };
 }
 
 @freezed

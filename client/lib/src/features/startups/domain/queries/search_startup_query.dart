@@ -6,6 +6,7 @@ part 'search_startup_query.g.dart';
 
 @freezed
 class SearchStartupsQuery with _$SearchStartupsQuery {
+  @JsonSerializable(includeIfNull: false)
   factory SearchStartupsQuery({
     int? page,
     int? size,

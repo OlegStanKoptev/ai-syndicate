@@ -19,29 +19,32 @@ class NewStartupScreen extends HookWidget {
     if (formContext.key.currentState!.validate()) {
       try {
         formContext.loading.value = true;
-        await Provider.of<StartupService>(context, listen: false)
-            .createNewStartup(
+        final startupService =
+            Provider.of<StartupService>(context, listen: false);
+        final fileService = Provider.of<FileService>(context, listen: false);
+        final specificationFile = await fileService.uploadFile(
+            file: formContext.specificationFile.chosenFile);
+        if (specificationFile == null) {
+          throw ErrorDescription('Specification file upload error');
+        }
+        await startupService.createNewStartup(
           newStartup: NewStartupModel(
             name: formContext.name.text,
             description: formContext.description.text,
-            logoFile: await Provider.of<FileService>(context, listen: false)
-                .uploadFile(file: formContext.logoFile.chosenFile),
-            specificationFile: (await Provider.of<FileService>(context,
-                    listen: false)
-                .uploadFile(file: formContext.specificationFile.chosenFile))!,
-            businessPlanFile:
-                await Provider.of<FileService>(context, listen: false)
-                    .uploadFile(file: formContext.businessPlanFile.chosenFile),
-            presentationFile:
-                await Provider.of<FileService>(context, listen: false)
-                    .uploadFile(file: formContext.presentationFile.chosenFile),
+            logoFile: await fileService.uploadFile(
+                file: formContext.logoFile.chosenFile),
+            specificationFile: specificationFile,
+            businessPlanFile: await fileService.uploadFile(
+                file: formContext.businessPlanFile.chosenFile),
+            presentationFile: await fileService.uploadFile(
+                file: formContext.presentationFile.chosenFile),
             targetFinancing: int.parse(formContext.targetFinancing.text),
           ),
         );
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text(
-              'You have successfully sent a request! Please await a email with details',
+              'You have successfully sent a request! Please await email with details',
             ),
           ));
           const HomeRoute().go(context);
@@ -92,10 +95,11 @@ class NewStartupScreen extends HookWidget {
                         val != null ? null : 'Enter valid description',
                   ),
                   CustomFormField(
-                    controller: formContext.description,
-                    hintText: 'Description',
-                    validator: (val) =>
-                        val != null ? null : 'Enter valid description',
+                    controller: formContext.targetFinancing,
+                    hintText: 'Target financing',
+                    validator: (val) => val != null && int.tryParse(val) != null
+                        ? null
+                        : 'Enter valid target financing',
                   ),
                   CustomImageFormField(
                     controller: formContext.logoFile,

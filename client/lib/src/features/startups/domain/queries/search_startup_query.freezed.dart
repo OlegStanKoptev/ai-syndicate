@@ -128,7 +128,8 @@ class __$$_SearchStartupsQueryCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@JsonSerializable(includeIfNull: false)
 class _$_SearchStartupsQuery implements _SearchStartupsQuery {
   _$_SearchStartupsQuery({this.page, this.size, this.status, this.startuperId});
 

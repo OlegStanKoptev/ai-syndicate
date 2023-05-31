@@ -1,17 +1,15 @@
-import 'package:client/src/constants/services/file_service.dart';
 import 'package:client/src/features/profile/application/profile_service.dart';
 import 'package:client/src/features/profile/domain/user_model.dart';
 import 'package:client/src/routing/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class UserPage extends StatelessWidget {
-  final User user;
-  const UserPage({super.key, required this.user});
+class ExpertPage extends StatelessWidget {
+  final Expert expert;
+  const ExpertPage({super.key, required this.expert});
 
   @override
   Widget build(BuildContext context) {
-    final avatarImageFile = user.avatarImageFile;
     final textTheme = Theme.of(context).textTheme;
     return SingleChildScrollView(
       child: Center(
@@ -22,24 +20,12 @@ class UserPage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  if (avatarImageFile != null)
-                    Consumer<FileService>(
-                      builder: (context, fileService, child) => Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Image.network(
-                            fileService
-                                .getFileUrl(fileName: avatarImageFile)
-                                .toString(),
-                            fit: BoxFit.fitHeight,
-                            height: 140,
-                          )),
-                    ),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          user.fullName,
+                          expert.fullName,
                           style: textTheme.headlineMedium,
                           textAlign: TextAlign.center,
                         ),
@@ -55,25 +41,6 @@ class UserPage extends StatelessWidget {
                   )
                 ],
               ),
-              const SizedBox(height: 32),
-              Card(
-                child: ListTile(
-                  title: const Text('My investments'),
-                  onTap: () => const MyInvestmentsRoute().go(context),
-                ),
-              ),
-              Card(
-                child: ListTile(
-                  title: const Text('My startups'),
-                  onTap: () => const MyStartupsRoute().go(context),
-                ),
-              ),
-              Card(
-                child: ListTile(
-                  title: const Text('Create a new startup'),
-                  onTap: () => const NewStartupRoute().go(context),
-                ),
-              )
             ],
           ),
         ),

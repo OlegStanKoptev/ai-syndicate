@@ -16,13 +16,21 @@ _$_SearchStartupsQuery _$$_SearchStartupsQueryFromJson(
     );
 
 Map<String, dynamic> _$$_SearchStartupsQueryToJson(
-        _$_SearchStartupsQuery instance) =>
-    <String, dynamic>{
-      'page': instance.page,
-      'size': instance.size,
-      'status': _$StartupStatusEnumMap[instance.status],
-      'startuperId': instance.startuperId,
-    };
+    _$_SearchStartupsQuery instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('page', instance.page);
+  writeNotNull('size', instance.size);
+  writeNotNull('status', _$StartupStatusEnumMap[instance.status]);
+  writeNotNull('startuperId', instance.startuperId);
+  return val;
+}
 
 const _$StartupStatusEnumMap = {
   StartupStatus.verification: 'verification',
