@@ -4,6 +4,7 @@ import invariant from "tiny-invariant";
 import { db } from "~/db.server";
 import { isStartupStatusSameOrLaterThan } from "~/utils";
 import {
+  getApplicationDeveloperApproval,
   getCurrentApiUser,
   getNewStartupNaysTotal,
   getNewStartupYeasTotal,
@@ -188,6 +189,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         developerVotingDeadline: startup.developerVotingDeadline,
         maxApproval,
         maxApprovalApplicationsDeveloper,
+        applicationsDeveloper: await Promise.all(
+          startup.applicationsDeveloper.map(async (applicationDeveloper) => ({
+            ...applicationDeveloper,
+            approval: await getApplicationDeveloperApproval(
+              applicationDeveloper.id
+            ),
+          }))
+        ),
       };
     })(),
   };
