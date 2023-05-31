@@ -7,6 +7,7 @@ import {
   getCurrentApiUser,
   getNewStartupNaysTotal,
   getNewStartupYeasTotal,
+  getStartupLeadingApplicationsDeveloper,
   getStartupTotalFinancing,
 } from "~/utils.server";
 
@@ -15,8 +16,33 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   invariant(typeof startupId === "string");
   const startup = await db.startup.findUnique({
     where: { id: startupId },
-    include: { startuper: true },
+    include: {
+      reports: { orderBy: { updatedAt: "desc" } },
+      startuper: true,
+      votesNewStartup: {
+        orderBy: { updatedAt: "desc" },
+        include: { expert: true },
+      },
+      investments: {
+        orderBy: { updatedAt: "desc" },
+        include: { investor: true },
+      },
+      applicationsDeveloper: {
+        orderBy: { updatedAt: "desc" },
+        include: { developer: true },
+      },
+      developer: true,
+    },
   });
+  const maxApprovalData = await getStartupLeadingApplicationsDeveloper(
+    startupId
+  );
+  const { maxApproval } = maxApprovalData;
+  const maxApprovalApplicationsDeveloper =
+    await db.applicationDeveloper.findMany({
+      where: { id: { in: maxApprovalData.ids } },
+      include: { developer: true },
+    });
   if (!startup) {
     return json(
       { message: `Startup with this id not found: ${startupId}` },
@@ -160,6 +186,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       }
       return {
         developerVotingDeadline: startup.developerVotingDeadline,
+        maxApproval,
+        maxApprovalApplicationsDeveloper,
       };
     })(),
   };
