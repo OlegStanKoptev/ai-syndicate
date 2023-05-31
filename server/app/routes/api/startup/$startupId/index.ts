@@ -2,6 +2,7 @@ import type { LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import { db } from "~/db.server";
+import { isStartupStatusSameOrLaterThan } from "~/utils";
 import {
   getCurrentApiUser,
   getNewStartupNaysTotal,
@@ -40,17 +41,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     businessPlanFile: startup.businessPlanFile,
     presentationFile: startup.presentationFile,
     verification: await (async () => {
-      if (
-        !(
-          startup.status === "verification" ||
-          startup.status === "verification_failed" ||
-          startup.status === "verification_succeded" ||
-          startup.status === "financing" ||
-          startup.status === "financing_failed" ||
-          startup.status === "financing_succeded" ||
-          startup.status === "developerApplication"
-        )
-      ) {
+      if (!isStartupStatusSameOrLaterThan(startup.status, "verification")) {
         return null;
       }
       return {
@@ -74,7 +65,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       };
     })(),
     verification_failed: await (async () => {
-      if (!(startup.status === "verification_failed")) {
+      if (
+        !isStartupStatusSameOrLaterThan(startup.status, "verification_failed")
+      ) {
         return null;
       }
       return {
@@ -97,27 +90,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     })(),
     verification_succeded: await (async () => {
       if (
-        !(
-          startup.status === "verification_succeded" ||
-          startup.status === "financing" ||
-          startup.status === "financing_failed" ||
-          startup.status === "financing_succeded" ||
-          startup.status === "developerApplication"
-        )
+        !isStartupStatusSameOrLaterThan(startup.status, "verification_succeded")
       ) {
         return null;
       }
       return {};
     })(),
     financing: await (async () => {
-      if (
-        !(
-          startup.status === "financing" ||
-          startup.status === "financing_failed" ||
-          startup.status === "financing_succeded" ||
-          startup.status === "developerApplication"
-        )
-      ) {
+      if (!isStartupStatusSameOrLaterThan(startup.status, "financing")) {
         return null;
       }
       const investmentsGroups = await db.investment.groupBy({
@@ -141,24 +121,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       };
     })(),
     financing_failed: await (async () => {
-      if (!(startup.status === "financing_failed")) {
+      if (!isStartupStatusSameOrLaterThan(startup.status, "financing_failed")) {
         return null;
       }
       return {};
     })(),
     financing_succeded: await (async () => {
       if (
-        !(
-          startup.status === "financing_succeded" ||
-          startup.status === "developerApplication"
-        )
+        !isStartupStatusSameOrLaterThan(startup.status, "financing_succeded")
       ) {
         return null;
       }
       return {};
     })(),
     developerApplication: await (async () => {
-      if (!(startup.status === "developerApplication")) {
+      if (
+        !isStartupStatusSameOrLaterThan(startup.status, "developerApplication")
+      ) {
         return null;
       }
       return {
@@ -176,7 +155,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       };
     })(),
     developerVoting: await (async () => {
-      if (!(startup.status === "developerVoting")) {
+      if (!isStartupStatusSameOrLaterThan(startup.status, "developerVoting")) {
         return null;
       }
       return {
