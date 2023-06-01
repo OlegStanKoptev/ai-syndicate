@@ -41,8 +41,6 @@ class StartupDevelopment extends StatelessWidget {
         startup.status == StartupStatus.development_succeded;
     final isStartuper = startup.startuper.id == currentUser?.id;
 
-    // final alreadySentReport = startup
-
     final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,8 +50,8 @@ class StartupDevelopment extends StatelessWidget {
           child: Text('Development', style: textTheme.headlineSmall),
         ),
         const ListTile(
-          title: Text('Latest report / verified'),
-          subtitle: Text('reportFile1.pdf'),
+          title: Text('Latest report'),
+          subtitle: Text('reportFile.docx'),
         ),
         ListTile(
           title: Text(
