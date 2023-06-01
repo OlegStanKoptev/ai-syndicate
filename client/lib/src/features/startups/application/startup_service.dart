@@ -1,11 +1,16 @@
 import 'package:client/src/constants/client.dart';
+import 'package:client/src/features/startups/domain/models/developer_application_confirm_model.dart';
+import 'package:client/src/features/startups/domain/models/developer_application_model.dart';
+import 'package:client/src/features/startups/domain/models/developer_voting_confirm_model.dart';
+import 'package:client/src/features/startups/domain/models/financing_confirm_model.dart';
 import 'package:client/src/features/startups/domain/models/full_startup_model.dart';
 import 'package:client/src/features/startups/domain/models/new_startup_model.dart';
 import 'package:client/src/features/startups/domain/models/verification_confirm_model.dart';
-import 'package:client/src/features/startups/domain/models/verification_model.dart';
+import 'package:client/src/features/startups/domain/models/vote_model.dart';
 import 'package:client/src/features/startups/domain/queries/search_startup_query.dart';
 import 'package:client/src/features/startups/domain/responses/new_startup_response.dart';
 import 'package:client/src/features/startups/domain/responses/search_startup_response.dart';
+import 'package:dio/dio.dart';
 
 class StartupService {
   Future<SearchStartupResponse> searchStartups({SearchStartupsQuery? query}) =>
@@ -26,16 +31,16 @@ class StartupService {
           .post('/api/startup/new', data: newStartup.toJson())
           .then((response) => NewStartupResponse.fromJson(response.data));
 
-  Future verifyStartup({
+  Future<Response> verificationVote({
     required String id,
-    required VerificationModel vote,
+    required StartupVote vote,
   }) =>
       dio.post(
         '/api/startup/$id/verification/vote',
         data: vote.toJson(),
       );
 
-  Future confirmStartup({
+  Future<Response> verificationSuccessConfirm({
     required String id,
     required VerificationConfirmModel confirm,
   }) =>
@@ -44,7 +49,7 @@ class StartupService {
         data: confirm.toJson(),
       );
 
-  Future investInStartup({
+  Future<Response> financingInvest({
     required String id,
     required int amount,
   }) =>
@@ -53,19 +58,16 @@ class StartupService {
         data: {"amount": amount},
       );
 
-  Future confirmFinancingStartup({
+  Future<Response> financingSuccessConfirm({
     required String id,
+    required FinancingConfirmModel confirmModel,
   }) =>
       dio.post(
         '/api/startup/$id/financing_succeded/confirm',
-        data: {
-          "developerApplicationDeadline": DateTime.now().add(
-            const Duration(days: 7),
-          )
-        },
+        data: confirmModel.toJson(),
       );
 
-  Future applyForDevelopment({
+  Future<Response> developerApplicationNew({
     required String id,
     required String message,
   }) =>
@@ -74,19 +76,26 @@ class StartupService {
         data: {"message": message},
       );
 
-  Future confirmDeveloperForStartup({
+  Future<Response> developerApplicationSuccessConfirm({
     required String id,
+    required DeveloperApplicationConfirmModel confirmModel,
   }) =>
       dio.post(
-        '/api/startup/$id/developer-application/new',
-        data: {
-          "developerVotingDeadline": DateTime.now().add(
-            const Duration(days: 7),
-          )
-        },
+        '/api/startup/$id/developer-application_succeded/confirm',
+        data: confirmModel.toJson(),
       );
 
-  Future voteForDeveloper({
+  Future<Iterable<DeveloperApplicationModel>> developerApplications({
+    required String id,
+  }) =>
+      dio
+          .get('/api/startup/$id/developer-application/list')
+          .then((response) => response.data as List)
+          .then(
+            (list) => list.map((e) => DeveloperApplicationModel.fromJson(e)),
+          );
+
+  Future<Response> developerVotingVote({
     required String id,
     required String applicationDeveloperId,
   }) =>
@@ -94,4 +103,43 @@ class StartupService {
         '/api/startup/$id/developer-voting/vote',
         data: {"applicationDeveloperId": applicationDeveloperId},
       );
+
+  Future<Response> developerVotingLeaders({
+    required String id,
+  }) =>
+      dio.get(
+        '/api/startup/$id/developer-voting_succeded/leaders',
+      );
+
+  Future<Response> developerVotingSuccessConfirm({
+    required String id,
+    required DeveloperVotingConfirmModel confirmModel,
+  }) =>
+      dio.post(
+        '/api/startup/$id/developer-voting_succeded/confirm',
+        data: confirmModel.toJson(),
+      );
+
+  Future<Response> developmentReport({
+    required String id,
+    required String reportFileId,
+  }) =>
+      dio.post(
+        '/api/startup/$id/development/report',
+        data: {"reportFile": reportFileId},
+      );
+
+  Future<Response> developmentReportVote({
+    required String id,
+    required VoteModel vote,
+  }) =>
+      dio.post(
+        '/api/startup/$id/development/vote',
+        data: vote.toJson(),
+      );
+
+  Future<Response> developmentSuccessConfirm({
+    required String id,
+  }) =>
+      dio.post('/api/startup/$id/development_succeded/confirm');
 }

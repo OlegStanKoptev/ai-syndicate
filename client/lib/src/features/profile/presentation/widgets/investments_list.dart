@@ -2,12 +2,13 @@ import 'package:client/src/features/profile/domain/investment.dart';
 import 'package:flutter/material.dart';
 
 class InvestmentsList extends StatelessWidget {
-  final List<Investment> investments;
+  final Iterable<Investment>? investments;
   const InvestmentsList({super.key, required this.investments});
 
   @override
   Widget build(BuildContext context) {
-    if (investments.isEmpty) {
+    final investments = this.investments;
+    if (investments == null || investments.isEmpty) {
       return const Center(
         child: Text('Wow, such empty...'),
       );

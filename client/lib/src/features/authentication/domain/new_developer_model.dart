@@ -8,7 +8,6 @@ sealed class NewDeveloperModel with _$NewDeveloperModel {
   const factory NewDeveloperModel({
     required String email,
     required String password,
-    required String fullName,
     required String phone,
     required String orgName,
     required String shortOrgName,

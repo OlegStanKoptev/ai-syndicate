@@ -27,7 +27,6 @@ class DeveloperRegisterPage extends HookWidget {
             avatarImageFile:
                 await Provider.of<FileService>(context, listen: false)
                     .uploadFile(file: formContext.avatarFile.chosenFile),
-            fullName: formContext.name.text,
             phone: formContext.phone.text,
             orgName: formContext.orgName.text,
             shortOrgName: formContext.shortOrgName.text,
@@ -60,7 +59,6 @@ class DeveloperRegisterPage extends HookWidget {
     final formContext = DeveloperRegistrationFormContext(
       key: useMemoized(GlobalKey<FormState>.new, const []),
       avatarFile: useFileController(),
-      name: useTextEditingController(),
       email: useTextEditingController(),
       password: useTextEditingController(),
       phone: useTextEditingController(),
@@ -79,12 +77,6 @@ class DeveloperRegisterPage extends HookWidget {
       key: formContext.key,
       child: Column(
         children: [
-          CustomFormField(
-            controller: formContext.name,
-            hintText: 'Full Name',
-            validator: (val) =>
-                val != null && val.isValidName ? null : 'Enter valid full name',
-          ),
           CustomFormField(
             controller: formContext.email,
             hintText: 'Email',
@@ -120,17 +112,23 @@ class DeveloperRegisterPage extends HookWidget {
           CustomFormField(
             controller: formContext.inn,
             hintText: 'INN',
-            validator: (val) => val != null ? null : 'Enter valid INN',
+            validator: (val) => val != null && val.length == 10
+                ? null
+                : 'Enter valid INN (10 symbols)',
           ),
           CustomFormField(
             controller: formContext.ogrn,
             hintText: 'OGRN',
-            validator: (val) => val != null ? null : 'Enter valid OGRN',
+            validator: (val) => val != null && val.length == 13
+                ? null
+                : 'Enter valid OGRN (13 symbols)',
           ),
           CustomFormField(
             controller: formContext.kpp,
             hintText: 'KPP',
-            validator: (val) => val != null ? null : 'Enter valid KPP',
+            validator: (val) => val != null && val.length == 9
+                ? null
+                : 'Enter valid KPP (9 symbols)',
           ),
           CustomFormField(
             controller: formContext.legalAddress,
@@ -140,12 +138,15 @@ class DeveloperRegisterPage extends HookWidget {
           CustomFormField(
             controller: formContext.actualAddress,
             hintText: 'Actual Address',
-            validator: (val) => val != null ? null : 'Enter valid address',
+            validator: (val) =>
+                val != null && val.isNotEmpty ? null : 'Enter valid address',
           ),
           CustomFormField(
             controller: formContext.website,
             hintText: 'Website',
-            validator: (val) => val != null ? null : 'Enter valid website name',
+            validator: (val) => val != null && val.isNotEmpty
+                ? null
+                : 'Enter valid website name',
           ),
           CustomImageFormField(
             controller: formContext.avatarFile,
@@ -175,7 +176,6 @@ class DeveloperRegisterPage extends HookWidget {
 
 class DeveloperRegistrationFormContext {
   final GlobalKey<FormState> key;
-  final TextEditingController name;
   final TextEditingController email;
   final TextEditingController password;
   final TextEditingController phone;
@@ -192,7 +192,6 @@ class DeveloperRegistrationFormContext {
   final ValueNotifier<String?> error;
   DeveloperRegistrationFormContext({
     required this.key,
-    required this.name,
     required this.email,
     required this.password,
     required this.avatarFile,

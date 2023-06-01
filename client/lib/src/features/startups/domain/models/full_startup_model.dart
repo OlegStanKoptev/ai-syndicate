@@ -1,6 +1,9 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:client/src/features/profile/domain/user_model.dart';
+import 'package:client/src/features/startups/domain/responses/startup_developer_applications_response.dart';
+import 'package:client/src/features/startups/domain/responses/startup_developer_voting_response.dart';
+import 'package:client/src/features/startups/domain/responses/startup_financing_response.dart';
 import 'package:client/src/features/startups/domain/responses/startup_verification_failed_response.dart';
 import 'package:client/src/features/startups/domain/responses/startup_verification_response.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -60,13 +63,13 @@ class FullStartupModel with _$FullStartupModel {
         StartupVerificationFailedResponse? verificationFailed,
     @JsonKey(name: 'verification_succeded')
         Map<String, Object?>? verificationSucceded,
-    Map<String, Object?>? financing,
+    StartupFinancingResponse? financing,
     @JsonKey(name: 'financing_failed')
         Map<String, Object?>? financingFailed,
     @JsonKey(name: 'financing_succeded')
         Map<String, Object?>? financingSucceded,
-    Map<String, Object?>? developerApplication,
-    Map<String, Object?>? developerVoting,
+    StartupDeveloperApplicationsResponse? developerApplication,
+    StartupDeveloperVotingResponse? developerVoting,
   }) = _FullStartupModel;
 
   factory FullStartupModel.fromJson(Map<String, dynamic> json) =>

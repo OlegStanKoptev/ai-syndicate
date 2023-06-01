@@ -35,28 +35,39 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
 mixin _$UserModel {
   String get id => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
-  String get fullName => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id, String email, String fullName) admin,
     required TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)
         developer,
-    required TResult Function(String id, String email, String fullName) expert,
-    required TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)
+        expert,
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)
         user,
   }) =>
       throw _privateConstructorUsedError;
@@ -66,21 +77,33 @@ mixin _$UserModel {
     TResult? Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult? Function(String id, String email, String fullName)? expert,
-    TResult? Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
   }) =>
       throw _privateConstructorUsedError;
@@ -90,21 +113,33 @@ mixin _$UserModel {
     TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult Function(String id, String email, String fullName)? expert,
-    TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
     required TResult orElse(),
   }) =>
@@ -145,7 +180,7 @@ abstract class $UserModelCopyWith<$Res> {
   factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) then) =
       _$UserModelCopyWithImpl<$Res, UserModel>;
   @useResult
-  $Res call({String id, String email, String fullName});
+  $Res call({String id, String email});
 }
 
 /// @nodoc
@@ -163,7 +198,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
   $Res call({
     Object? id = null,
     Object? email = null,
-    Object? fullName = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -173,10 +207,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
       email: null == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as String,
-      fullName: null == fullName
-          ? _value.fullName
-          : fullName // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
   }
@@ -276,21 +306,33 @@ class _$Admin implements Admin {
     required TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)
         developer,
-    required TResult Function(String id, String email, String fullName) expert,
-    required TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)
+        expert,
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)
         user,
   }) {
     return admin(id, email, fullName);
@@ -303,21 +345,33 @@ class _$Admin implements Admin {
     TResult? Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult? Function(String id, String email, String fullName)? expert,
-    TResult? Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
   }) {
     return admin?.call(id, email, fullName);
@@ -330,21 +384,33 @@ class _$Admin implements Admin {
     TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult Function(String id, String email, String fullName)? expert,
-    TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
     required TResult orElse(),
   }) {
@@ -411,7 +477,6 @@ abstract class Admin implements UserModel {
   String get id;
   @override
   String get email;
-  @override
   String get fullName;
   @override
   @JsonKey(ignore: true)
@@ -428,17 +493,17 @@ abstract class _$$DeveloperCopyWith<$Res> implements $UserModelCopyWith<$Res> {
   $Res call(
       {String id,
       String email,
-      String fullName,
-      String phone,
+      String? phone,
       String? avatarImageFile,
       String orgName,
       String shortOrgName,
       String inn,
       String ogrn,
       String kpp,
-      String legalAddress,
+      String? legalAddress,
       String actualAddress,
-      String website});
+      String website,
+      Iterable<DeveloperApplicationModel>? applicationsDeveloper});
 }
 
 /// @nodoc
@@ -454,17 +519,17 @@ class __$$DeveloperCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? email = null,
-    Object? fullName = null,
-    Object? phone = null,
+    Object? phone = freezed,
     Object? avatarImageFile = freezed,
     Object? orgName = null,
     Object? shortOrgName = null,
     Object? inn = null,
     Object? ogrn = null,
     Object? kpp = null,
-    Object? legalAddress = null,
+    Object? legalAddress = freezed,
     Object? actualAddress = null,
     Object? website = null,
+    Object? applicationsDeveloper = freezed,
   }) {
     return _then(_$Developer(
       id: null == id
@@ -475,14 +540,10 @@ class __$$DeveloperCopyWithImpl<$Res>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      fullName: null == fullName
-          ? _value.fullName
-          : fullName // ignore: cast_nullable_to_non_nullable
-              as String,
-      phone: null == phone
+      phone: freezed == phone
           ? _value.phone
           : phone // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       avatarImageFile: freezed == avatarImageFile
           ? _value.avatarImageFile
           : avatarImageFile // ignore: cast_nullable_to_non_nullable
@@ -507,10 +568,10 @@ class __$$DeveloperCopyWithImpl<$Res>
           ? _value.kpp
           : kpp // ignore: cast_nullable_to_non_nullable
               as String,
-      legalAddress: null == legalAddress
+      legalAddress: freezed == legalAddress
           ? _value.legalAddress
           : legalAddress // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       actualAddress: null == actualAddress
           ? _value.actualAddress
           : actualAddress // ignore: cast_nullable_to_non_nullable
@@ -519,6 +580,10 @@ class __$$DeveloperCopyWithImpl<$Res>
           ? _value.website
           : website // ignore: cast_nullable_to_non_nullable
               as String,
+      applicationsDeveloper: freezed == applicationsDeveloper
+          ? _value.applicationsDeveloper
+          : applicationsDeveloper // ignore: cast_nullable_to_non_nullable
+              as Iterable<DeveloperApplicationModel>?,
     ));
   }
 }
@@ -529,17 +594,17 @@ class _$Developer implements Developer {
   const _$Developer(
       {required this.id,
       required this.email,
-      required this.fullName,
-      required this.phone,
+      this.phone,
       this.avatarImageFile,
       required this.orgName,
       required this.shortOrgName,
       required this.inn,
       required this.ogrn,
       required this.kpp,
-      required this.legalAddress,
+      this.legalAddress,
       required this.actualAddress,
       required this.website,
+      this.applicationsDeveloper,
       final String? $type})
       : $type = $type ?? 'developer';
 
@@ -551,9 +616,7 @@ class _$Developer implements Developer {
   @override
   final String email;
   @override
-  final String fullName;
-  @override
-  final String phone;
+  final String? phone;
   @override
   final String? avatarImageFile;
   @override
@@ -567,18 +630,20 @@ class _$Developer implements Developer {
   @override
   final String kpp;
   @override
-  final String legalAddress;
+  final String? legalAddress;
   @override
   final String actualAddress;
   @override
   final String website;
+  @override
+  final Iterable<DeveloperApplicationModel>? applicationsDeveloper;
 
   @JsonKey(name: 'role')
   final String $type;
 
   @override
   String toString() {
-    return 'UserModel.developer(id: $id, email: $email, fullName: $fullName, phone: $phone, avatarImageFile: $avatarImageFile, orgName: $orgName, shortOrgName: $shortOrgName, inn: $inn, ogrn: $ogrn, kpp: $kpp, legalAddress: $legalAddress, actualAddress: $actualAddress, website: $website)';
+    return 'UserModel.developer(id: $id, email: $email, phone: $phone, avatarImageFile: $avatarImageFile, orgName: $orgName, shortOrgName: $shortOrgName, inn: $inn, ogrn: $ogrn, kpp: $kpp, legalAddress: $legalAddress, actualAddress: $actualAddress, website: $website, applicationsDeveloper: $applicationsDeveloper)';
   }
 
   @override
@@ -588,8 +653,6 @@ class _$Developer implements Developer {
             other is _$Developer &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.fullName, fullName) ||
-                other.fullName == fullName) &&
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.avatarImageFile, avatarImageFile) ||
                 other.avatarImageFile == avatarImageFile) &&
@@ -603,7 +666,9 @@ class _$Developer implements Developer {
                 other.legalAddress == legalAddress) &&
             (identical(other.actualAddress, actualAddress) ||
                 other.actualAddress == actualAddress) &&
-            (identical(other.website, website) || other.website == website));
+            (identical(other.website, website) || other.website == website) &&
+            const DeepCollectionEquality()
+                .equals(other.applicationsDeveloper, applicationsDeveloper));
   }
 
   @JsonKey(ignore: true)
@@ -612,7 +677,6 @@ class _$Developer implements Developer {
       runtimeType,
       id,
       email,
-      fullName,
       phone,
       avatarImageFile,
       orgName,
@@ -622,7 +686,8 @@ class _$Developer implements Developer {
       kpp,
       legalAddress,
       actualAddress,
-      website);
+      website,
+      const DeepCollectionEquality().hash(applicationsDeveloper));
 
   @JsonKey(ignore: true)
   @override
@@ -637,25 +702,49 @@ class _$Developer implements Developer {
     required TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)
         developer,
-    required TResult Function(String id, String email, String fullName) expert,
-    required TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)
+        expert,
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)
         user,
   }) {
-    return developer(id, email, fullName, phone, avatarImageFile, orgName,
-        shortOrgName, inn, ogrn, kpp, legalAddress, actualAddress, website);
+    return developer(
+        id,
+        email,
+        phone,
+        avatarImageFile,
+        orgName,
+        shortOrgName,
+        inn,
+        ogrn,
+        kpp,
+        legalAddress,
+        actualAddress,
+        website,
+        applicationsDeveloper);
   }
 
   @override
@@ -665,25 +754,49 @@ class _$Developer implements Developer {
     TResult? Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult? Function(String id, String email, String fullName)? expert,
-    TResult? Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
   }) {
-    return developer?.call(id, email, fullName, phone, avatarImageFile, orgName,
-        shortOrgName, inn, ogrn, kpp, legalAddress, actualAddress, website);
+    return developer?.call(
+        id,
+        email,
+        phone,
+        avatarImageFile,
+        orgName,
+        shortOrgName,
+        inn,
+        ogrn,
+        kpp,
+        legalAddress,
+        actualAddress,
+        website,
+        applicationsDeveloper);
   }
 
   @override
@@ -693,27 +806,51 @@ class _$Developer implements Developer {
     TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult Function(String id, String email, String fullName)? expert,
-    TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
     required TResult orElse(),
   }) {
     if (developer != null) {
-      return developer(id, email, fullName, phone, avatarImageFile, orgName,
-          shortOrgName, inn, ogrn, kpp, legalAddress, actualAddress, website);
+      return developer(
+          id,
+          email,
+          phone,
+          avatarImageFile,
+          orgName,
+          shortOrgName,
+          inn,
+          ogrn,
+          kpp,
+          legalAddress,
+          actualAddress,
+          website,
+          applicationsDeveloper);
     }
     return orElse();
   }
@@ -765,19 +902,20 @@ class _$Developer implements Developer {
 
 abstract class Developer implements UserModel {
   const factory Developer(
-      {required final String id,
-      required final String email,
-      required final String fullName,
-      required final String phone,
-      final String? avatarImageFile,
-      required final String orgName,
-      required final String shortOrgName,
-      required final String inn,
-      required final String ogrn,
-      required final String kpp,
-      required final String legalAddress,
-      required final String actualAddress,
-      required final String website}) = _$Developer;
+          {required final String id,
+          required final String email,
+          final String? phone,
+          final String? avatarImageFile,
+          required final String orgName,
+          required final String shortOrgName,
+          required final String inn,
+          required final String ogrn,
+          required final String kpp,
+          final String? legalAddress,
+          required final String actualAddress,
+          required final String website,
+          final Iterable<DeveloperApplicationModel>? applicationsDeveloper}) =
+      _$Developer;
 
   factory Developer.fromJson(Map<String, dynamic> json) = _$Developer.fromJson;
 
@@ -785,18 +923,17 @@ abstract class Developer implements UserModel {
   String get id;
   @override
   String get email;
-  @override
-  String get fullName;
-  String get phone;
+  String? get phone;
   String? get avatarImageFile;
   String get orgName;
   String get shortOrgName;
   String get inn;
   String get ogrn;
   String get kpp;
-  String get legalAddress;
+  String? get legalAddress;
   String get actualAddress;
   String get website;
+  Iterable<DeveloperApplicationModel>? get applicationsDeveloper;
   @override
   @JsonKey(ignore: true)
   _$$DeveloperCopyWith<_$Developer> get copyWith =>
@@ -809,7 +946,12 @@ abstract class _$$ExpertCopyWith<$Res> implements $UserModelCopyWith<$Res> {
       __$$ExpertCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String email, String fullName});
+  $Res call(
+      {String id,
+      String email,
+      String fullName,
+      Iterable<StartupVote>? votesNewStartup,
+      Iterable<ReportVote>? votesReport});
 }
 
 /// @nodoc
@@ -825,6 +967,8 @@ class __$$ExpertCopyWithImpl<$Res>
     Object? id = null,
     Object? email = null,
     Object? fullName = null,
+    Object? votesNewStartup = freezed,
+    Object? votesReport = freezed,
   }) {
     return _then(_$Expert(
       id: null == id
@@ -839,6 +983,14 @@ class __$$ExpertCopyWithImpl<$Res>
           ? _value.fullName
           : fullName // ignore: cast_nullable_to_non_nullable
               as String,
+      votesNewStartup: freezed == votesNewStartup
+          ? _value.votesNewStartup
+          : votesNewStartup // ignore: cast_nullable_to_non_nullable
+              as Iterable<StartupVote>?,
+      votesReport: freezed == votesReport
+          ? _value.votesReport
+          : votesReport // ignore: cast_nullable_to_non_nullable
+              as Iterable<ReportVote>?,
     ));
   }
 }
@@ -850,6 +1002,8 @@ class _$Expert implements Expert {
       {required this.id,
       required this.email,
       required this.fullName,
+      this.votesNewStartup,
+      this.votesReport,
       final String? $type})
       : $type = $type ?? 'expert';
 
@@ -862,13 +1016,17 @@ class _$Expert implements Expert {
   final String email;
   @override
   final String fullName;
+  @override
+  final Iterable<StartupVote>? votesNewStartup;
+  @override
+  final Iterable<ReportVote>? votesReport;
 
   @JsonKey(name: 'role')
   final String $type;
 
   @override
   String toString() {
-    return 'UserModel.expert(id: $id, email: $email, fullName: $fullName)';
+    return 'UserModel.expert(id: $id, email: $email, fullName: $fullName, votesNewStartup: $votesNewStartup, votesReport: $votesReport)';
   }
 
   @override
@@ -879,12 +1037,22 @@ class _$Expert implements Expert {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.fullName, fullName) ||
-                other.fullName == fullName));
+                other.fullName == fullName) &&
+            const DeepCollectionEquality()
+                .equals(other.votesNewStartup, votesNewStartup) &&
+            const DeepCollectionEquality()
+                .equals(other.votesReport, votesReport));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, email, fullName);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      email,
+      fullName,
+      const DeepCollectionEquality().hash(votesNewStartup),
+      const DeepCollectionEquality().hash(votesReport));
 
   @JsonKey(ignore: true)
   @override
@@ -899,24 +1067,36 @@ class _$Expert implements Expert {
     required TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)
         developer,
-    required TResult Function(String id, String email, String fullName) expert,
-    required TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)
+        expert,
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)
         user,
   }) {
-    return expert(id, email, fullName);
+    return expert(id, email, fullName, votesNewStartup, votesReport);
   }
 
   @override
@@ -926,24 +1106,36 @@ class _$Expert implements Expert {
     TResult? Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult? Function(String id, String email, String fullName)? expert,
-    TResult? Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
   }) {
-    return expert?.call(id, email, fullName);
+    return expert?.call(id, email, fullName, votesNewStartup, votesReport);
   }
 
   @override
@@ -953,26 +1145,38 @@ class _$Expert implements Expert {
     TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult Function(String id, String email, String fullName)? expert,
-    TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
     required TResult orElse(),
   }) {
     if (expert != null) {
-      return expert(id, email, fullName);
+      return expert(id, email, fullName, votesNewStartup, votesReport);
     }
     return orElse();
   }
@@ -1026,7 +1230,9 @@ abstract class Expert implements UserModel {
   const factory Expert(
       {required final String id,
       required final String email,
-      required final String fullName}) = _$Expert;
+      required final String fullName,
+      final Iterable<StartupVote>? votesNewStartup,
+      final Iterable<ReportVote>? votesReport}) = _$Expert;
 
   factory Expert.fromJson(Map<String, dynamic> json) = _$Expert.fromJson;
 
@@ -1034,8 +1240,9 @@ abstract class Expert implements UserModel {
   String get id;
   @override
   String get email;
-  @override
   String get fullName;
+  Iterable<StartupVote>? get votesNewStartup;
+  Iterable<ReportVote>? get votesReport;
   @override
   @JsonKey(ignore: true)
   _$$ExpertCopyWith<_$Expert> get copyWith =>
@@ -1053,7 +1260,9 @@ abstract class _$$UserCopyWith<$Res> implements $UserModelCopyWith<$Res> {
       String email,
       String fullName,
       String? avatarImageFile,
-      int? balance});
+      int? balance,
+      Iterable<FullStartupModel>? startupsCreated,
+      Iterable<Investment>? investments});
 }
 
 /// @nodoc
@@ -1070,6 +1279,8 @@ class __$$UserCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res, _$User>
     Object? fullName = null,
     Object? avatarImageFile = freezed,
     Object? balance = freezed,
+    Object? startupsCreated = freezed,
+    Object? investments = freezed,
   }) {
     return _then(_$User(
       id: null == id
@@ -1092,6 +1303,14 @@ class __$$UserCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res, _$User>
           ? _value.balance
           : balance // ignore: cast_nullable_to_non_nullable
               as int?,
+      startupsCreated: freezed == startupsCreated
+          ? _value.startupsCreated
+          : startupsCreated // ignore: cast_nullable_to_non_nullable
+              as Iterable<FullStartupModel>?,
+      investments: freezed == investments
+          ? _value.investments
+          : investments // ignore: cast_nullable_to_non_nullable
+              as Iterable<Investment>?,
     ));
   }
 }
@@ -1105,6 +1324,8 @@ class _$User implements User {
       required this.fullName,
       this.avatarImageFile,
       this.balance,
+      this.startupsCreated,
+      this.investments,
       final String? $type})
       : $type = $type ?? 'user';
 
@@ -1120,13 +1341,17 @@ class _$User implements User {
   final String? avatarImageFile;
   @override
   final int? balance;
+  @override
+  final Iterable<FullStartupModel>? startupsCreated;
+  @override
+  final Iterable<Investment>? investments;
 
   @JsonKey(name: 'role')
   final String $type;
 
   @override
   String toString() {
-    return 'UserModel.user(id: $id, email: $email, fullName: $fullName, avatarImageFile: $avatarImageFile, balance: $balance)';
+    return 'UserModel.user(id: $id, email: $email, fullName: $fullName, avatarImageFile: $avatarImageFile, balance: $balance, startupsCreated: $startupsCreated, investments: $investments)';
   }
 
   @override
@@ -1140,13 +1365,24 @@ class _$User implements User {
                 other.fullName == fullName) &&
             (identical(other.avatarImageFile, avatarImageFile) ||
                 other.avatarImageFile == avatarImageFile) &&
-            (identical(other.balance, balance) || other.balance == balance));
+            (identical(other.balance, balance) || other.balance == balance) &&
+            const DeepCollectionEquality()
+                .equals(other.startupsCreated, startupsCreated) &&
+            const DeepCollectionEquality()
+                .equals(other.investments, investments));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, email, fullName, avatarImageFile, balance);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      email,
+      fullName,
+      avatarImageFile,
+      balance,
+      const DeepCollectionEquality().hash(startupsCreated),
+      const DeepCollectionEquality().hash(investments));
 
   @JsonKey(ignore: true)
   @override
@@ -1161,24 +1397,37 @@ class _$User implements User {
     required TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)
         developer,
-    required TResult Function(String id, String email, String fullName) expert,
-    required TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)
+        expert,
+    required TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)
         user,
   }) {
-    return user(id, email, fullName, avatarImageFile, balance);
+    return user(id, email, fullName, avatarImageFile, balance, startupsCreated,
+        investments);
   }
 
   @override
@@ -1188,24 +1437,37 @@ class _$User implements User {
     TResult? Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult? Function(String id, String email, String fullName)? expert,
-    TResult? Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult? Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
   }) {
-    return user?.call(id, email, fullName, avatarImageFile, balance);
+    return user?.call(id, email, fullName, avatarImageFile, balance,
+        startupsCreated, investments);
   }
 
   @override
@@ -1215,26 +1477,39 @@ class _$User implements User {
     TResult Function(
             String id,
             String email,
-            String fullName,
-            String phone,
+            String? phone,
             String? avatarImageFile,
             String orgName,
             String shortOrgName,
             String inn,
             String ogrn,
             String kpp,
-            String legalAddress,
+            String? legalAddress,
             String actualAddress,
-            String website)?
+            String website,
+            Iterable<DeveloperApplicationModel>? applicationsDeveloper)?
         developer,
-    TResult Function(String id, String email, String fullName)? expert,
-    TResult Function(String id, String email, String fullName,
-            String? avatarImageFile, int? balance)?
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            Iterable<StartupVote>? votesNewStartup,
+            Iterable<ReportVote>? votesReport)?
+        expert,
+    TResult Function(
+            String id,
+            String email,
+            String fullName,
+            String? avatarImageFile,
+            int? balance,
+            Iterable<FullStartupModel>? startupsCreated,
+            Iterable<Investment>? investments)?
         user,
     required TResult orElse(),
   }) {
     if (user != null) {
-      return user(id, email, fullName, avatarImageFile, balance);
+      return user(id, email, fullName, avatarImageFile, balance,
+          startupsCreated, investments);
     }
     return orElse();
   }
@@ -1290,7 +1565,9 @@ abstract class User implements UserModel {
       required final String email,
       required final String fullName,
       final String? avatarImageFile,
-      final int? balance}) = _$User;
+      final int? balance,
+      final Iterable<FullStartupModel>? startupsCreated,
+      final Iterable<Investment>? investments}) = _$User;
 
   factory User.fromJson(Map<String, dynamic> json) = _$User.fromJson;
 
@@ -1298,10 +1575,11 @@ abstract class User implements UserModel {
   String get id;
   @override
   String get email;
-  @override
   String get fullName;
   String? get avatarImageFile;
   int? get balance;
+  Iterable<FullStartupModel>? get startupsCreated;
+  Iterable<Investment>? get investments;
   @override
   @JsonKey(ignore: true)
   _$$UserCopyWith<_$User> get copyWith => throw _privateConstructorUsedError;

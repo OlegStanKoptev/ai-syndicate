@@ -3,13 +3,15 @@ import 'package:client/src/features/startups/presentation/widgets/startups_list_
 import 'package:flutter/material.dart';
 
 class StartupsList extends StatelessWidget {
-  final List<ShortStartupModel> startups;
+  final Iterable<ShortStartupModel> startups;
+  final Iterable<String> highlightedStartups;
   final Widget? header;
-  const StartupsList({
+  StartupsList({
     super.key,
     required this.startups,
+    Iterable<String>? highlightedStartups,
     this.header,
-  });
+  }) : highlightedStartups = highlightedStartups ?? [];
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,10 @@ class StartupsList extends StatelessWidget {
           return header;
         }
         final startup = startups.elementAt(index - (header != null ? 1 : 0));
-        return StartupsListItem(startup: startup);
+        return StartupsListItem(
+          startup: startup,
+          highlight: highlightedStartups.contains(startup.id),
+        );
       },
     );
   }

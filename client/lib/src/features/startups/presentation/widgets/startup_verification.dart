@@ -16,7 +16,7 @@ class StartupVerification extends StatelessWidget {
   void confirm(BuildContext context, FullStartupModel startup) async {
     final startupService = Provider.of<StartupService>(context, listen: false);
     final invalidator = Provider.of<DataInvalidator>(context, listen: false);
-    await startupService.confirmStartup(
+    await startupService.verificationSuccessConfirm(
       id: startup.id,
       confirm: VerificationConfirmModel(
         financingDeadline: DateTime.now().add(
@@ -27,8 +27,10 @@ class StartupVerification extends StatelessWidget {
     invalidator.invalidate();
   }
 
-  void action(BuildContext context, FullStartupModel startup) {
-    StartupVerificationRoute(startupId: startup.id).go(context);
+  void action(BuildContext context, FullStartupModel startup) async {
+    final invalidator = Provider.of<DataInvalidator>(context, listen: false);
+    await StartupVerificationRoute(startupId: startup.id).push(context);
+    invalidator.invalidate();
   }
 
   @override
@@ -47,7 +49,10 @@ class StartupVerification extends StatelessWidget {
     final processOngoing = startup.status == StartupStatus.verification;
     final processSuccess =
         startup.status >= StartupStatus.verification_succeded;
-    final isExpert = currentUser is Expert;
+    final canVote = currentUser is Expert &&
+        !(currentUser.votesNewStartup ?? [])
+            .map((e) => e.startupId)
+            .contains(startup.id);
 
     final processWaitsForConfirmation =
         startup.status == StartupStatus.verification_succeded;
@@ -98,7 +103,7 @@ class StartupVerification extends StatelessWidget {
               onTap: () => confirm(context, startup),
             ),
           ),
-        if (processOngoing && isExpert)
+        if (processOngoing && canVote)
           Card(
             child: InkWell(
               child: Center(

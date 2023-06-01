@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'startup_verification_vote_model.dart';
+part of 'startup_vote_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

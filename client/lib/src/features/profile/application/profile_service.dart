@@ -1,7 +1,5 @@
 import 'package:client/src/constants/client.dart';
 import 'package:client/src/features/profile/domain/deposit_response.dart';
-import 'package:client/src/features/profile/domain/investment.dart';
-import 'package:client/src/features/profile/domain/investments_response.dart';
 import 'package:client/src/features/profile/domain/user_model.dart';
 import 'package:flutter/material.dart';
 
@@ -22,32 +20,20 @@ class ProfileService extends ChangeNotifier {
   Future logout() =>
       dio.post('/api/user/logout').then((_) => _updateUserAndNotify(null));
 
-  Future placeDeposit() => dio
-          .post('/api/user/deposit')
-          .then((response) => DepositResponse.fromJson(response.data).balance)
-          .then(
+  Future placeDeposit({required int amount}) => dio
+      .post('/api/user/deposit', data: {"amount": amount})
+      .then((response) => DepositResponse.fromJson(response.data).balance)
+      .then(
         (balance) {
           final currentUser = _currentUser;
           if (currentUser != null) {
             final UserModel updatedCurrentUser = switch (currentUser) {
+              // ignore: unused_result
               User() => currentUser.copyWith(balance: balance),
               _ => currentUser,
             };
             _updateUserAndNotify(updatedCurrentUser);
           }
         },
-      );
-
-  Future<InvestmentsResponse> getInvestments() => Future.delayed(
-        const Duration(seconds: 1),
-        () => InvestmentsResponse(
-          investments: [
-            Investment(
-              startupId: "cli8ugyyw035ps30irrzv5c08",
-              amount: 100,
-              date: DateTime.now(),
-            )
-          ],
-        ),
       );
 }

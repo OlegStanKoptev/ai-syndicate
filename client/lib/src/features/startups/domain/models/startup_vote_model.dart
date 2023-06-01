@@ -1,8 +1,8 @@
 import 'package:client/src/features/profile/domain/user_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'startup_verification_vote_model.freezed.dart';
-part 'startup_verification_vote_model.g.dart';
+part 'startup_vote_model.freezed.dart';
+part 'startup_vote_model.g.dart';
 
 @freezed
 class StartupVerificationVoteModel with _$StartupVerificationVoteModel {

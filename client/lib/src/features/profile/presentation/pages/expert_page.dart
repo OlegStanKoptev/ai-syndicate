@@ -41,6 +41,13 @@ class ExpertPage extends StatelessWidget {
                   )
                 ],
               ),
+              const SizedBox(height: 32),
+              Card(
+                child: ListTile(
+                  title: const Text('New startups'),
+                  onTap: () => const StartupsToBeVerifiedRoute().go(context),
+                ),
+              ),
             ],
           ),
         ),

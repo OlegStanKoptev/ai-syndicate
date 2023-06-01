@@ -7,13 +7,19 @@ import 'package:provider/provider.dart';
 
 class StartupsListItem extends StatelessWidget {
   final ShortStartupModel startup;
-  const StartupsListItem({super.key, required this.startup});
+  final bool highlight;
+  const StartupsListItem({
+    super.key,
+    required this.startup,
+    this.highlight = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final logoFile = startup.logoFile;
     final textTheme = Theme.of(context).textTheme;
     return Card(
+      elevation: highlight ? 2.0 : null,
       child: ListTile(
         leading: logoFile != null
             ? Consumer<FileService>(

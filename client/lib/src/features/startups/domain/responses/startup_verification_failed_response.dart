@@ -1,4 +1,4 @@
-import 'package:client/src/features/startups/domain/models/startup_verification_vote_model.dart';
+import 'package:client/src/features/startups/domain/models/startup_vote_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'startup_verification_failed_response.freezed.dart';

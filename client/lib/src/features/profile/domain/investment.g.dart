@@ -8,14 +8,14 @@ part of 'investment.dart';
 
 _$_Investment _$$_InvestmentFromJson(Map<String, dynamic> json) =>
     _$_Investment(
+      id: json['id'] as String,
       startupId: json['startupId'] as String,
       amount: json['amount'] as int,
-      date: DateTime.parse(json['date'] as String),
     );
 
 Map<String, dynamic> _$$_InvestmentToJson(_$_Investment instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'startupId': instance.startupId,
       'amount': instance.amount,
-      'date': instance.date.toIso8601String(),
     };

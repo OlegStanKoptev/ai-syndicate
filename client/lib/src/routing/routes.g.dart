@@ -19,6 +19,10 @@ RouteBase get $homeRoute => GoRouteData.$route(
           factory: $ProfileRouteExtension._fromState,
           routes: [
             GoRouteData.$route(
+              path: 'deposit',
+              factory: $DepositRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
               path: 'new-startup',
               factory: $NewStartupRouteExtension._fromState,
             ),
@@ -29,6 +33,14 @@ RouteBase get $homeRoute => GoRouteData.$route(
             GoRouteData.$route(
               path: 'my-investments',
               factory: $MyInvestmentsRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'my-applications',
+              factory: $MyApplicationsRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'startups-to-verify',
+              factory: $StartupsToBeVerifiedRouteExtension._fromState,
             ),
             GoRouteData.$route(
               path: 'notifications',
@@ -62,6 +74,18 @@ RouteBase get $homeRoute => GoRouteData.$route(
               path: 'invest',
               factory: $StartupInvestRouteExtension._fromState,
             ),
+            GoRouteData.$route(
+              path: 'developer-application',
+              factory: $StartupDeveloperApplicationRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'developer-voting',
+              factory: $StartupDeveloperVotingRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'developer-report',
+              factory: $StartupDeveloperReportRouteExtension._fromState,
+            ),
           ],
         ),
       ],
@@ -87,6 +111,21 @@ extension $ProfileRouteExtension on ProfileRoute {
 
   String get location => GoRouteData.$location(
         '/profile',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
+extension $DepositRouteExtension on DepositRoute {
+  static DepositRoute _fromState(GoRouterState state) => const DepositRoute();
+
+  String get location => GoRouteData.$location(
+        '/profile/deposit',
       );
 
   void go(BuildContext context) => context.go(location);
@@ -135,6 +174,38 @@ extension $MyInvestmentsRouteExtension on MyInvestmentsRoute {
 
   String get location => GoRouteData.$location(
         '/profile/my-investments',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
+extension $MyApplicationsRouteExtension on MyApplicationsRoute {
+  static MyApplicationsRoute _fromState(GoRouterState state) =>
+      const MyApplicationsRoute();
+
+  String get location => GoRouteData.$location(
+        '/profile/my-applications',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
+extension $StartupsToBeVerifiedRouteExtension on StartupsToBeVerifiedRoute {
+  static StartupsToBeVerifiedRoute _fromState(GoRouterState state) =>
+      const StartupsToBeVerifiedRoute();
+
+  String get location => GoRouteData.$location(
+        '/profile/startups-to-verify',
       );
 
   void go(BuildContext context) => context.go(location);
@@ -250,6 +321,61 @@ extension $StartupInvestRouteExtension on StartupInvestRoute {
 
   String get location => GoRouteData.$location(
         '/startups/${Uri.encodeComponent(startupId)}/invest',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
+extension $StartupDeveloperApplicationRouteExtension
+    on StartupDeveloperApplicationRoute {
+  static StartupDeveloperApplicationRoute _fromState(GoRouterState state) =>
+      StartupDeveloperApplicationRoute(
+        startupId: state.pathParameters['startupId']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/startups/${Uri.encodeComponent(startupId)}/developer-application',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
+extension $StartupDeveloperVotingRouteExtension on StartupDeveloperVotingRoute {
+  static StartupDeveloperVotingRoute _fromState(GoRouterState state) =>
+      StartupDeveloperVotingRoute(
+        startupId: state.pathParameters['startupId']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/startups/${Uri.encodeComponent(startupId)}/developer-voting',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
+extension $StartupDeveloperReportRouteExtension on StartupDeveloperReportRoute {
+  static StartupDeveloperReportRoute _fromState(GoRouterState state) =>
+      StartupDeveloperReportRoute(
+        startupId: state.pathParameters['startupId']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/startups/${Uri.encodeComponent(startupId)}/developer-report',
       );
 
   void go(BuildContext context) => context.go(location);

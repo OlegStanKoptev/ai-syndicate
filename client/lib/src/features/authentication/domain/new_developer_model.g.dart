@@ -10,7 +10,6 @@ _$_NewDeveloperModel _$$_NewDeveloperModelFromJson(Map<String, dynamic> json) =>
     _$_NewDeveloperModel(
       email: json['email'] as String,
       password: json['password'] as String,
-      fullName: json['fullName'] as String,
       phone: json['phone'] as String,
       orgName: json['orgName'] as String,
       shortOrgName: json['shortOrgName'] as String,
@@ -28,7 +27,6 @@ Map<String, dynamic> _$$_NewDeveloperModelToJson(
     <String, dynamic>{
       'email': instance.email,
       'password': instance.password,
-      'fullName': instance.fullName,
       'phone': instance.phone,
       'orgName': instance.orgName,
       'shortOrgName': instance.shortOrgName,

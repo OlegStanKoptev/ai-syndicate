@@ -22,7 +22,6 @@ NewDeveloperModel _$NewDeveloperModelFromJson(Map<String, dynamic> json) {
 mixin _$NewDeveloperModel {
   String get email => throw _privateConstructorUsedError;
   String get password => throw _privateConstructorUsedError;
-  String get fullName => throw _privateConstructorUsedError;
   String get phone => throw _privateConstructorUsedError;
   String get orgName => throw _privateConstructorUsedError;
   String get shortOrgName => throw _privateConstructorUsedError;
@@ -49,7 +48,6 @@ abstract class $NewDeveloperModelCopyWith<$Res> {
   $Res call(
       {String email,
       String password,
-      String fullName,
       String phone,
       String orgName,
       String shortOrgName,
@@ -77,7 +75,6 @@ class _$NewDeveloperModelCopyWithImpl<$Res, $Val extends NewDeveloperModel>
   $Res call({
     Object? email = null,
     Object? password = null,
-    Object? fullName = null,
     Object? phone = null,
     Object? orgName = null,
     Object? shortOrgName = null,
@@ -97,10 +94,6 @@ class _$NewDeveloperModelCopyWithImpl<$Res, $Val extends NewDeveloperModel>
       password: null == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
-              as String,
-      fullName: null == fullName
-          ? _value.fullName
-          : fullName // ignore: cast_nullable_to_non_nullable
               as String,
       phone: null == phone
           ? _value.phone
@@ -157,7 +150,6 @@ abstract class _$$_NewDeveloperModelCopyWith<$Res>
   $Res call(
       {String email,
       String password,
-      String fullName,
       String phone,
       String orgName,
       String shortOrgName,
@@ -183,7 +175,6 @@ class __$$_NewDeveloperModelCopyWithImpl<$Res>
   $Res call({
     Object? email = null,
     Object? password = null,
-    Object? fullName = null,
     Object? phone = null,
     Object? orgName = null,
     Object? shortOrgName = null,
@@ -203,10 +194,6 @@ class __$$_NewDeveloperModelCopyWithImpl<$Res>
       password: null == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
-              as String,
-      fullName: null == fullName
-          ? _value.fullName
-          : fullName // ignore: cast_nullable_to_non_nullable
               as String,
       phone: null == phone
           ? _value.phone
@@ -258,7 +245,6 @@ class _$_NewDeveloperModel implements _NewDeveloperModel {
   const _$_NewDeveloperModel(
       {required this.email,
       required this.password,
-      required this.fullName,
       required this.phone,
       required this.orgName,
       required this.shortOrgName,
@@ -277,8 +263,6 @@ class _$_NewDeveloperModel implements _NewDeveloperModel {
   final String email;
   @override
   final String password;
-  @override
-  final String fullName;
   @override
   final String phone;
   @override
@@ -302,7 +286,7 @@ class _$_NewDeveloperModel implements _NewDeveloperModel {
 
   @override
   String toString() {
-    return 'NewDeveloperModel(email: $email, password: $password, fullName: $fullName, phone: $phone, orgName: $orgName, shortOrgName: $shortOrgName, inn: $inn, ogrn: $ogrn, kpp: $kpp, legalAddress: $legalAddress, actualAddress: $actualAddress, website: $website, avatarImageFile: $avatarImageFile)';
+    return 'NewDeveloperModel(email: $email, password: $password, phone: $phone, orgName: $orgName, shortOrgName: $shortOrgName, inn: $inn, ogrn: $ogrn, kpp: $kpp, legalAddress: $legalAddress, actualAddress: $actualAddress, website: $website, avatarImageFile: $avatarImageFile)';
   }
 
   @override
@@ -313,8 +297,6 @@ class _$_NewDeveloperModel implements _NewDeveloperModel {
             (identical(other.email, email) || other.email == email) &&
             (identical(other.password, password) ||
                 other.password == password) &&
-            (identical(other.fullName, fullName) ||
-                other.fullName == fullName) &&
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.orgName, orgName) || other.orgName == orgName) &&
             (identical(other.shortOrgName, shortOrgName) ||
@@ -337,7 +319,6 @@ class _$_NewDeveloperModel implements _NewDeveloperModel {
       runtimeType,
       email,
       password,
-      fullName,
       phone,
       orgName,
       shortOrgName,
@@ -368,7 +349,6 @@ abstract class _NewDeveloperModel implements NewDeveloperModel {
   const factory _NewDeveloperModel(
       {required final String email,
       required final String password,
-      required final String fullName,
       required final String phone,
       required final String orgName,
       required final String shortOrgName,
@@ -387,8 +367,6 @@ abstract class _NewDeveloperModel implements NewDeveloperModel {
   String get email;
   @override
   String get password;
-  @override
-  String get fullName;
   @override
   String get phone;
   @override

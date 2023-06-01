@@ -4,14 +4,18 @@ import 'package:client/src/features/authentication/presentation/auth_screen.dart
 import 'package:client/src/features/authentication/presentation/screens/login_screen.dart';
 import 'package:client/src/features/authentication/presentation/screens/registration_screen.dart';
 import 'package:client/src/features/profile/application/profile_service.dart';
-import 'package:client/src/features/profile/presentation/my_investments_screen.dart';
-import 'package:client/src/features/profile/presentation/my_startups_screen.dart';
-import 'package:client/src/features/profile/presentation/notifications_screen.dart';
-import 'package:client/src/features/profile/presentation/profile_screen.dart';
+import 'package:client/src/features/profile/presentation/screens/deposit_screen.dart';
+import 'package:client/src/features/profile/presentation/screens/my_applications.dart';
+import 'package:client/src/features/profile/presentation/screens/my_investments_screen.dart';
+import 'package:client/src/features/profile/presentation/screens/my_startups_screen.dart';
+import 'package:client/src/features/profile/presentation/screens/notifications_screen.dart';
+import 'package:client/src/features/profile/presentation/screens/profile_screen.dart';
+import 'package:client/src/features/profile/presentation/screens/startups_to_be_verified_screen.dart';
 import 'package:client/src/features/startups/presentation/screens/new_startup_screen.dart';
 import 'package:client/src/features/startups/presentation/screens/startup_developer_application.dart';
 import 'package:client/src/features/startups/presentation/screens/startup_developer_voting.dart';
 import 'package:client/src/features/startups/presentation/screens/startup_invest_screen.dart';
+import 'package:client/src/features/startups/presentation/screens/startup_report_screen.dart';
 import 'package:client/src/features/startups/presentation/screens/startup_screen.dart';
 import 'package:client/src/features/startups/presentation/screens/startup_verification_screen.dart';
 import 'package:client/src/features/startups/presentation/startups_screen.dart';
@@ -31,9 +35,12 @@ FutureOr<String?> authenticationRequired(BuildContext context) =>
 
 @TypedGoRoute<HomeRoute>(path: '/', routes: [
   TypedGoRoute<ProfileRoute>(path: 'profile', routes: [
+    TypedGoRoute<DepositRoute>(path: 'deposit'),
     TypedGoRoute<NewStartupRoute>(path: 'new-startup'),
     TypedGoRoute<MyStartupsRoute>(path: 'my-startups'),
     TypedGoRoute<MyInvestmentsRoute>(path: 'my-investments'),
+    TypedGoRoute<MyApplicationsRoute>(path: 'my-applications'),
+    TypedGoRoute<StartupsToBeVerifiedRoute>(path: 'startups-to-verify'),
     TypedGoRoute<NotificationsRoute>(path: 'notifications'),
   ]),
   TypedGoRoute<AuthRoute>(path: 'auth', routes: [
@@ -46,9 +53,8 @@ FutureOr<String?> authenticationRequired(BuildContext context) =>
     TypedGoRoute<StartupDeveloperApplicationRoute>(
       path: 'developer-application',
     ),
-    TypedGoRoute<StartupDeveloperVotingRoute>(
-      path: 'developer-voting',
-    ),
+    TypedGoRoute<StartupDeveloperVotingRoute>(path: 'developer-voting'),
+    TypedGoRoute<StartupDeveloperReportRoute>(path: 'developer-report'),
   ]),
 ])
 class HomeRoute extends GoRouteData {
@@ -161,6 +167,45 @@ class MyInvestmentsRoute extends GoRouteData {
 }
 
 @immutable
+class MyApplicationsRoute extends GoRouteData {
+  const MyApplicationsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const MyApplicationsScreen();
+
+  @override
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>
+      authenticationRequired(context);
+}
+
+@immutable
+class DepositRoute extends GoRouteData {
+  const DepositRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const DepositScreen();
+
+  @override
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>
+      authenticationRequired(context);
+}
+
+@immutable
+class StartupsToBeVerifiedRoute extends GoRouteData {
+  const StartupsToBeVerifiedRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const StartupsToBeVerifiedScreen();
+
+  @override
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>
+      authenticationRequired(context);
+}
+
+@immutable
 class StartupVerificationRoute extends GoRouteData {
   const StartupVerificationRoute({required this.startupId});
   final String startupId;
@@ -210,6 +255,20 @@ class StartupDeveloperVotingRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       StartupDeveloperVotingScreen(startupId: startupId);
+
+  @override
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>
+      authenticationRequired(context);
+}
+
+@immutable
+class StartupDeveloperReportRoute extends GoRouteData {
+  const StartupDeveloperReportRoute({required this.startupId});
+  final String startupId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      StartupReportScreen(startupId: startupId);
 
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>

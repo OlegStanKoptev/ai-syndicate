@@ -1,7 +1,8 @@
 import 'package:client/src/features/profile/application/profile_service.dart';
-import 'package:client/src/features/profile/domain/user_model.dart';
 import 'package:client/src/features/startups/application/startup_service.dart';
+import 'package:client/src/features/startups/domain/models/developer_voting_confirm_model.dart';
 import 'package:client/src/features/startups/domain/models/full_startup_model.dart';
+import 'package:client/src/routing/routes.dart';
 import 'package:client/src/utils/enum_extension.dart';
 import 'package:client/src/utils/future_data_consumer.dart';
 import 'package:flutter/material.dart';
@@ -13,15 +14,40 @@ class StartupDeveloper extends StatelessWidget {
   void confirm(BuildContext context, FullStartupModel startup) async {
     final startupService = Provider.of<StartupService>(context, listen: false);
     final invalidator = Provider.of<DataInvalidator>(context, listen: false);
-    await startupService.confirmFinancingStartup(id: startup.id);
+    final applicationDeveloperId =
+        startup.developerVoting?.maxApprovalApplicationsDeveloper.first.id;
+    final deadline = await showDatePicker(
+      context: context,
+      helpText: 'Development deadline',
+      initialDate: DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now().add(const Duration(days: 1)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (deadline == null || applicationDeveloperId == null) {
+      return;
+    }
+    await startupService.developerVotingSuccessConfirm(
+      id: startup.id,
+      confirmModel: DeveloperVotingConfirmModel(
+        developmentDeadline: deadline,
+        applicationDeveloperId: applicationDeveloperId,
+      ),
+    );
+    invalidator.invalidate();
+  }
+
+  void action(BuildContext context, FullStartupModel startup) async {
+    final invalidator = Provider.of<DataInvalidator>(context, listen: false);
+    await StartupDeveloperVotingRoute(startupId: startup.id).push(context);
     invalidator.invalidate();
   }
 
   @override
   Widget build(BuildContext context) {
     final startup = Provider.of<FullStartupModel>(context);
-    final developerVoting =
-        startup.status >= StartupStatus.developerVoting ? {} : null;
+    final developerVoting = startup.status >= StartupStatus.developerVoting
+        ? startup.developerVoting
+        : null;
     if (developerVoting == null) {
       return Container();
     }
@@ -30,8 +56,15 @@ class StartupDeveloper extends StatelessWidget {
     final processSuccess =
         startup.status >= StartupStatus.developerVoting_succeded;
     final currentUser = Provider.of<ProfileService>(context).currentUser;
-    final ableToAct = currentUser is Expert ||
-        (currentUser != null && startup.startuper.id == currentUser.id);
+    final ableToAct = (startup.financing?.investments
+                .map((e) => e.investor.id)
+                .contains(currentUser?.id) ??
+            false) ||
+        (startup.startuper.id == currentUser?.id);
+
+    final processWaitsForConfirmation =
+        startup.status == StartupStatus.developerVoting_succeded;
+    final isStartuper = startup.startuper.id == currentUser?.id;
 
     final textTheme = Theme.of(context).textTheme;
     return Column(
@@ -43,14 +76,18 @@ class StartupDeveloper extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Developer Voting', style: textTheme.headlineSmall),
-              Text('Current leader: "developer0-ais@mail.ru"',
+              Text(
+                  'Current leader: "${developerVoting.maxApprovalApplicationsDeveloper.first.developer.shortOrgName}"',
                   style: textTheme.bodyMedium)
             ],
           ),
         ),
-        const ListTile(title: Text('developer2-ais@mail.ru / 42%')),
-        const ListTile(title: Text('developer1-ais@mail.ru / 78%')),
-        const ListTile(title: Text('developer0-ais@mail.ru / 85%')),
+        ...developerVoting.applicationsDeveloper.map(
+          (application) => ListTile(
+            title: Text(
+                '${application.developer.shortOrgName} / ${(application.approval * 100).round()}%'),
+          ),
+        ),
         ListTile(
           title: Text(
             processOngoing
@@ -67,19 +104,36 @@ class StartupDeveloper extends StatelessWidget {
             ),
           ),
         ),
-        processOngoing && ableToAct
-            ? Card(
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Choose who you prefer',
-                      style: textTheme.bodyLarge,
-                    ),
+        if (processWaitsForConfirmation && isStartuper)
+          Card(
+            child: InkWell(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Hire developer with max approval!',
+                    style: textTheme.bodyLarge,
                   ),
                 ),
-              )
-            : Container(),
+              ),
+              onTap: () => confirm(context, startup),
+            ),
+          ),
+        if (processOngoing && ableToAct)
+          Card(
+            child: InkWell(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Choose who you prefer',
+                    style: textTheme.bodyLarge,
+                  ),
+                ),
+              ),
+              onTap: () => action(context, startup),
+            ),
+          ),
       ],
     );
   }

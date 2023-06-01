@@ -43,6 +43,11 @@ class UserPage extends StatelessWidget {
                           style: textTheme.headlineMedium,
                           textAlign: TextAlign.center,
                         ),
+                        Text(
+                          'Current balance: ${user.balance}',
+                          style: textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
                         TextButton(
                           onPressed: () => Provider.of<ProfileService>(context,
                                   listen: false)
@@ -56,6 +61,12 @@ class UserPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 32),
+              Card(
+                child: ListTile(
+                  title: const Text('Deposit money'),
+                  onTap: () => const DepositRoute().go(context),
+                ),
+              ),
               Card(
                 child: ListTile(
                   title: const Text('My investments'),

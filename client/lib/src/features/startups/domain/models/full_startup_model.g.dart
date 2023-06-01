@@ -28,12 +28,20 @@ _$_FullStartupModel _$$_FullStartupModelFromJson(Map<String, dynamic> json) =>
               json['verification_failed'] as Map<String, dynamic>),
       verificationSucceded:
           json['verification_succeded'] as Map<String, dynamic>?,
-      financing: json['financing'] as Map<String, dynamic>?,
+      financing: json['financing'] == null
+          ? null
+          : StartupFinancingResponse.fromJson(
+              json['financing'] as Map<String, dynamic>),
       financingFailed: json['financing_failed'] as Map<String, dynamic>?,
       financingSucceded: json['financing_succeded'] as Map<String, dynamic>?,
-      developerApplication:
-          json['developerApplication'] as Map<String, dynamic>?,
-      developerVoting: json['developerVoting'] as Map<String, dynamic>?,
+      developerApplication: json['developerApplication'] == null
+          ? null
+          : StartupDeveloperApplicationsResponse.fromJson(
+              json['developerApplication'] as Map<String, dynamic>),
+      developerVoting: json['developerVoting'] == null
+          ? null
+          : StartupDeveloperVotingResponse.fromJson(
+              json['developerVoting'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$_FullStartupModelToJson(_$_FullStartupModel instance) =>

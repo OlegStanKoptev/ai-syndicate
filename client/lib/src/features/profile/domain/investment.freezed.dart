@@ -20,9 +20,9 @@ Investment _$InvestmentFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Investment {
+  String get id => throw _privateConstructorUsedError;
   String get startupId => throw _privateConstructorUsedError;
   int get amount => throw _privateConstructorUsedError;
-  DateTime get date => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -36,7 +36,7 @@ abstract class $InvestmentCopyWith<$Res> {
           Investment value, $Res Function(Investment) then) =
       _$InvestmentCopyWithImpl<$Res, Investment>;
   @useResult
-  $Res call({String startupId, int amount, DateTime date});
+  $Res call({String id, String startupId, int amount});
 }
 
 /// @nodoc
@@ -52,11 +52,15 @@ class _$InvestmentCopyWithImpl<$Res, $Val extends Investment>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? startupId = null,
     Object? amount = null,
-    Object? date = null,
   }) {
     return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       startupId: null == startupId
           ? _value.startupId
           : startupId // ignore: cast_nullable_to_non_nullable
@@ -65,10 +69,6 @@ class _$InvestmentCopyWithImpl<$Res, $Val extends Investment>
           ? _value.amount
           : amount // ignore: cast_nullable_to_non_nullable
               as int,
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
     ) as $Val);
   }
 }
@@ -81,7 +81,7 @@ abstract class _$$_InvestmentCopyWith<$Res>
       __$$_InvestmentCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String startupId, int amount, DateTime date});
+  $Res call({String id, String startupId, int amount});
 }
 
 /// @nodoc
@@ -95,11 +95,15 @@ class __$$_InvestmentCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? startupId = null,
     Object? amount = null,
-    Object? date = null,
   }) {
     return _then(_$_Investment(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       startupId: null == startupId
           ? _value.startupId
           : startupId // ignore: cast_nullable_to_non_nullable
@@ -108,10 +112,6 @@ class __$$_InvestmentCopyWithImpl<$Res>
           ? _value.amount
           : amount // ignore: cast_nullable_to_non_nullable
               as int,
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
     ));
   }
 }
@@ -120,21 +120,21 @@ class __$$_InvestmentCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_Investment implements _Investment {
   const _$_Investment(
-      {required this.startupId, required this.amount, required this.date});
+      {required this.id, required this.startupId, required this.amount});
 
   factory _$_Investment.fromJson(Map<String, dynamic> json) =>
       _$$_InvestmentFromJson(json);
 
   @override
+  final String id;
+  @override
   final String startupId;
   @override
   final int amount;
-  @override
-  final DateTime date;
 
   @override
   String toString() {
-    return 'Investment(startupId: $startupId, amount: $amount, date: $date)';
+    return 'Investment(id: $id, startupId: $startupId, amount: $amount)';
   }
 
   @override
@@ -142,15 +142,15 @@ class _$_Investment implements _Investment {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_Investment &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.startupId, startupId) ||
                 other.startupId == startupId) &&
-            (identical(other.amount, amount) || other.amount == amount) &&
-            (identical(other.date, date) || other.date == date));
+            (identical(other.amount, amount) || other.amount == amount));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, startupId, amount, date);
+  int get hashCode => Object.hash(runtimeType, id, startupId, amount);
 
   @JsonKey(ignore: true)
   @override
@@ -168,19 +168,19 @@ class _$_Investment implements _Investment {
 
 abstract class _Investment implements Investment {
   const factory _Investment(
-      {required final String startupId,
-      required final int amount,
-      required final DateTime date}) = _$_Investment;
+      {required final String id,
+      required final String startupId,
+      required final int amount}) = _$_Investment;
 
   factory _Investment.fromJson(Map<String, dynamic> json) =
       _$_Investment.fromJson;
 
   @override
+  String get id;
+  @override
   String get startupId;
   @override
   int get amount;
-  @override
-  DateTime get date;
   @override
   @JsonKey(ignore: true)
   _$$_InvestmentCopyWith<_$_Investment> get copyWith =>

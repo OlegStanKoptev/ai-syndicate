@@ -20,7 +20,8 @@ class UserRegistrationPage extends HookWidget {
     if (formContext.key.currentState!.validate()) {
       try {
         formContext.loading.value = true;
-        await Provider.of<AuthService>(context, listen: false).joinAsUser(
+        final authService = Provider.of<AuthService>(context, listen: false);
+        await authService.joinAsUser(
           user: NewUserModel(
             email: formContext.email.text,
             password: formContext.password.text,
@@ -30,11 +31,15 @@ class UserRegistrationPage extends HookWidget {
             fullName: formContext.name.text,
           ),
         );
+        await authService.login(
+          email: formContext.email.text,
+          password: formContext.password.text,
+        );
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('You have successfully registered!'),
           ));
-          const LoginRoute().go(context);
+          const ProfileRoute().go(context);
         }
       } catch (e) {
         formContext.error.value = e.toString();

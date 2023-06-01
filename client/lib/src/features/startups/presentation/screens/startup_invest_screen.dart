@@ -1,33 +1,42 @@
 import 'package:client/src/features/authentication/presentation/widgets/custom_form_field.dart';
 import 'package:client/src/features/startups/application/startup_service.dart';
-import 'package:client/src/utils/future_data_consumer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class StartupInvestScreen extends StatelessWidget {
+class StartupInvestScreen extends HookWidget {
   final String startupId;
   const StartupInvestScreen({super.key, required this.startupId});
 
   void invest(BuildContext context, String startupId, String amount) async {
-    final startupService = Provider.of<StartupService>(context);
-    final invalidate = Provider.of<DataInvalidator>(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     final intAmount = int.tryParse(amount);
-    if (intAmount != null) {
-      await startupService.investInStartup(id: startupId, amount: intAmount);
+    if (intAmount == null || intAmount == 0) {
+      scaffoldMessenger.showSnackBar(const SnackBar(
+        content: Text('Enter a valid number'),
+      ));
+      return;
     }
-    if (context.mounted) {
-      context.pop();
-      invalidate.invalidate();
+    final startupService = Provider.of<StartupService>(context, listen: false);
+    try {
+      await startupService.financingInvest(id: startupId, amount: intAmount);
+      scaffoldMessenger.showSnackBar(SnackBar(
+        content: Text('Successfully invested $intAmount'),
+      ));
+      if (context.mounted) {
+        context.pop();
+      }
+    } catch (e) {
+      scaffoldMessenger.showSnackBar(const SnackBar(
+        content: Text('Issue occurred'),
+      ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final amount = useTextEditingController();
-    final allowInvesting =
-        amount.text.isNotEmpty && int.tryParse(amount.text) != null;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Startup investment'),
@@ -44,9 +53,7 @@ class StartupInvestScreen extends StatelessWidget {
                 validator: (val) => val != null ? null : 'Enter valid reason',
               ),
               ElevatedButton(
-                onPressed: allowInvesting
-                    ? () => invest(context, startupId, amount.text)
-                    : null,
+                onPressed: () => invest(context, startupId, amount.text),
                 child: const Text('Invest'),
               )
             ],

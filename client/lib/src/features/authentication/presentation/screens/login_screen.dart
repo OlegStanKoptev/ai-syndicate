@@ -22,7 +22,7 @@ class LoginScreen extends HookWidget {
           const ProfileRoute().go(context);
         }
       } catch (e) {
-        formContext.error.value = e.toString();
+        formContext.error.value = "Email or password is incorrect";
       } finally {
         formContext.loading.value = false;
       }

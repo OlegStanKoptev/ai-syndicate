@@ -6,9 +6,9 @@ part 'investment.freezed.dart';
 @freezed
 sealed class Investment with _$Investment {
   const factory Investment({
+    required String id,
     required String startupId,
     required int amount,
-    required DateTime date,
   }) = _Investment;
 
   factory Investment.fromJson(Map<String, Object?> json) =>

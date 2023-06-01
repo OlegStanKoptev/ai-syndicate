@@ -1,6 +1,7 @@
 import 'package:client/src/features/authentication/presentation/widgets/custom_form_field.dart';
+import 'package:client/src/features/profile/application/profile_service.dart';
 import 'package:client/src/features/startups/application/startup_service.dart';
-import 'package:client/src/features/startups/domain/models/verification_model.dart';
+import 'package:client/src/features/startups/domain/models/vote_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -17,13 +18,43 @@ class StartupVerificationScreen extends HookWidget {
     VerificationDecision? decision,
     String nayReason,
   ) async {
-    final startupService = Provider.of<StartupService>(context);
-    final vote = decision == VerificationDecision.yea
-        ? const Yea()
-        : Nay(reason: nayReason);
-    await startupService.verifyStartup(id: startupId, vote: vote);
-    if (context.mounted) {
-      context.pop();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    if (decision == null ||
+        (decision == VerificationDecision.nay && nayReason.isEmpty)) {
+      scaffoldMessenger.showSnackBar(const SnackBar(
+        content: Text('Not all fields have valid values'),
+      ));
+      return;
+    }
+
+    final startupService = Provider.of<StartupService>(context, listen: false);
+    final profileService = Provider.of<ProfileService>(context, listen: false);
+    final vote = StartupVote(
+      yea: decision == VerificationDecision.yea,
+      nayReason: nayReason.isEmpty ? null : nayReason,
+    );
+    try {
+      final response =
+          await startupService.verificationVote(id: startupId, vote: vote);
+      final success = response.statusCode == 200;
+      await profileService.updateCurrentUser();
+
+      if (context.mounted) {
+        if (success) {
+          scaffoldMessenger.showSnackBar(const SnackBar(
+            content: Text('You have successfully voted!'),
+          ));
+          context.pop();
+        } else {
+          scaffoldMessenger.showSnackBar(const SnackBar(
+            content: Text('Issue occurred when voting'),
+          ));
+        }
+      }
+    } catch (e) {
+      scaffoldMessenger.showSnackBar(const SnackBar(
+        content: Text('An issue occurred...'),
+      ));
     }
   }
 
@@ -31,9 +62,6 @@ class StartupVerificationScreen extends HookWidget {
   Widget build(BuildContext context) {
     final decision = useState<VerificationDecision?>(null);
     final nayReason = useTextEditingController();
-    final allowVoting = decision.value == VerificationDecision.yea ||
-        (decision.value == VerificationDecision.nay &&
-            nayReason.text.isNotEmpty);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Startup verification'),
@@ -63,9 +91,7 @@ class StartupVerificationScreen extends HookWidget {
                   validator: (val) => val != null ? null : 'Enter valid reason',
                 ),
               ElevatedButton(
-                onPressed: allowVoting
-                    ? () => vote(context, decision.value, nayReason.text)
-                    : null,
+                onPressed: () => vote(context, decision.value, nayReason.text),
                 child: const Text('Place vote'),
               )
             ],
