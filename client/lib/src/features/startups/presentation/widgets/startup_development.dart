@@ -1,7 +1,6 @@
 import 'package:client/src/features/profile/application/profile_service.dart';
 import 'package:client/src/features/profile/domain/user_model.dart';
 import 'package:client/src/features/startups/application/startup_service.dart';
-import 'package:client/src/features/startups/domain/models/developer_voting_confirm_model.dart';
 import 'package:client/src/features/startups/domain/models/full_startup_model.dart';
 import 'package:client/src/routing/routes.dart';
 import 'package:client/src/utils/enum_extension.dart';
@@ -15,25 +14,7 @@ class StartupDevelopment extends StatelessWidget {
   void confirm(BuildContext context, FullStartupModel startup) async {
     final startupService = Provider.of<StartupService>(context, listen: false);
     final invalidator = Provider.of<DataInvalidator>(context, listen: false);
-    final applicationDeveloperId =
-        startup.developerVoting?.maxApprovalApplicationsDeveloper.first.id;
-    final deadline = await showDatePicker(
-      context: context,
-      helpText: 'Development deadline',
-      initialDate: DateTime.now().add(const Duration(days: 1)),
-      firstDate: DateTime.now().add(const Duration(days: 1)),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (deadline == null || applicationDeveloperId == null) {
-      return;
-    }
-    await startupService.developerVotingSuccessConfirm(
-      id: startup.id,
-      confirmModel: DeveloperVotingConfirmModel(
-        developmentDeadline: deadline,
-        applicationDeveloperId: applicationDeveloperId,
-      ),
-    );
+    await startupService.developmentSuccessConfirm(id: startup.id);
     invalidator.invalidate();
   }
 
@@ -56,6 +37,12 @@ class StartupDevelopment extends StatelessWidget {
     final currentUser = Provider.of<ProfileService>(context).currentUser;
     final ableToAct = currentUser is Developer;
 
+    final processWaitsForConfirmation =
+        startup.status == StartupStatus.development_succeded;
+    final isStartuper = startup.startuper.id == currentUser?.id;
+
+    // final alreadySentReport = startup
+
     final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +60,7 @@ class StartupDevelopment extends StatelessWidget {
             processOngoing
                 ? 'Development is undergoing!'
                 : processSuccess
-                    ? 'Development has been finished!'
+                    ? 'Development has finished!'
                     : 'Development has been halted',
             style: TextStyle(
               color: processOngoing
@@ -84,19 +71,36 @@ class StartupDevelopment extends StatelessWidget {
             ),
           ),
         ),
-        processOngoing && ableToAct
-            ? Card(
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Send in a new report',
-                      style: textTheme.bodyLarge,
-                    ),
+        if (processWaitsForConfirmation && isStartuper)
+          Card(
+            child: InkWell(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Finish the project!',
+                    style: textTheme.bodyLarge,
                   ),
                 ),
-              )
-            : Container(),
+              ),
+              onTap: () => confirm(context, startup),
+            ),
+          ),
+        if (processOngoing && ableToAct)
+          Card(
+            child: InkWell(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Send in a new report',
+                    style: textTheme.bodyLarge,
+                  ),
+                ),
+              ),
+              onTap: () => action(context, startup),
+            ),
+          ),
       ],
     );
   }

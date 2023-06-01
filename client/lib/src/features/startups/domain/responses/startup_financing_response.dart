@@ -1,4 +1,3 @@
-import 'package:client/src/features/profile/domain/investment.dart';
 import 'package:client/src/features/startups/domain/responses/startup_investment_response.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

@@ -31,6 +31,10 @@ RouteBase get $homeRoute => GoRouteData.$route(
               factory: $MyStartupsRouteExtension._fromState,
             ),
             GoRouteData.$route(
+              path: 'my-developing-startups',
+              factory: $MyDevelopingStartupsRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
               path: 'my-investments',
               factory: $MyInvestmentsRouteExtension._fromState,
             ),
@@ -158,6 +162,22 @@ extension $MyStartupsRouteExtension on MyStartupsRoute {
 
   String get location => GoRouteData.$location(
         '/profile/my-startups',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
+extension $MyDevelopingStartupsRouteExtension on MyDevelopingStartupsRoute {
+  static MyDevelopingStartupsRoute _fromState(GoRouterState state) =>
+      const MyDevelopingStartupsRoute();
+
+  String get location => GoRouteData.$location(
+        '/profile/my-developing-startups',
       );
 
   void go(BuildContext context) => context.go(location);

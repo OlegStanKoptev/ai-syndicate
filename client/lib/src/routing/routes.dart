@@ -5,6 +5,7 @@ import 'package:client/src/features/authentication/presentation/screens/login_sc
 import 'package:client/src/features/authentication/presentation/screens/registration_screen.dart';
 import 'package:client/src/features/profile/application/profile_service.dart';
 import 'package:client/src/features/profile/presentation/screens/deposit_screen.dart';
+import 'package:client/src/features/profile/presentation/screens/developed_startup.dart';
 import 'package:client/src/features/profile/presentation/screens/my_applications.dart';
 import 'package:client/src/features/profile/presentation/screens/my_investments_screen.dart';
 import 'package:client/src/features/profile/presentation/screens/my_startups_screen.dart';
@@ -38,6 +39,7 @@ FutureOr<String?> authenticationRequired(BuildContext context) =>
     TypedGoRoute<DepositRoute>(path: 'deposit'),
     TypedGoRoute<NewStartupRoute>(path: 'new-startup'),
     TypedGoRoute<MyStartupsRoute>(path: 'my-startups'),
+    TypedGoRoute<MyDevelopingStartupsRoute>(path: 'my-developing-startups'),
     TypedGoRoute<MyInvestmentsRoute>(path: 'my-investments'),
     TypedGoRoute<MyApplicationsRoute>(path: 'my-applications'),
     TypedGoRoute<StartupsToBeVerifiedRoute>(path: 'startups-to-verify'),
@@ -173,6 +175,19 @@ class MyApplicationsRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const MyApplicationsScreen();
+
+  @override
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>
+      authenticationRequired(context);
+}
+
+@immutable
+class MyDevelopingStartupsRoute extends GoRouteData {
+  const MyDevelopingStartupsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const DevelopedStartupsScreen();
 
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>

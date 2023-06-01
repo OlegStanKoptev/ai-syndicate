@@ -16,13 +16,19 @@ class StartupVerification extends StatelessWidget {
   void confirm(BuildContext context, FullStartupModel startup) async {
     final startupService = Provider.of<StartupService>(context, listen: false);
     final invalidator = Provider.of<DataInvalidator>(context, listen: false);
+    final deadline = await showDatePicker(
+      context: context,
+      helpText: 'Financing deadline',
+      initialDate: DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now().add(const Duration(days: 1)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (deadline == null) {
+      return;
+    }
     await startupService.verificationSuccessConfirm(
       id: startup.id,
-      confirm: VerificationConfirmModel(
-        financingDeadline: DateTime.now().add(
-          const Duration(days: 7),
-        ),
-      ),
+      confirm: VerificationConfirmModel(financingDeadline: deadline),
     );
     invalidator.invalidate();
   }

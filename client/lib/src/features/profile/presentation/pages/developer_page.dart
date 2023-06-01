@@ -48,6 +48,12 @@ class DeveloperPage extends StatelessWidget {
                   onTap: () => const MyApplicationsRoute().go(context),
                 ),
               ),
+              Card(
+                child: ListTile(
+                  title: const Text('Startups in development'),
+                  onTap: () => const MyDevelopingStartupsRoute().go(context),
+                ),
+              ),
             ],
           ),
         ),
