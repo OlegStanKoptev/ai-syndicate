@@ -12,8 +12,6 @@ class StartupDescription extends StatelessWidget {
     final startup = Provider.of<FullStartupModel>(context);
     final logoFile = startup.logoFile;
 
-    final finished = startup.status == StartupStatus.finished;
-
     final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

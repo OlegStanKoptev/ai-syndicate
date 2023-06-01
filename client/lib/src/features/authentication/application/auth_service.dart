@@ -13,10 +13,7 @@ class AuthService {
   }) {
     return dio.post(
       '/api/user/login',
-      data: {
-        'email': email,
-        'password': password,
-      },
+      data: {'email': email, 'password': password, 'rememberMe': true},
     ).then((response) {
       if (response.statusCode == 200) {
         return profileService.updateCurrentUser();
