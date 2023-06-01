@@ -49,6 +49,8 @@ mixin _$FullStartupModel {
       throw _privateConstructorUsedError;
   StartupDeveloperVotingResponse? get developerVoting =>
       throw _privateConstructorUsedError;
+  StartupDevelopmentResponse? get development =>
+      throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -84,13 +86,15 @@ abstract class $FullStartupModelCopyWith<$Res> {
       @JsonKey(name: 'financing_succeded')
           Map<String, Object?>? financingSucceded,
       StartupDeveloperApplicationsResponse? developerApplication,
-      StartupDeveloperVotingResponse? developerVoting});
+      StartupDeveloperVotingResponse? developerVoting,
+      StartupDevelopmentResponse? development});
 
   $StartupVerificationResponseCopyWith<$Res>? get verification;
   $StartupVerificationFailedResponseCopyWith<$Res>? get verificationFailed;
   $StartupFinancingResponseCopyWith<$Res>? get financing;
   $StartupDeveloperApplicationsResponseCopyWith<$Res>? get developerApplication;
   $StartupDeveloperVotingResponseCopyWith<$Res>? get developerVoting;
+  $StartupDevelopmentResponseCopyWith<$Res>? get development;
 }
 
 /// @nodoc
@@ -124,6 +128,7 @@ class _$FullStartupModelCopyWithImpl<$Res, $Val extends FullStartupModel>
     Object? financingSucceded = freezed,
     Object? developerApplication = freezed,
     Object? developerVoting = freezed,
+    Object? development = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -198,6 +203,10 @@ class _$FullStartupModelCopyWithImpl<$Res, $Val extends FullStartupModel>
           ? _value.developerVoting
           : developerVoting // ignore: cast_nullable_to_non_nullable
               as StartupDeveloperVotingResponse?,
+      development: freezed == development
+          ? _value.development
+          : development // ignore: cast_nullable_to_non_nullable
+              as StartupDevelopmentResponse?,
     ) as $Val);
   }
 
@@ -265,6 +274,19 @@ class _$FullStartupModelCopyWithImpl<$Res, $Val extends FullStartupModel>
       return _then(_value.copyWith(developerVoting: value) as $Val);
     });
   }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $StartupDevelopmentResponseCopyWith<$Res>? get development {
+    if (_value.development == null) {
+      return null;
+    }
+
+    return $StartupDevelopmentResponseCopyWith<$Res>(_value.development!,
+        (value) {
+      return _then(_value.copyWith(development: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -297,7 +319,8 @@ abstract class _$$_FullStartupModelCopyWith<$Res>
       @JsonKey(name: 'financing_succeded')
           Map<String, Object?>? financingSucceded,
       StartupDeveloperApplicationsResponse? developerApplication,
-      StartupDeveloperVotingResponse? developerVoting});
+      StartupDeveloperVotingResponse? developerVoting,
+      StartupDevelopmentResponse? development});
 
   @override
   $StartupVerificationResponseCopyWith<$Res>? get verification;
@@ -309,6 +332,8 @@ abstract class _$$_FullStartupModelCopyWith<$Res>
   $StartupDeveloperApplicationsResponseCopyWith<$Res>? get developerApplication;
   @override
   $StartupDeveloperVotingResponseCopyWith<$Res>? get developerVoting;
+  @override
+  $StartupDevelopmentResponseCopyWith<$Res>? get development;
 }
 
 /// @nodoc
@@ -340,6 +365,7 @@ class __$$_FullStartupModelCopyWithImpl<$Res>
     Object? financingSucceded = freezed,
     Object? developerApplication = freezed,
     Object? developerVoting = freezed,
+    Object? development = freezed,
   }) {
     return _then(_$_FullStartupModel(
       id: null == id
@@ -414,6 +440,10 @@ class __$$_FullStartupModelCopyWithImpl<$Res>
           ? _value.developerVoting
           : developerVoting // ignore: cast_nullable_to_non_nullable
               as StartupDeveloperVotingResponse?,
+      development: freezed == development
+          ? _value.development
+          : development // ignore: cast_nullable_to_non_nullable
+              as StartupDevelopmentResponse?,
     ));
   }
 }
@@ -443,7 +473,8 @@ class _$_FullStartupModel implements _FullStartupModel {
       @JsonKey(name: 'financing_succeded')
           final Map<String, Object?>? financingSucceded,
       this.developerApplication,
-      this.developerVoting})
+      this.developerVoting,
+      this.development})
       : _verificationSucceded = verificationSucceded,
         _financingFailed = financingFailed,
         _financingSucceded = financingSucceded;
@@ -517,10 +548,12 @@ class _$_FullStartupModel implements _FullStartupModel {
   final StartupDeveloperApplicationsResponse? developerApplication;
   @override
   final StartupDeveloperVotingResponse? developerVoting;
+  @override
+  final StartupDevelopmentResponse? development;
 
   @override
   String toString() {
-    return 'FullStartupModel(id: $id, status: $status, startuper: $startuper, targetFinancing: $targetFinancing, name: $name, description: $description, logoFile: $logoFile, specificationFile: $specificationFile, businessPlanFile: $businessPlanFile, presentationFile: $presentationFile, verification: $verification, verificationFailed: $verificationFailed, verificationSucceded: $verificationSucceded, financing: $financing, financingFailed: $financingFailed, financingSucceded: $financingSucceded, developerApplication: $developerApplication, developerVoting: $developerVoting)';
+    return 'FullStartupModel(id: $id, status: $status, startuper: $startuper, targetFinancing: $targetFinancing, name: $name, description: $description, logoFile: $logoFile, specificationFile: $specificationFile, businessPlanFile: $businessPlanFile, presentationFile: $presentationFile, verification: $verification, verificationFailed: $verificationFailed, verificationSucceded: $verificationSucceded, financing: $financing, financingFailed: $financingFailed, financingSucceded: $financingSucceded, developerApplication: $developerApplication, developerVoting: $developerVoting, development: $development)';
   }
 
   @override
@@ -559,31 +592,35 @@ class _$_FullStartupModel implements _FullStartupModel {
             (identical(other.developerApplication, developerApplication) ||
                 other.developerApplication == developerApplication) &&
             (identical(other.developerVoting, developerVoting) ||
-                other.developerVoting == developerVoting));
+                other.developerVoting == developerVoting) &&
+            (identical(other.development, development) ||
+                other.development == development));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      status,
-      const DeepCollectionEquality().hash(startuper),
-      targetFinancing,
-      name,
-      description,
-      logoFile,
-      specificationFile,
-      businessPlanFile,
-      presentationFile,
-      verification,
-      verificationFailed,
-      const DeepCollectionEquality().hash(_verificationSucceded),
-      financing,
-      const DeepCollectionEquality().hash(_financingFailed),
-      const DeepCollectionEquality().hash(_financingSucceded),
-      developerApplication,
-      developerVoting);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        status,
+        const DeepCollectionEquality().hash(startuper),
+        targetFinancing,
+        name,
+        description,
+        logoFile,
+        specificationFile,
+        businessPlanFile,
+        presentationFile,
+        verification,
+        verificationFailed,
+        const DeepCollectionEquality().hash(_verificationSucceded),
+        financing,
+        const DeepCollectionEquality().hash(_financingFailed),
+        const DeepCollectionEquality().hash(_financingSucceded),
+        developerApplication,
+        developerVoting,
+        development
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -601,29 +638,29 @@ class _$_FullStartupModel implements _FullStartupModel {
 
 abstract class _FullStartupModel implements FullStartupModel {
   factory _FullStartupModel(
-          {required final String id,
-          required final StartupStatus status,
-          required final User startuper,
-          required final int targetFinancing,
-          required final String name,
-          required final String description,
-          final String? logoFile,
-          required final String specificationFile,
-          final String? businessPlanFile,
-          final String? presentationFile,
-          final StartupVerificationResponse? verification,
-          @JsonKey(name: 'verification_failed')
-              final StartupVerificationFailedResponse? verificationFailed,
-          @JsonKey(name: 'verification_succeded')
-              final Map<String, Object?>? verificationSucceded,
-          final StartupFinancingResponse? financing,
-          @JsonKey(name: 'financing_failed')
-              final Map<String, Object?>? financingFailed,
-          @JsonKey(name: 'financing_succeded')
-              final Map<String, Object?>? financingSucceded,
-          final StartupDeveloperApplicationsResponse? developerApplication,
-          final StartupDeveloperVotingResponse? developerVoting}) =
-      _$_FullStartupModel;
+      {required final String id,
+      required final StartupStatus status,
+      required final User startuper,
+      required final int targetFinancing,
+      required final String name,
+      required final String description,
+      final String? logoFile,
+      required final String specificationFile,
+      final String? businessPlanFile,
+      final String? presentationFile,
+      final StartupVerificationResponse? verification,
+      @JsonKey(name: 'verification_failed')
+          final StartupVerificationFailedResponse? verificationFailed,
+      @JsonKey(name: 'verification_succeded')
+          final Map<String, Object?>? verificationSucceded,
+      final StartupFinancingResponse? financing,
+      @JsonKey(name: 'financing_failed')
+          final Map<String, Object?>? financingFailed,
+      @JsonKey(name: 'financing_succeded')
+          final Map<String, Object?>? financingSucceded,
+      final StartupDeveloperApplicationsResponse? developerApplication,
+      final StartupDeveloperVotingResponse? developerVoting,
+      final StartupDevelopmentResponse? development}) = _$_FullStartupModel;
 
   factory _FullStartupModel.fromJson(Map<String, dynamic> json) =
       _$_FullStartupModel.fromJson;
@@ -668,6 +705,8 @@ abstract class _FullStartupModel implements FullStartupModel {
   StartupDeveloperApplicationsResponse? get developerApplication;
   @override
   StartupDeveloperVotingResponse? get developerVoting;
+  @override
+  StartupDevelopmentResponse? get development;
   @override
   @JsonKey(ignore: true)
   _$$_FullStartupModelCopyWith<_$_FullStartupModel> get copyWith =>

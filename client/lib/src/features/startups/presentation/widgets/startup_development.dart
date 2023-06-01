@@ -27,7 +27,9 @@ class StartupDevelopment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final startup = Provider.of<FullStartupModel>(context);
-    final development = startup.status >= StartupStatus.development ? {} : null;
+    final development = startup.status >= StartupStatus.development
+        ? startup.development
+        : null;
     if (development == null) {
       return Container();
     }
@@ -49,10 +51,16 @@ class StartupDevelopment extends StatelessWidget {
           padding: const EdgeInsets.only(top: 16),
           child: Text('Development', style: textTheme.headlineSmall),
         ),
-        const ListTile(
-          title: Text('Latest report'),
-          subtitle: Text('reportFile.docx'),
-        ),
+        ...development.reports
+            .map(
+              (report) => ListTile(
+                title: Text('Report ${report.reportFile}'),
+                subtitle: Text(
+                  '${report.yeas} liked it, ${report.nays} disliked it',
+                ),
+              ),
+            )
+            .toList(),
         ListTile(
           title: Text(
             processOngoing

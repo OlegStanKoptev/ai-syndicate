@@ -1,8 +1,20 @@
-import 'dart:io';
 import 'package:client/src/features/authentication/presentation/utils/file_controller.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+
+class DataFile {
+  final String? path;
+  final String fileName;
+  final Uint8List? bytes;
+
+  DataFile({
+    required this.path,
+    required this.bytes,
+    required this.fileName,
+  });
+}
 
 class CustomImageFormField extends HookWidget {
   const CustomImageFormField({
@@ -10,17 +22,19 @@ class CustomImageFormField extends HookWidget {
     required this.controller,
     required this.validator,
     this.hintText,
+    this.fileType,
   });
 
   final FileController? controller;
-  final String? Function(File?) validator;
+  final String? Function(DataFile?) validator;
   final String? hintText;
+  final FileType? fileType;
 
   @override
   Widget build(BuildContext context) {
-    final pickedFile = useState<File?>(null);
+    final pickedFile = useState<DataFile?>(null);
     final touched = useState(false);
-    return FormField<File>(
+    return FormField<DataFile>(
       validator: validator,
       builder: (formFieldState) {
         return Column(
@@ -30,10 +44,17 @@ class CustomImageFormField extends HookWidget {
               onTapUp: (_) => touched.value = false,
               onTapCancel: () => touched.value = false,
               onTap: () async {
-                FilePickerResult? file = await FilePicker.platform
-                    .pickFiles(type: FileType.image, allowMultiple: false);
-                if (file != null) {
-                  pickedFile.value = File(file.files.first.path!);
+                FilePickerResult? file = await FilePicker.platform.pickFiles(
+                    type: fileType ?? FileType.image, allowMultiple: false);
+                final filePath = file?.files.first.path;
+                final platformFileData = file?.files.first.bytes;
+                final fileName = file?.files.first.name;
+                if (fileName != null) {
+                  pickedFile.value = DataFile(
+                    path: filePath,
+                    bytes: platformFileData,
+                    fileName: fileName,
+                  );
                   formFieldState.didChange(pickedFile.value!);
                   controller?.onChanged(pickedFile.value!);
                 }

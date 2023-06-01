@@ -3,6 +3,7 @@
 import 'package:client/src/features/profile/domain/user_model.dart';
 import 'package:client/src/features/startups/domain/responses/startup_developer_applications_response.dart';
 import 'package:client/src/features/startups/domain/responses/startup_developer_voting_response.dart';
+import 'package:client/src/features/startups/domain/responses/startup_development_response.dart';
 import 'package:client/src/features/startups/domain/responses/startup_financing_response.dart';
 import 'package:client/src/features/startups/domain/responses/startup_verification_failed_response.dart';
 import 'package:client/src/features/startups/domain/responses/startup_verification_response.dart';
@@ -70,6 +71,7 @@ class FullStartupModel with _$FullStartupModel {
         Map<String, Object?>? financingSucceded,
     StartupDeveloperApplicationsResponse? developerApplication,
     StartupDeveloperVotingResponse? developerVoting,
+    StartupDevelopmentResponse? development,
   }) = _FullStartupModel;
 
   factory FullStartupModel.fromJson(Map<String, dynamic> json) =>

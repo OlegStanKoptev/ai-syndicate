@@ -6,6 +6,7 @@ import 'package:client/src/features/authentication/presentation/utils/string_ext
 import 'package:client/src/features/authentication/presentation/widgets/custom_form_field.dart';
 import 'package:client/src/features/authentication/presentation/widgets/custom_image_form_field.dart';
 import 'package:client/src/routing/routes.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
@@ -41,8 +42,8 @@ class UserRegistrationPage extends HookWidget {
           ));
           const ProfileRoute().go(context);
         }
-      } catch (e) {
-        formContext.error.value = e.toString();
+      } on DioError catch (e) {
+        formContext.error.value = e.response?.data['message'] ?? e.toString();
       } finally {
         formContext.loading.value = false;
       }

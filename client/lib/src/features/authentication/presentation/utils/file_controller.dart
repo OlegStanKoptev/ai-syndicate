@@ -1,15 +1,14 @@
-import 'dart:io';
-
+import 'package:client/src/features/authentication/presentation/widgets/custom_image_form_field.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 class FileController {
-  File? chosenFile;
+  DataFile? chosenFile;
   FileController({this.chosenFile});
-  void onChanged(File? file) {
+  void onChanged(DataFile? file) {
     chosenFile = file;
   }
 }
 
-FileController useFileController([File? initialData]) {
+FileController useFileController([DataFile? initialData]) {
   return useState(FileController(chosenFile: initialData)).value;
 }

@@ -1,6 +1,10 @@
+import 'package:client/src/constants/client_configurator.dart'
+    if (dart.library.io) 'package:client/src/constants/client_configurator_platform.dart'
+    if (dart.library.html) 'package:client/src/constants/client_configurator_web.dart';
 import 'package:dio/dio.dart';
 
-final dio = Dio()..options.baseUrl = 'https://feldspar.space';
+final dio = DioConfigurator()
+    .configure(Dio()..options.baseUrl = 'https://feldspar.space');
 
 // Future<void> prepareJar() async {
 //   final Directory appDocDir = await getApplicationDocumentsDirectory();

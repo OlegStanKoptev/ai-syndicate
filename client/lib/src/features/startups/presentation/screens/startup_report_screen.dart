@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:client/src/constants/services/file_service.dart';
 import 'package:client/src/features/authentication/presentation/utils/file_controller.dart';
 import 'package:client/src/features/authentication/presentation/widgets/custom_image_form_field.dart';
@@ -13,7 +11,7 @@ class StartupReportScreen extends HookWidget {
   final String startupId;
   const StartupReportScreen({super.key, required this.startupId});
 
-  void invest(BuildContext context, String startupId, File? file) async {
+  void invest(BuildContext context, String startupId, DataFile? file) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     if (file == null) {
       scaffoldMessenger.showSnackBar(const SnackBar(

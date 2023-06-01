@@ -42,6 +42,10 @@ _$_FullStartupModel _$$_FullStartupModelFromJson(Map<String, dynamic> json) =>
           ? null
           : StartupDeveloperVotingResponse.fromJson(
               json['developerVoting'] as Map<String, dynamic>),
+      development: json['development'] == null
+          ? null
+          : StartupDevelopmentResponse.fromJson(
+              json['development'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$_FullStartupModelToJson(_$_FullStartupModel instance) =>
@@ -64,6 +68,7 @@ Map<String, dynamic> _$$_FullStartupModelToJson(_$_FullStartupModel instance) =>
       'financing_succeded': instance.financingSucceded,
       'developerApplication': instance.developerApplication,
       'developerVoting': instance.developerVoting,
+      'development': instance.development,
     };
 
 const _$StartupStatusEnumMap = {
