@@ -8,6 +8,8 @@ import {
   getCurrentApiUser,
   getNewStartupNaysTotal,
   getNewStartupYeasTotal,
+  getReportNaysTotal,
+  getReportYeasTotal,
   getStartupLeadingApplicationsDeveloper,
   getStartupTotalFinancing,
 } from "~/utils.server";
@@ -195,6 +197,21 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             approval: await getApplicationDeveloperApproval(
               applicationDeveloper.id
             ),
+          }))
+        ),
+      };
+    })(),
+    development: await (async () => {
+      if (!isStartupStatusSameOrLaterThan(startup.status, "development")) {
+        return null;
+      }
+      return {
+        developmentDeadline: startup.developmentDeadline,
+        reports: await Promise.all(
+          startup.reports.map(async (report) => ({
+            ...report,
+            yeas: await getReportYeasTotal(report.id),
+            nays: await getReportNaysTotal(report.id),
           }))
         ),
       };
