@@ -64,6 +64,10 @@ RouteBase get $homeRoute => GoRouteData.$route(
               path: 'registration',
               factory: $RegistrationRouteExtension._fromState,
             ),
+            GoRouteData.$route(
+              path: 'dev-login',
+              factory: $DevLoginRouteExtension._fromState,
+            ),
           ],
         ),
         GoRouteData.$route(
@@ -89,6 +93,10 @@ RouteBase get $homeRoute => GoRouteData.$route(
             GoRouteData.$route(
               path: 'developer-report',
               factory: $StartupDeveloperReportRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'report-voting',
+              factory: $StartupReportVotingRouteExtension._fromState,
             ),
           ],
         ),
@@ -298,6 +306,21 @@ extension $RegistrationRouteExtension on RegistrationRoute {
       context.pushReplacement(location);
 }
 
+extension $DevLoginRouteExtension on DevLoginRoute {
+  static DevLoginRoute _fromState(GoRouterState state) => const DevLoginRoute();
+
+  String get location => GoRouteData.$location(
+        '/auth/dev-login',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
 extension $StartupRouteExtension on StartupRoute {
   static StartupRoute _fromState(GoRouterState state) => StartupRoute(
         startupId: state.pathParameters['startupId']!,
@@ -396,6 +419,24 @@ extension $StartupDeveloperReportRouteExtension on StartupDeveloperReportRoute {
 
   String get location => GoRouteData.$location(
         '/startups/${Uri.encodeComponent(startupId)}/developer-report',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
+extension $StartupReportVotingRouteExtension on StartupReportVotingRoute {
+  static StartupReportVotingRoute _fromState(GoRouterState state) =>
+      StartupReportVotingRoute(
+        startupId: state.pathParameters['startupId']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/startups/${Uri.encodeComponent(startupId)}/report-voting',
       );
 
   void go(BuildContext context) => context.go(location);

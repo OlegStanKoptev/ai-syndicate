@@ -38,6 +38,11 @@ class AuthScreen extends StatelessWidget {
                     onPressed: () => const LoginRoute().go(context),
                     child: const Text('Log In'),
                   ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () => const DevLoginRoute().go(context),
+                    child: const Text('Dev Log In'),
+                  ),
                 ],
               ),
             ),

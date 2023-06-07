@@ -8,21 +8,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
-class StartupsScreen extends StatelessWidget {
+class StartupsScreen extends HookWidget {
   const StartupsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final invalidateRef = useRef<DataInvalidator?>(null);
     return Scaffold(
       appBar: AppBar(
         title: const Text('AI Syndicate'),
         actions: [
           IconButton(
-            onPressed: () => const ProfileRoute().go(context),
+            onPressed: () async {
+              await const ProfileRoute().push(context);
+              invalidateRef.value?.invalidate();
+            },
             icon: const Icon(Icons.person),
           ),
           IconButton(
-            onPressed: () => const NotificationsRoute().go(context),
+            onPressed: () {
+              const NotificationsRoute().push(context);
+              invalidateRef.value?.invalidate();
+            },
             icon: const Icon(Icons.notifications),
           )
         ],
@@ -31,11 +38,15 @@ class StartupsScreen extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 500),
           child: FutureDataConsumer(
-            load: Provider.of<StartupService>(context, listen: false)
-                .searchStartups,
-            data: (response, _) =>
-                FilteredStartupsList(startups: response.data),
-          ),
+              load: Provider.of<StartupService>(context, listen: false)
+                  .searchStartups,
+              data: (response, invalidate) {
+                invalidateRef.value = invalidate;
+                return Provider.value(
+                  value: invalidate,
+                  child: FilteredStartupsList(startups: response.data),
+                );
+              }),
         ),
       ),
     );

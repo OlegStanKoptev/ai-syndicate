@@ -11,6 +11,8 @@ class StartupDescription extends StatelessWidget {
   Widget build(BuildContext context) {
     final startup = Provider.of<FullStartupModel>(context);
     final logoFile = startup.logoFile;
+    final businessPlan = startup.businessPlanFile;
+    final presentation = startup.presentationFile;
 
     final textTheme = Theme.of(context).textTheme;
     return Column(
@@ -25,7 +27,8 @@ class StartupDescription extends StatelessWidget {
             builder: (context, fileService, child) => Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: Image.network(
-                  fileService.getFileUrl(fileName: logoFile).toString()),
+                fileService.getFileUrl(fileName: logoFile).toString(),
+              ),
             ),
           ),
         ListTile(
@@ -53,9 +56,30 @@ class StartupDescription extends StatelessWidget {
           subtitle: Text(startup.specificationFile),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => launchUrl(
-              Provider.of<FileService>(context, listen: false)
-                  .getFileUrl(fileName: startup.specificationFile)),
+            Provider.of<FileService>(context, listen: false)
+                .getFileUrl(fileName: startup.specificationFile),
+          ),
         ),
+        if (businessPlan != null)
+          ListTile(
+            title: const Text('Business Plan'),
+            subtitle: Text(businessPlan),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => launchUrl(
+              Provider.of<FileService>(context, listen: false)
+                  .getFileUrl(fileName: businessPlan),
+            ),
+          ),
+        if (presentation != null)
+          ListTile(
+            title: const Text('Presentation'),
+            subtitle: Text(presentation),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => launchUrl(
+              Provider.of<FileService>(context, listen: false)
+                  .getFileUrl(fileName: presentation),
+            ),
+          ),
       ],
     );
   }

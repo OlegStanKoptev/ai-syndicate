@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:client/src/features/authentication/presentation/auth_screen.dart';
+import 'package:client/src/features/authentication/presentation/screens/dev_login_screen.dart';
 import 'package:client/src/features/authentication/presentation/screens/login_screen.dart';
 import 'package:client/src/features/authentication/presentation/screens/registration_screen.dart';
 import 'package:client/src/features/profile/application/profile_service.dart';
@@ -17,6 +18,7 @@ import 'package:client/src/features/startups/presentation/screens/startup_develo
 import 'package:client/src/features/startups/presentation/screens/startup_developer_voting.dart';
 import 'package:client/src/features/startups/presentation/screens/startup_invest_screen.dart';
 import 'package:client/src/features/startups/presentation/screens/startup_report_screen.dart';
+import 'package:client/src/features/startups/presentation/screens/startup_report_voting_screen.dart';
 import 'package:client/src/features/startups/presentation/screens/startup_screen.dart';
 import 'package:client/src/features/startups/presentation/screens/startup_verification_screen.dart';
 import 'package:client/src/features/startups/presentation/startups_screen.dart';
@@ -48,6 +50,7 @@ FutureOr<String?> authenticationRequired(BuildContext context) =>
   TypedGoRoute<AuthRoute>(path: 'auth', routes: [
     TypedGoRoute<LoginRoute>(path: 'login'),
     TypedGoRoute<RegistrationRoute>(path: 'registration'),
+    TypedGoRoute<DevLoginRoute>(path: 'dev-login'),
   ]),
   TypedGoRoute<StartupRoute>(path: 'startups/:startupId', routes: [
     TypedGoRoute<StartupVerificationRoute>(path: 'verification'),
@@ -57,6 +60,7 @@ FutureOr<String?> authenticationRequired(BuildContext context) =>
     ),
     TypedGoRoute<StartupDeveloperVotingRoute>(path: 'developer-voting'),
     TypedGoRoute<StartupDeveloperReportRoute>(path: 'developer-report'),
+    TypedGoRoute<StartupReportVotingRoute>(path: 'report-voting'),
   ]),
 ])
 class HomeRoute extends GoRouteData {
@@ -108,6 +112,15 @@ class LoginRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const LoginScreen();
+}
+
+@immutable
+class DevLoginRoute extends GoRouteData {
+  const DevLoginRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const DevLoginScreen();
 }
 
 @immutable
@@ -284,6 +297,20 @@ class StartupDeveloperReportRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       StartupReportScreen(startupId: startupId);
+
+  @override
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>
+      authenticationRequired(context);
+}
+
+@immutable
+class StartupReportVotingRoute extends GoRouteData {
+  const StartupReportVotingRoute({required this.startupId});
+  final String startupId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      StartupReportVotingScreen(startupId: startupId);
 
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>

@@ -1,3 +1,4 @@
+import 'package:client/src/constants/services/file_service.dart';
 import 'package:client/src/features/profile/application/profile_service.dart';
 import 'package:client/src/features/profile/domain/user_model.dart';
 import 'package:client/src/features/startups/application/startup_service.dart';
@@ -7,6 +8,7 @@ import 'package:client/src/utils/enum_extension.dart';
 import 'package:client/src/utils/future_data_consumer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StartupDevelopment extends StatelessWidget {
   const StartupDevelopment({super.key});
@@ -21,6 +23,12 @@ class StartupDevelopment extends StatelessWidget {
   void action(BuildContext context, FullStartupModel startup) async {
     final invalidator = Provider.of<DataInvalidator>(context, listen: false);
     await StartupDeveloperReportRoute(startupId: startup.id).push(context);
+    invalidator.invalidate();
+  }
+
+  void vote(BuildContext context, FullStartupModel startup) async {
+    final invalidator = Provider.of<DataInvalidator>(context, listen: false);
+    await StartupReportVotingRoute(startupId: startup.id).push(context);
     invalidator.invalidate();
   }
 
@@ -43,6 +51,14 @@ class StartupDevelopment extends StatelessWidget {
         startup.status == StartupStatus.development_succeded;
     final isStartuper = startup.startuper.id == currentUser?.id;
 
+    final isExpert = currentUser is Expert;
+    final hasVoted = isExpert
+        ? currentUser.votesReport
+                ?.map((e) => e.reportId)
+                .contains(development.reports.firstOrNull?.id) ??
+            true
+        : true;
+
     final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,9 +74,29 @@ class StartupDevelopment extends StatelessWidget {
                 subtitle: Text(
                   '${report.yeas} liked it, ${report.nays} disliked it',
                 ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => launchUrl(
+                  Provider.of<FileService>(context, listen: false)
+                      .getFileUrl(fileName: report.reportFile),
+                ),
               ),
             )
             .toList(),
+        if (isExpert && !hasVoted)
+          Card(
+            child: InkWell(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Vote for the latest report',
+                    style: textTheme.bodyLarge,
+                  ),
+                ),
+              ),
+              onTap: () => vote(context, startup),
+            ),
+          ),
         ListTile(
           title: Text(
             processOngoing

@@ -17,7 +17,12 @@ class InvestmentsList extends StatelessWidget {
       itemCount: investments.length,
       itemBuilder: (context, index) {
         final investment = investments.elementAt(index);
-        return Text(investment.amount.toString());
+        return Card(
+          child: ListTile(
+            title: Text(investment.startupId),
+            subtitle: Text('Invested \$${investment.amount}'),
+          ),
+        );
       },
     );
   }

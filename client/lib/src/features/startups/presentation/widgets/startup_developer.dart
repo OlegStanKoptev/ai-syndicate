@@ -77,7 +77,7 @@ class StartupDeveloper extends StatelessWidget {
             children: [
               Text('Developer Voting', style: textTheme.headlineSmall),
               Text(
-                  'Current leader: "${developerVoting.maxApprovalApplicationsDeveloper.first.developer.shortOrgName}"',
+                  '${processSuccess ? 'Chosen developer' : 'Current leader'}: "${developerVoting.maxApprovalApplicationsDeveloper.first.developer.shortOrgName}"',
                   style: textTheme.bodyMedium)
             ],
           ),
@@ -85,7 +85,7 @@ class StartupDeveloper extends StatelessWidget {
         ...developerVoting.applicationsDeveloper.map(
           (application) => ListTile(
             title: Text(
-                '${application.developer.shortOrgName} / ${(application.approval * 100).round()}%'),
+                '${application.developer.shortOrgName} - ${(application.approval * 100).round()}%'),
           ),
         ),
         ListTile(

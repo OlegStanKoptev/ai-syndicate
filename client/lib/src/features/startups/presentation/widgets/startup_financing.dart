@@ -64,11 +64,12 @@ class StartupFinancing extends StatelessWidget {
 
     final processOngoing = startup.status == StartupStatus.financing;
     final processSuccess = startup.status >= StartupStatus.financing_succeded;
-    final isInvestor = currentUser is User;
 
     final processWaitsForConfirmation =
         startup.status == StartupStatus.financing_succeded;
     final isStartuper = startup.startuper.id == currentUser?.id;
+
+    final isInvestor = currentUser is User && !isStartuper;
 
     final textTheme = Theme.of(context).textTheme;
     return Column(
